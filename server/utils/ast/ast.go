@@ -3,6 +3,7 @@ package ast
 import (
 	"fmt"
 	"github.com/flipped-aurora/gin-vue-admin/server/model/system"
+	apimysql "github.com/flipped-aurora/gin-vue-admin/server/internal/modules/system/api/infrastructure/mysql"
 	"go/ast"
 	"go/parser"
 	"go/token"
@@ -204,7 +205,7 @@ func CreateMenuStructAst(menus []system.SysBaseMenu) *[]ast.Expr {
 	return &menuElts
 }
 
-func CreateApiStructAst(apis []system.SysApi) *[]ast.Expr {
+func CreateApiStructAst(apis []apimysql.SysApi) *[]ast.Expr {
 	var apiElts []ast.Expr
 	for i := range apis {
 		elts := []ast.Expr{ // 结构体的字段

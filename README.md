@@ -1,37 +1,14 @@
 # BoyKing Admin
 
-这是一个基于 `gin + vue3 + element-plus` 精简出来的后台脚手架。
+基于 `gin + vue3 + element-plus` 精简的后台脚手架，已完成 V2 模块化重构。
 
-当前仓库已经做过一轮较大幅度收口，目标是保留一套更适合二次开发的基础后台，而不是继续维持原始开源项目的完整能力集合。
-
-## 当前保留内容
-
-- 超级管理员模块
-- 用户、角色、菜单、API、字典、操作记录、参数管理等系统能力
-- `mysql + redis + local` 这一组默认运行能力
-- 后端启动时自动补齐系统出厂数据
-
-## 已移除或已停用
-
-- AI / MCP / 自动生成代码相关功能
-- plugin 体系及其扩展模块
-- 大部分无关前端页面
-- 多余的根目录文档、部署模板、IDE 配置、缓存目录
-
-## 目录结构
-
-```text
-.
-├─ server
-└─ web
-```
-
-## 本地开发
+## 快速开始
 
 ### 后端
 
 ```bash
 cd server
+# 需要 MySQL + Redis，配置见 config.yaml
 go run .
 ```
 
@@ -43,14 +20,37 @@ npm install
 npm run dev
 ```
 
-## 默认说明
+## 后端架构
 
-- 默认数据库建议使用 MySQL
-- 首次启动时如果系统表为空，后端会自动补齐系统出厂数据
-- 当前项目不依赖前端初始化页面
+DDD-lite 模块化单体，显式依赖注入，框架无关的领域层。
 
-## 后续建议
+```
+server/internal/
+├── app/bootstrap/      启动编排（初始化、路由、数据库、定时器）
+├── app/container/      DI 容器（Config, Logger, DB, Tx, Authorizer）
+├── interfaces/http/    V2 HTTP 路由 + 中间件
+├── modules/system/     系统模块（auth/user/role/menu/api/operation-record/config/status/version）
+├── modules/business/   业务模块（file/example）
+└── platform/           平台共享层（auth/authz/casbin/config/database/errors/logger/...）
+```
 
-- 继续清理后端未使用的数据库与对象存储代码
-- 根据你自己的业务重写菜单、默认角色和 README
-- 把品牌名、Logo、默认账号信息都换成你自己的项目内容
+- 模块注册：`server/internal/modules/modules.go`
+- 50 个 V2 端点，`/v2/` 前缀
+- JWT 核心逻辑（Claims、Token 生成/解析）位于 `platform/auth`，零全局依赖
+- Casbin RBAC 认证与鉴权
+- 中间件全部参数化：`JWTAuthWithConfig` / `GinRecovery(log)` / `OperationRecord(db, log)` / `NewLimiter(rdb, log, ...)`
+- 6 条架构边界规则自动检查：`go test ./internal -run TestArchitectureBoundaries`
+
+## 工具
+
+| 命令 | 用途 |
+|------|------|
+| `go run ./cmd/migrate up` | 执行数据库迁移 |
+| `go run ./cmd/migrate status` | 查看迁移状态 |
+| `go run ./cmd/migrate up --dry-run` | 预览待执行迁移 |
+| `go run ./cmd/modulegen -name <name>` | 生成新模块代码 |
+
+## 文档
+
+- 详细 API 列表与架构说明：`docs/backend-v2-handoff.md`
+- 架构蓝图：`docs/backend-architecture-blueprint.md`

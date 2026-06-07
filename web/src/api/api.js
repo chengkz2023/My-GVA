@@ -1,167 +1,91 @@
 import service from '@/utils/request'
 
-// @Tags api
-// @Summary 分页获取角色列表
-// @Security ApiKeyAuth
-// @accept application/json
-// @Produce application/json
-// @Param data body modelInterface.PageInfo true "分页获取用户列表"
-// @Success 200 {string} json "{"success":true,"data":{},"msg":"获取成功"}"
-// @Router /api/getApiList [post]
-// {
-//  page     int
-//	pageSize int
-// }
-export const getApiList = (data) => {
+// GET /v2/system/api/list
+export const getApiList = (params) => {
   return service({
-    url: '/api/getApiList',
-    method: 'post',
-    data
+    url: '/v2/system/api/list',
+    method: 'get',
+    params
   })
 }
 
-// @Tags Api
-// @Summary 创建基础api
-// @Security ApiKeyAuth
-// @accept application/json
-// @Produce application/json
-// @Param data body api.CreateApiParams true "创建api"
-// @Success 200 {string} json "{"success":true,"data":{},"msg":"获取成功"}"
-// @Router /api/createApi [post]
+// POST /v2/system/api
 export const createApi = (data) => {
   return service({
-    url: '/api/createApi',
+    url: '/v2/system/api',
     method: 'post',
     data
   })
 }
 
-// @Tags menu
-// @Summary 根据id获取菜单
-// @Security ApiKeyAuth
-// @accept application/json
-// @Produce application/json
-// @Param data body api.GetById true "根据id获取菜单"
-// @Success 200 {string} json "{"success":true,"data":{},"msg":"获取成功"}"
-// @Router /menu/getApiById [post]
-export const getApiById = (data) => {
+// GET /v2/system/api/:id
+export const getApiById = (id) => {
   return service({
-    url: '/api/getApiById',
-    method: 'post',
-    data
+    url: `/v2/system/api/${id}`,
+    method: 'get'
   })
 }
 
-// @Tags Api
-// @Summary 更新api
-// @Security ApiKeyAuth
-// @accept application/json
-// @Produce application/json
-// @Param data body api.CreateApiParams true "更新api"
-// @Success 200 {string} json "{"success":true,"data":{},"msg":"更新成功"}"
-// @Router /api/updateApi [post]
-export const updateApi = (data) => {
+// PUT /v2/system/api/:id
+export const updateApi = (id, data) => {
   return service({
-    url: '/api/updateApi',
-    method: 'post',
+    url: `/v2/system/api/${id}`,
+    method: 'put',
     data
   })
 }
 
-// @Tags Api
-// @Summary 更新api
-// @Security ApiKeyAuth
-// @accept application/json
-// @Produce application/json
-// @Param data body api.CreateApiParams true "更新api"
-// @Success 200 {string} json "{"success":true,"data":{},"msg":"更新成功"}"
-// @Router /api/setAuthApi [post]
-export const setAuthApi = (data) => {
+// DELETE /v2/system/api/:id
+export const deleteApi = (id) => {
   return service({
-    url: '/api/setAuthApi',
-    method: 'post',
-    data
+    url: `/v2/system/api/${id}`,
+    method: 'delete'
   })
 }
 
-// @Tags Api
-// @Summary 获取所有的Api 不分页
-// @Security ApiKeyAuth
-// @accept application/json
-// @Produce application/json
-// @Success 200 {string} json "{"success":true,"data":{},"msg":"获取成功"}"
-// @Router /api/getAllApis [post]
-export const getAllApis = (data) => {
-  return service({
-    url: '/api/getAllApis',
-    method: 'post',
-    data
-  })
-}
-
-// @Tags Api
-// @Summary 删除指定api
-// @Security ApiKeyAuth
-// @accept application/json
-// @Produce application/json
-// @Param data body dbModel.Api true "删除api"
-// @Success 200 {string} json "{"success":true,"data":{},"msg":"删除成功"}"
-// @Router /api/deleteApi [post]
-export const deleteApi = (data) => {
-  return service({
-    url: '/api/deleteApi',
-    method: 'post',
-    data
-  })
-}
-
-// @Tags SysApi
-// @Summary 删除选中Api
-// @Security ApiKeyAuth
-// @accept application/json
-// @Produce application/json
-// @Param data body request.IdsReq true "ID"
-// @Success 200 {string} string "{"success":true,"data":{},"msg":"删除成功"}"
-// @Router /api/deleteApisByIds [delete]
+// POST /v2/system/api/batch-delete
 export const deleteApisByIds = (data) => {
   return service({
-    url: '/api/deleteApisByIds',
-    method: 'delete',
+    url: '/v2/system/api/batch-delete',
+    method: 'post',
     data
   })
 }
 
-// FreshCasbin
-// @Tags      SysApi
-// @Summary   刷新casbin缓存
-// @accept    application/json
-// @Produce   application/json
-// @Success   200   {object}  response.Response{msg=string}  "刷新成功"
-// @Router    /api/freshCasbin [get]
+// GET /v2/system/api/all
+export const getAllApis = (params) => {
+  return service({
+    url: '/v2/system/api/all',
+    method: 'get',
+    params
+  })
+}
+
+// GET /v2/system/api/groups
+export const getApiGroups = () => {
+  return service({
+    url: '/v2/system/api/groups',
+    method: 'get'
+  })
+}
+
 export const freshCasbin = () => {
   return service({
-    url: '/api/freshCasbin',
-    method: 'get'
+    url: '/v2/system/api/fresh-casbin',
+    method: 'post'
   })
 }
 
 export const syncApi = () => {
   return service({
-    url: '/api/syncApi',
-    method: 'get'
-  })
-}
-
-export const getApiGroups = () => {
-  return service({
-    url: '/api/getApiGroups',
+    url: '/v2/system/api/sync',
     method: 'get'
   })
 }
 
 export const ignoreApi = (data) => {
   return service({
-    url: '/api/ignoreApi',
+    url: '/v2/system/api/ignore',
     method: 'post',
     data
   })
@@ -169,7 +93,7 @@ export const ignoreApi = (data) => {
 
 export const enterSyncApi = (data) => {
   return service({
-    url: '/api/enterSyncApi',
+    url: '/v2/system/api/batch-sync',
     method: 'post',
     data
   })

@@ -311,7 +311,7 @@ const getGroup = async () => {
   if (res.code === 0) {
     const groups = res.data.groups || []
     apiGroupOptions.value = groups.map((item) => ({ label: item, value: item }))
-    apiGroupMap.value = res.data.apiGroupMap || {}
+    apiGroupMap.value = res.data.apiGroupMap || res.data.groups.reduce((acc, g) => { acc[g] = g; return acc }, {})
   }
 }
 
@@ -379,9 +379,9 @@ const closeDialog = () => {
 }
 
 const editApiFunc = async (row) => {
-  const res = await getApiById({ id: row.ID })
+  const res = await getApiById(row.ID)
   if (res.code === 0) {
-    form.value = { ...res.data.api }
+    form.value = { ...res.data }
     openDialog('edit')
   }
 }
@@ -390,7 +390,7 @@ const enterDialog = () => {
   apiForm.value.validate(async (valid) => {
     if (!valid) return
     const request = { ...form.value }
-    const res = type.value === 'edit' ? await updateApi(request) : await createApi(request)
+    const res = type.value === 'edit' ? await updateApi(request.id, request) : await createApi(request)
     if (res.code === 0) {
       ElMessage.success(type.value === 'edit' ? '更新成功' : '新增成功')
       closeDialog()
@@ -406,7 +406,7 @@ const deleteApiFunc = async (row) => {
     cancelButtonText: '取消',
     type: 'warning'
   }).then(async () => {
-    const res = await deleteApi(row)
+    const res = await deleteApi(row.ID)
     if (res.code === 0) {
       ElMessage.success('删除成功')
       if (tableData.value.length === 1 && page.value > 1) {

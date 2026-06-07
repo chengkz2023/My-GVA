@@ -1,41 +1,46 @@
-# Server
+# BoyKing Admin Server
 
-这是当前脚手架的后端部分，基于 `gin + gorm + casbin`。
+Go 1.24+ backend with Gin + GORM + Casbin + JWT.
 
-## 当前定位
-
-- 只保留超级管理员相关的系统能力
-- 默认数据库为 MySQL
-- 默认缓存为 Redis
-- 默认文件存储为本地存储
-- 启动时自动建表并补齐系统出厂数据
-
-## 目录说明
-
-```text
-server
-├─ api
-├─ config
-├─ core
-├─ global
-├─ initialize
-├─ middleware
-├─ model
-├─ resource
-├─ router
-├─ service
-├─ source
-└─ utils
-```
-
-## 运行
+## Build & Test
 
 ```bash
-go run .
+go build .                     # main package
+go build ./cmd/admin-api       # V2 entrypoint
+go build ./cmd/migrate         # migration tool
+go build ./cmd/modulegen       # code generator
+go test ./...                  # all tests (28 packages)
 ```
 
-## 说明
+## Project Layout
 
-- 当前仓库已经移除了 plugin、AI、自动代码生成运行链、多对象存储、多数据库初始化等能力
-- 如果系统表为空，服务启动后会自动补系统默认数据
-- Swagger 页面已经移除，如需重新接入，需要单独恢复文档生成链
+```
+.
+├── main.go                    # bootstrap.Run()
+├── cmd/
+│   ├── admin-api/             # future entrypoint
+│   ├── migrate/               # migration CLI (up/down/status/dry-run)
+│   └── modulegen/             # module code generator
+├── internal/
+│   ├── app/                   # bootstrap, container, migration engine, scaffold
+│   ├── interfaces/http/       # V2 router + middleware
+│   ├── modules/               # system + business modules (11 modules, 50 endpoints)
+│   └── platform/              # shared infra (auth/JWT/claims, authz, casbin, config, db, ...)
+├── config/                    # config struct definitions
+├── model/                     # legacy GORM models (25 files)
+├── utils/                     # backward-compat wrappers, timer, AST
+└── global/                    # legacy global variables
+```
+
+## Adding a Module
+
+```bash
+go run ./cmd/modulegen -name <module-name>
+```
+
+Then register in `internal/modules/modules.go`. Architecture test enforces boundary rules automatically.
+
+## Documentation
+
+- `../docs/backend-v2-handoff.md` — full API list and architecture overview
+- `../docs/backend-architecture-blueprint.md` — design spec
