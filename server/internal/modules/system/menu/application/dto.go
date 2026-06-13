@@ -1,7 +1,7 @@
 package application
 
 type TreeResponse struct {
-	List []MenuResponse `json:"list"`
+	Menus []MenuResponse `json:"menus"`
 }
 
 type MenuResponse struct {

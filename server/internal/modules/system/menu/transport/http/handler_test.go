@@ -43,9 +43,9 @@ func TestTree(t *testing.T) {
 	if !ok {
 		t.Fatalf("data type = %T, want map[string]any", body.Data)
 	}
-	list, ok := data["list"].([]any)
+	list, ok := data["menus"].([]any)
 	if !ok || len(list) != 1 {
-		t.Fatalf("list = %v, want one item", data["list"])
+		t.Fatalf("menus = %v, want one item", data["menus"])
 	}
 }
 

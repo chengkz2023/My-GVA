@@ -26,17 +26,17 @@ func (s *Service) Tree(ctx context.Context) (TreeResponse, error) {
 		return TreeResponse{}, apperrors.WithMessage(apperrors.Unauthorized, "missing actor")
 	}
 	if s.repo == nil {
-		return TreeResponse{List: []MenuResponse{}}, nil
+		return TreeResponse{Menus: []MenuResponse{}}, nil
 	}
 
 	menus, err := s.repo.TreeByAuthority(ctx, actor.AuthorityID)
 	if errors.Is(err, domain.ErrRepositoryUnavailable) {
-		return TreeResponse{List: []MenuResponse{}}, nil
+		return TreeResponse{Menus: []MenuResponse{}}, nil
 	}
 	if err != nil {
 		return TreeResponse{}, apperrors.New(apperrors.Internal, 0, "list menus failed", err)
 	}
-	return TreeResponse{List: mapMenus(menus)}, nil
+	return TreeResponse{Menus: mapMenus(menus)}, nil
 }
 
 func (s *Service) AssignAuthority(ctx context.Context, authorityID uint, menuIDs []uint) error {

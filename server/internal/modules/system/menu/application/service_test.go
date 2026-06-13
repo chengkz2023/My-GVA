@@ -42,8 +42,8 @@ func TestTree(t *testing.T) {
 	if repo.authorityID != 888 {
 		t.Fatalf("authorityID = %d, want 888", repo.authorityID)
 	}
-	if len(got.List) != 1 || got.List[0].ID != 1 || len(got.List[0].Children) != 1 {
-		t.Fatalf("tree = %+v, want root with one child", got.List)
+	if len(got.Menus) != 1 || got.Menus[0].ID != 1 || len(got.Menus[0].Children) != 1 {
+		t.Fatalf("tree = %+v, want root with one child", got.Menus)
 	}
 }
 
@@ -60,8 +60,8 @@ func TestTreeRepositoryUnavailable(t *testing.T) {
 	if err != nil {
 		t.Fatalf("Tree() error = %v", err)
 	}
-	if len(got.List) != 0 {
-		t.Fatalf("list = %+v, want empty list", got.List)
+	if len(got.Menus) != 0 {
+		t.Fatalf("list = %+v, want empty list", got.Menus)
 	}
 }
 
