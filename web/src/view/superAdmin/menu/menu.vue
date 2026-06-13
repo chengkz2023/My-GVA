@@ -550,7 +550,7 @@
   const getTableData = async () => {
     const table = await getMenuList()
     if (table.code === 0) {
-      tableData.value = table.data
+      tableData.value = table.data.menus || []
     }
   }
 

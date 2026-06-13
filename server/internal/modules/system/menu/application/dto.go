@@ -5,7 +5,7 @@ type TreeResponse struct {
 }
 
 type MenuResponse struct {
-	ID        uint            `json:"id"`
+	ID        uint            `json:"ID"`
 	ParentID  uint            `json:"parentId"`
 	Path      string          `json:"path"`
 	Name      string          `json:"name"`
