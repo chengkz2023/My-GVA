@@ -48,7 +48,7 @@
 
 <script setup>
   import { getAllApis } from '@/api/api'
-  import { UpdateCasbin, getPolicyPathByAuthorityId } from '@/api/casbin'
+  import { updateCasbin, getPolicyPathByAuthorityId } from '@/api/casbin'
   import { ref, watch } from 'vue'
   import { ElMessage } from 'element-plus'
 
@@ -76,7 +76,7 @@
   const activeUserId = ref('')
   const init = async () => {
     const res2 = await getAllApis()
-    const apis = res2.data.apis
+    const apis = res2.data.list
 
     apiTreeData.value = buildApiTree(apis)
     const res = await getPolicyPathByAuthorityId({
@@ -138,7 +138,7 @@
         }
         casbinInfos.push(casbinInfo)
       })
-    const res = await UpdateCasbin({
+    const res = await updateCasbin({
       authorityId: activeUserId.value,
       casbinInfos
     })
