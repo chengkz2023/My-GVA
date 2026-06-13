@@ -2,6 +2,7 @@ package database
 
 import (
 	"context"
+	"strings"
 
 	"github.com/flipped-aurora/gin-vue-admin/server/config"
 	"github.com/flipped-aurora/gin-vue-admin/server/global"
@@ -39,8 +40,12 @@ func openMySQL(m config.Mysql) *gorm.DB {
 	if m.Dbname == "" {
 		return nil
 	}
+	dsn := m.Dsn()
+	if m.Config == "" || !strings.Contains(m.Config, "timeout=") {
+		dsn += "&timeout=5s&readTimeout=10s&writeTimeout=10s"
+	}
 	mysqlConfig := mysql.Config{
-		DSN:                       m.Dsn(),
+		DSN:                       dsn,
 		DefaultStringSize:         191,
 		SkipInitializeWithVersion: false,
 	}

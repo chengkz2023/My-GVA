@@ -18,14 +18,20 @@ func Initialize() *container.Container {
 	OtherInit()
 	global.GVA_LOG = logger.New()
 	zap.ReplaceGlobals(global.GVA_LOG)
+
+	global.GVA_LOG.Info("connecting to database...")
 	global.GVA_DB = database.Open()
+	if global.GVA_DB != nil {
+		global.GVA_LOG.Info("database connected, running migrations...")
+		RegisterTables()
+		global.GVA_LOG.Info("migrations complete, loading seed data...")
+		EnsureSystemSeedData()
+		global.GVA_LOG.Info("seed data complete, initializing casbin...")
+		_ = utils.GetCasbin()
+		global.GVA_LOG.Info("casbin initialized")
+	}
 	Timer()
 	SetupHandlers()
-	if global.GVA_DB != nil {
-		RegisterTables()
-		EnsureSystemSeedData()
-		_ = utils.GetCasbin()
-	}
 
 	c := container.New(global.GVA_CONFIG, global.GVA_LOG, global.GVA_DB, transaction.NewGormManager(global.GVA_DB), casbinauthz.NewAuthorizer())
 	if global.GVA_DB != nil {
