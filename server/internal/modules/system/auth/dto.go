@@ -1,14 +1,19 @@
 package auth
 
 type MeResponse struct {
-	Actor ActorResponse `json:"actor"`
+	UserInfo UserInfoResponse `json:"userInfo"`
 }
 
-type ActorResponse struct {
-	UserID      uint   `json:"userId"`
-	AuthorityID uint   `json:"authorityId"`
-	Username    string `json:"username"`
-	NickName    string `json:"nickName"`
+type UserInfoResponse struct {
+	UUID          string         `json:"uuid"`
+	NickName      string         `json:"nickName"`
+	HeaderImg     string         `json:"headerImg"`
+	Authority     AuthorityInfo  `json:"authority"`
+	OriginSetting map[string]any `json:"originSetting,omitempty"`
+}
+
+type AuthorityInfo struct {
+	DefaultRouter string `json:"defaultRouter"`
 }
 
 type LoginResponse struct {

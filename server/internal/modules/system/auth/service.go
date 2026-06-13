@@ -24,14 +24,35 @@ func (s *Service) Me(ctx context.Context) (MeResponse, error) {
 	if !ok {
 		return MeResponse{}, apperrors.WithMessage(apperrors.Unauthorized, "missing actor")
 	}
-	return MeResponse{
-		Actor: ActorResponse{
-			UserID:      actor.UserID,
-			AuthorityID: actor.AuthorityID,
-			Username:    actor.Username,
-			NickName:    actor.NickName,
+	ui := UserInfoResponse{
+		NickName: actor.NickName,
+		Authority: AuthorityInfo{
+			DefaultRouter: "authority",
 		},
-	}, nil
+	}
+	if s.db != nil {
+		var user legacymodel.SysUser
+		if err := s.db.WithContext(ctx).
+			Preload("Authority").
+			Where("id = ?", actor.UserID).
+			First(&user).Error; err == nil {
+			ui.UUID = user.UUID.String()
+			ui.NickName = user.NickName
+			ui.HeaderImg = user.HeaderImg
+			ui.Authority.DefaultRouter = user.Authority.DefaultRouter
+			if ui.Authority.DefaultRouter == "" {
+				ui.Authority.DefaultRouter = "authority"
+			}
+			if user.OriginSetting != nil {
+				originSetting := map[string]any{}
+				for k, v := range user.OriginSetting {
+					originSetting[k] = v
+				}
+				ui.OriginSetting = originSetting
+			}
+		}
+	}
+	return MeResponse{UserInfo: ui}, nil
 }
 
 func (s *Service) Login(ctx context.Context, username, password string) (LoginResponse, error) {

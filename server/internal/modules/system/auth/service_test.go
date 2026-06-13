@@ -18,8 +18,11 @@ func TestServiceMe(t *testing.T) {
 	if err != nil {
 		t.Fatalf("Me() error = %v", err)
 	}
-	if got.Actor.Username != "admin" || got.Actor.AuthorityID != 888 {
-		t.Fatalf("actor = %+v, want admin authority 888", got.Actor)
+	if got.UserInfo.NickName != "Admin" {
+		t.Fatalf("userInfo = %+v, want nickName Admin", got.UserInfo)
+	}
+	if got.UserInfo.Authority.DefaultRouter != "authority" {
+		t.Fatalf("defaultRouter = %s, want authority", got.UserInfo.Authority.DefaultRouter)
 	}
 }
 
