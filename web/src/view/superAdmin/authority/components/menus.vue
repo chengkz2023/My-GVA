@@ -233,8 +233,9 @@
   // 关联树 确认方法
   const relation = async () => {
     const checkArr = menuTree.value.getCheckedNodes(false, true)
+    const menuIds = checkArr.map((item) => item.ID)
     const res = await addMenuAuthority({
-      menus: checkArr,
+      menuIds,
       authorityId: props.row.authorityId
     })
     if (res.code === 0) {
