@@ -1,8 +1,8 @@
 import service from '@/utils/request'
 export const getMenu = (data) => service({ url: '/system/menu/tree', method: 'get' })
-export const getMenuList = (data) => service({ url: '/system/menu/tree', method: 'get' })
+export const getMenuList = (data) => service({ url: '/system/menu/tree?all=true', method: 'get' })
 export const asyncMenu = () => service({ url: '/system/menu/tree', method: 'get' })
-export const getBaseMenuTree = () => service({ url: '/system/menu/tree', method: 'get' })
+export const getBaseMenuTree = () => service({ url: '/system/menu/tree?all=true', method: 'get' })
 export const addBaseMenu = (data) => service({ url: '/system/menu', method: 'post', data })
 export const deleteBaseMenu = (data) => service({ url: `/system/menu/${data.id||data.ID}`, method: 'delete' })
 export const updateBaseMenu = (data) => service({ url: '/system/menu', method: 'post', data })

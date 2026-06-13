@@ -17,6 +17,7 @@ var (
 
 type Repository interface {
 	TreeByAuthority(ctx context.Context, authorityID uint) ([]Menu, error)
+	All(ctx context.Context) ([]Menu, error)
 	AssignMenus(ctx context.Context, authorityID uint, menuIDs []uint) error
 	Save(ctx context.Context, input SaveMenuInput) (uint, error)
 	Delete(ctx context.Context, id uint) error

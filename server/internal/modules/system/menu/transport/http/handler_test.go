@@ -51,6 +51,7 @@ func TestTree(t *testing.T) {
 
 type fakeRepository struct{}
 
+func (fakeRepository) All(ctx context.Context) ([]domain.Menu, error) { return nil, nil }
 func (fakeRepository) TreeByAuthority(ctx context.Context, authorityID uint) ([]domain.Menu, error) {
 	return []domain.Menu{{
 		ID:        1,

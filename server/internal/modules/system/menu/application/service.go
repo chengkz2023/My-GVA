@@ -20,6 +20,20 @@ func NewService(repo domain.Repository, checker AuthorityChecker) *Service {
 	return &Service{repo: repo, authorityChecker: checker}
 }
 
+func (s *Service) All(ctx context.Context) (TreeResponse, error) {
+	if s.repo == nil {
+		return TreeResponse{Menus: []MenuResponse{}}, nil
+	}
+	menus, err := s.repo.All(ctx)
+	if errors.Is(err, domain.ErrRepositoryUnavailable) {
+		return TreeResponse{Menus: []MenuResponse{}}, nil
+	}
+	if err != nil {
+		return TreeResponse{}, apperrors.New(apperrors.Internal, 0, "list all menus failed", err)
+	}
+	return TreeResponse{Menus: mapMenus(menus)}, nil
+}
+
 func (s *Service) Tree(ctx context.Context) (TreeResponse, error) {
 	actor, ok := platformauth.ActorFromContext(ctx)
 	if !ok {

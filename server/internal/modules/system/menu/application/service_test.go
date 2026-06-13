@@ -81,6 +81,10 @@ type fakeRepository struct {
 	authorityID uint
 }
 
+func (r *fakeRepository) All(ctx context.Context) ([]domain.Menu, error) {
+	if r.err != nil { return nil, r.err }
+	return r.menus, nil
+}
 func (r *fakeRepository) TreeByAuthority(ctx context.Context, authorityID uint) ([]domain.Menu, error) {
 	r.called = true
 	r.authorityID = authorityID

@@ -58,6 +58,22 @@ func (r *Repository) TreeByAuthority(ctx context.Context, authorityID uint) ([]d
 	return keepScaffoldMenus(domainMenus), nil
 }
 
+func (r *Repository) All(ctx context.Context) ([]domain.Menu, error) {
+	if r == nil || r.db == nil {
+		return []domain.Menu{}, domain.ErrRepositoryUnavailable
+	}
+	var baseMenus []legacysystem.SysBaseMenu
+	if err := r.db.WithContext(ctx).Order("sort asc").Find(&baseMenus).Error; err != nil {
+		return nil, err
+	}
+	treeMap := make(map[uint][]legacysystem.SysBaseMenu)
+	for _, bm := range baseMenus {
+		treeMap[bm.ParentId] = append(treeMap[bm.ParentId], bm)
+	}
+	domainMenus := buildTree(treeMap, 0)
+	return keepScaffoldMenus(domainMenus), nil
+}
+
 func buildTree(treeMap map[uint][]legacysystem.SysBaseMenu, parentID uint) []domain.Menu {
 	baseMenus := treeMap[parentID]
 	domainMenus := make([]domain.Menu, 0, len(baseMenus))

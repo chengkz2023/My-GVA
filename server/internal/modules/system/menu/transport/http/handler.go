@@ -26,6 +26,15 @@ func (h *Handler) Register(group *gin.RouterGroup) {
 }
 
 func (h *Handler) Tree(c *gin.Context) {
+	if c.Query("all") == "true" {
+		tree, err := h.service.All(c.Request.Context())
+		if err != nil {
+			response.Error(c, err)
+			return
+		}
+		response.OK(c, tree)
+		return
+	}
 	tree, err := h.service.Tree(c.Request.Context())
 	if err != nil {
 		response.Error(c, err)
