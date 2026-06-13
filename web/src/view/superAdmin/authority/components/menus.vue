@@ -175,14 +175,18 @@
     const res = await getBaseMenuTree()
     menuTreeData.value = res.data.menus
     const res1 = await getMenuAuthority({ authorityId: props.row.authorityId })
-    const menus = res1.data.menus
+    const menus = res1.data.menus || []
     const arr = []
-    menus.forEach((item) => {
-      // 防止直接选中父级造成全选
-      if (!menus.some((same) => same.parentId === item.menuId)) {
-        arr.push(Number(item.menuId))
-      }
-    })
+    const collectLeafIds = (items) => {
+      items.forEach((item) => {
+        if (item.children && item.children.length > 0) {
+          collectLeafIds(item.children)
+        } else {
+          arr.push(Number(item.ID))
+        }
+      })
+    }
+    collectLeafIds(menus)
     menuTreeIds.value = arr
 
     // 确保异步数据加载后，树的勾选状态与选项同步

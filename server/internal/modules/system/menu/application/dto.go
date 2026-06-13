@@ -15,6 +15,7 @@ type MenuResponse struct {
 	Meta      MenuMeta        `json:"meta"`
 	Children  []MenuResponse  `json:"children"`
 	Btns      []any           `json:"btns"`
+	MenuBtn   []any           `json:"menuBtn"`
 	Parent    string          `json:"parent,omitempty"`
 }
 
