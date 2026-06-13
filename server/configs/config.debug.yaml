@@ -40,7 +40,7 @@ mysql:
   path: 139.196.105.27
   port: "3306"
   config: charset=utf8mb4&parseTime=True&loc=Local
-  db-name: admin_lab
+  db-name: gva_dev
   username: root
   password: "Mysql@2o20..."
   prefix: ""
