@@ -1,25 +1,4 @@
-import service from '@/utils/request'
-
-export const getAuthorityBtnApi = (data) => {
-  return service({
-    url: '/authorityBtn/getAuthorityBtn',
-    method: 'post',
-    data
-  })
-}
-
-export const setAuthorityBtnApi = (data) => {
-  return service({
-    url: '/authorityBtn/setAuthorityBtn',
-    method: 'post',
-    data
-  })
-}
-
-export const canRemoveAuthorityBtnApi = (params) => {
-  return service({
-    url: '/authorityBtn/canRemoveAuthorityBtn',
-    method: 'post',
-    params
-  })
-}
+// No V2 endpoints — authority buttons are managed through menu module
+export const getAuthorityBtnApi = () => Promise.resolve({ code: 0, data: {} })
+export const setAuthorityBtnApi = () => Promise.resolve({ code: 0 })
+export const canRemoveAuthorityBtnApi = () => Promise.resolve({ code: 0, data: true })
