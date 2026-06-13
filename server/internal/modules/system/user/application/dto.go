@@ -75,14 +75,17 @@ type SetAuthoritiesResponse struct {
 }
 
 type SourceUser struct {
-	ID          uint   `json:"id"`
-	UUID        string `json:"uuid,omitempty"`
-	Username    string `json:"username"`
-	NickName    string `json:"nickName"`
-	HeaderImg   string `json:"headerImg,omitempty"`
-	AuthorityID uint   `json:"authorityId"`
-	Phone       string `json:"phone,omitempty"`
-	Email       string `json:"email,omitempty"`
-	Enable      int    `json:"enable,omitempty"`
-	Source      string `json:"source"`
+	ID           uint   `json:"ID"`
+	UUID         string `json:"uuid,omitempty"`
+	Username     string `json:"username"`
+	UserName     string `json:"userName"`
+	NickName     string `json:"nickName"`
+	HeaderImg    string `json:"headerImg,omitempty"`
+	AuthorityID  uint   `json:"authorityId"`
+	Authorities  []any  `json:"authorities"`
+	AuthorityIds []uint `json:"authorityIds"`
+	Phone        string `json:"phone,omitempty"`
+	Email        string `json:"email,omitempty"`
+	Enable       int    `json:"enable,omitempty"`
+	Source       string `json:"source"`
 }

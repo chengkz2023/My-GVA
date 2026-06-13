@@ -75,7 +75,8 @@ func (r *Repository) DeleteByIds(ctx context.Context, ids []int) error {
 
 func mapRecord(r SysOperationRecord) domain.Record {
 	rec := domain.Record{
-		ID: r.ID, IP: r.Ip, Method: r.Method, Path: r.Path,
+		ID: r.ID, CreatedAt: r.CreatedAt.Format("2006-01-02 15:04:05"),
+		IP: r.Ip, Method: r.Method, Path: r.Path,
 		Status: r.Status, Latency: int64(r.Latency), Agent: r.Agent,
 		ErrorMessage: r.ErrorMessage, Body: r.Body, Resp: r.Resp,
 		UserID: r.UserID,

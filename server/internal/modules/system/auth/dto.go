@@ -5,10 +5,12 @@ type MeResponse struct {
 }
 
 type UserInfoResponse struct {
+	ID            uint           `json:"ID"`
 	UUID          string         `json:"uuid"`
 	NickName      string         `json:"nickName"`
 	HeaderImg     string         `json:"headerImg"`
 	Authority     AuthorityInfo  `json:"authority"`
+	Authorities   []any          `json:"authorities"`
 	OriginSetting map[string]any `json:"originSetting,omitempty"`
 }
 

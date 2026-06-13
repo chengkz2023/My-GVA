@@ -69,9 +69,11 @@
 
   const init = () => {
     roundAuthority(props.authority)
-    props.row.dataAuthorityId?.forEach((item) => {
+    const authIds = props.row.dataAuthorityIds || props.row.dataAuthorityId || []
+    authIds.forEach((item) => {
+      const authId = typeof item === 'object' ? item.authorityId : item
       const target = authoritys.value.find(
-        (authority) => authority.authorityId === item.authorityId
+        (authority) => authority.authorityId === authId
       )
       if (target) {
         dataAuthorityId.value.push(target)

@@ -25,10 +25,12 @@ func (s *Service) Me(ctx context.Context) (MeResponse, error) {
 		return MeResponse{}, apperrors.WithMessage(apperrors.Unauthorized, "missing actor")
 	}
 	ui := UserInfoResponse{
+		ID:       actor.UserID,
 		NickName: actor.NickName,
 		Authority: AuthorityInfo{
 			DefaultRouter: "authority",
 		},
+		Authorities: []any{},
 	}
 	if s.db != nil {
 		var user legacymodel.SysUser
@@ -36,6 +38,7 @@ func (s *Service) Me(ctx context.Context) (MeResponse, error) {
 			Preload("Authority").
 			Where("id = ?", actor.UserID).
 			First(&user).Error; err == nil {
+			ui.ID = user.ID
 			ui.UUID = user.UUID.String()
 			ui.NickName = user.NickName
 			ui.HeaderImg = user.HeaderImg

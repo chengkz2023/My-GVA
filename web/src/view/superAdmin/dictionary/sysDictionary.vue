@@ -288,7 +288,7 @@ const updateSysDictionaryFunc = async (row) => {
   if (res.code === 0) {
     type.value = 'update'
     formData.value = {
-      ...res.data.resysDictionary,
+      ...(res.data.resysDictionary || {}),
       status: res.data.resysDictionary.status ?? true
     }
     updateAvailableParentDictionaries()

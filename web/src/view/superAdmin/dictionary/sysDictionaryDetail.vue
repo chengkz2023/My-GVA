@@ -192,7 +192,7 @@ const updateSysDictionaryDetailFunc = async (row) => {
   if (res.code === 0) {
     type.value = 'update'
     formData.value = {
-      ...res.data.reSysDictionaryDetail,
+      ...(res.data.reSysDictionaryDetail || {}),
       status: res.data.reSysDictionaryDetail.status ?? true,
       sysDictionaryID: props.sysDictionaryID
     }

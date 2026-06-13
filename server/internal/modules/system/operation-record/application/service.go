@@ -64,10 +64,11 @@ func (s *Service) DeleteByIds(ctx context.Context, ids []int) error {
 
 func fromDomain(r domain.Record) RecordResponse {
 	return RecordResponse{
-		ID: r.ID, IP: r.IP, Method: r.Method, Path: r.Path,
+		ID: r.ID, CreatedAt: r.CreatedAt, IP: r.IP, Method: r.Method, Path: r.Path,
 		Status: r.Status, Latency: r.Latency, Agent: r.Agent,
 		ErrorMessage: r.ErrorMessage, Body: r.Body, Resp: r.Resp,
 		UserID: r.UserID, Username: r.Username, NickName: r.NickName,
+		User: UserInRecord{ID: uint(r.UserID), UserName: r.Username, NickName: r.NickName},
 	}
 }
 

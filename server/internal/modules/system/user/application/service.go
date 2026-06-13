@@ -279,14 +279,17 @@ func userFromActor(actor platformauth.Actor) SourceUser {
 
 func userFromDomain(user domain.User) SourceUser {
 	return SourceUser{
-		ID:          user.ID,
-		UUID:        user.UUID,
-		Username:    user.Username,
-		NickName:    user.NickName,
-		HeaderImg:   user.HeaderImg,
-		AuthorityID: user.AuthorityID,
-		Phone:       user.Phone,
-		Email:       user.Email,
+		ID:           user.ID,
+		UUID:         user.UUID,
+		Username:     user.Username,
+		UserName:     user.Username,
+		NickName:     user.NickName,
+		HeaderImg:    user.HeaderImg,
+		AuthorityID:  user.AuthorityID,
+		Authorities:  []any{},
+		AuthorityIds: []uint{user.AuthorityID},
+		Phone:        user.Phone,
+		Email:        user.Email,
 		Enable:      user.Enable,
 		Source:      "database",
 	}

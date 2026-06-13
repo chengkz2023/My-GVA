@@ -114,6 +114,7 @@
 
   const changeUserAuth = async (id) => {
     const res = await setUserAuthority({
+      id: userStore.userInfo.ID,
       authorityId: id
     })
     if (res.code === 0) {

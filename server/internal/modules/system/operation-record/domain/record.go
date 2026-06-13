@@ -2,6 +2,7 @@ package domain
 
 type Record struct {
 	ID           uint
+	CreatedAt    string
 	IP           string
 	Method       string
 	Path         string

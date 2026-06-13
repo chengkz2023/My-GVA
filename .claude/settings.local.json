@@ -122,7 +122,9 @@
       "Bash(sed -i 's/legacysystem\\\\.SysApi/SysApi/g; s/legacysystem\\\\.SysIgnoreApi/SysIgnoreApi/g' internal/modules/system/api/infrastructure/mysql/repository.go)",
       "Bash(sed -i '/legacysystem \"github.com\\\\/flipped-aurora\\\\/gin-vue-admin\\\\/server\\\\/model\\\\/system\"/d' internal/modules/system/api/infrastructure/mysql/repository.go)",
       "Bash(cat)",
-      "Bash(grep -v \"code\\\\|\\\\.list\\\\|node_modules\\\\|//\")"
+      "Bash(grep -v \"code\\\\|\\\\.list\\\\|node_modules\\\\|//\")",
+      "Bash(sed -i 's/\\\\.\\\\.\\\\.res\\\\.data\\\\.resysDictionary,/...\\(res.data.resysDictionary || {}\\),/g' view/superAdmin/dictionary/sysDictionary.vue)",
+      "Bash(sed -i 's/\\\\.\\\\.\\\\.res\\\\.data\\\\.reSysDictionaryDetail,/...\\(res.data.reSysDictionaryDetail || {}\\),/g' view/superAdmin/dictionary/sysDictionaryDetail.vue)"
     ]
   }
 }
