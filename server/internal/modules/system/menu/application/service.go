@@ -161,8 +161,15 @@ func (s *Service) GetByID(ctx context.Context, id uint) (MenuDetailResponse, err
 			Hidden:    detail.Hidden,
 			Component: detail.Component,
 			Sort:      detail.Sort,
-			Title:     detail.Title,
-			Icon:      detail.Icon,
+			Btns:      []any{},
+			Meta: MenuMeta{
+				Title:       detail.Title,
+				Icon:        detail.Icon,
+				KeepAlive:   detail.KeepAlive,
+				ActiveName:  detail.ActiveName,
+				DefaultMenu: detail.DefaultMenu,
+				CloseTab:    detail.CloseTab,
+			},
 		},
 		Meta: MenuMetaResponse{
 			ActiveName:     detail.Meta.ActiveName,
@@ -192,9 +199,17 @@ func mapMenus(menus []domain.Menu) []MenuResponse {
 			Hidden:    menu.Hidden,
 			Component: menu.Component,
 			Sort:      menu.Sort,
-			Title:     menu.Title,
-			Icon:      menu.Icon,
-			Children:  mapMenus(menu.Children),
+			Btns:      []any{},
+			Meta: MenuMeta{
+				Title:       menu.Title,
+				Icon:        menu.Icon,
+				KeepAlive:   menu.KeepAlive,
+				ActiveName:  menu.ActiveName,
+				DefaultMenu: menu.DefaultMenu,
+				CloseTab:    menu.CloseTab,
+				Hidden:      menu.Hidden,
+			},
+			Children: mapMenus(menu.Children),
 		})
 	}
 	return items

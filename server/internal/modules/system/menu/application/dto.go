@@ -5,16 +5,27 @@ type TreeResponse struct {
 }
 
 type MenuResponse struct {
-	ID        uint           `json:"id"`
-	ParentID  uint           `json:"parentId"`
-	Path      string         `json:"path"`
-	Name      string         `json:"name"`
-	Hidden    bool           `json:"hidden"`
-	Component string         `json:"component"`
-	Sort      int            `json:"sort"`
-	Title     string         `json:"title"`
-	Icon      string         `json:"icon"`
-	Children  []MenuResponse `json:"children"`
+	ID        uint            `json:"id"`
+	ParentID  uint            `json:"parentId"`
+	Path      string          `json:"path"`
+	Name      string          `json:"name"`
+	Hidden    bool            `json:"hidden"`
+	Component string          `json:"component"`
+	Sort      int             `json:"sort"`
+	Meta      MenuMeta        `json:"meta"`
+	Children  []MenuResponse  `json:"children"`
+	Btns      []any           `json:"btns"`
+	Parent    string          `json:"parent,omitempty"`
+}
+
+type MenuMeta struct {
+	Title      string `json:"title"`
+	Icon       string `json:"icon"`
+	KeepAlive  bool   `json:"keepAlive"`
+	ActiveName string `json:"activeName"`
+	DefaultMenu bool  `json:"defaultMenu"`
+	CloseTab   bool   `json:"closeTab"`
+	Hidden     bool   `json:"hidden"`
 }
 
 type SaveMenuRequest struct {

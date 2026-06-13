@@ -63,15 +63,19 @@ func buildTree(treeMap map[uint][]legacysystem.SysBaseMenu, parentID uint) []dom
 	domainMenus := make([]domain.Menu, 0, len(baseMenus))
 	for _, bm := range baseMenus {
 		m := domain.Menu{
-			ID:        bm.ID,
-			ParentID:  bm.ParentId,
-			Path:      bm.Path,
-			Name:      bm.Name,
-			Hidden:    bm.Hidden,
-			Component: bm.Component,
-			Sort:      bm.Sort,
-			Title:     bm.Meta.Title,
-			Icon:      bm.Meta.Icon,
+			ID:          bm.ID,
+			ParentID:    bm.ParentId,
+			Path:        bm.Path,
+			Name:        bm.Name,
+			Hidden:      bm.Hidden,
+			Component:   bm.Component,
+			Sort:        bm.Sort,
+			Title:       bm.Meta.Title,
+			Icon:        bm.Meta.Icon,
+			KeepAlive:   bm.Meta.KeepAlive,
+			ActiveName:  bm.Meta.ActiveName,
+			DefaultMenu: bm.Meta.DefaultMenu,
+			CloseTab:    bm.Meta.CloseTab,
 		}
 		m.Children = buildTree(treeMap, bm.ID)
 		domainMenus = append(domainMenus, m)
