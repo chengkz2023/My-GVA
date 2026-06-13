@@ -9,7 +9,7 @@
 ```bash
 cd server
 # 需要 MySQL + Redis，配置见 config.yaml
-go run .
+go run ./cmd/admin-api
 ```
 
 ### 前端

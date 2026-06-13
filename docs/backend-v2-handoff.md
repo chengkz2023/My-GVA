@@ -20,9 +20,8 @@ go test ./...
 
 ```
 server/
-├── main.go                          # 入口（调用 bootstrap.Run()）
 ├── cmd/
-│   ├── admin-api/main.go            # 未来入口点
+│   ├── admin-api/main.go            # Web 服务入口（调用 bootstrap.Run()）
 │   ├── migrate/main.go              # 数据库迁移工具（up/down/status/dry-run）
 │   └── modulegen/main.go            # 模块代码生成器
 ├── internal/

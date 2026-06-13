@@ -5,9 +5,8 @@ Go 1.24+ backend with Gin + GORM + Casbin + JWT.
 ## Build & Test
 
 ```bash
-go build .                     # main package
-go build ./cmd/admin-api       # V2 entrypoint
-go build ./cmd/migrate         # migration tool
+go build ./cmd/admin-api       # V2 entrypoint (web server)
+go build ./cmd/migrate         # migration CLI
 go build ./cmd/modulegen       # code generator
 go test ./...                  # all tests (28 packages)
 ```
