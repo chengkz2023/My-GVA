@@ -14,12 +14,18 @@ func CasbinHandler() gin.HandlerFunc {
 	return CasbinHandlerWithPrefix("")
 }
 
+const superAdminAuthorityID = 888
+
 func CasbinHandlerWithPrefix(routerPrefix string) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		claims, ok := platformauth.GetClaimsFromContext(c)
 		if !ok {
 			response.Fail(c, 403, 7, "permission denied")
 			c.Abort()
+			return
+		}
+		if claims.AuthorityId == superAdminAuthorityID {
+			c.Next()
 			return
 		}
 		path := c.Request.URL.Path
