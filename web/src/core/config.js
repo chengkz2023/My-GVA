@@ -6,7 +6,7 @@ export const config = {
   appName: 'BoyKing Admin',
   showViteLogo: true,
   keepAliveTabs: false,
-  useStaticMenu: false,
+  useStaticMenu: true,
   useMockLogin: false,
   logs: []
 }
