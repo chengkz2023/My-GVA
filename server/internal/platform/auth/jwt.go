@@ -2,6 +2,8 @@ package auth
 
 import (
 	"errors"
+	"strconv"
+	"strings"
 	"time"
 
 	jwt "github.com/golang-jwt/jwt/v5"
@@ -30,9 +32,27 @@ type JWT struct {
 	Buffer     time.Duration
 }
 
+func parseDuration(s string) time.Duration {
+	d, err := time.ParseDuration(s)
+	if err == nil {
+		return d
+	}
+	if idx := strings.Index(s, "d"); idx >= 0 {
+		days, _ := strconv.Atoi(s[:idx])
+		d = time.Hour * 24 * time.Duration(days)
+		rest, err := time.ParseDuration(s[idx+1:])
+		if err == nil {
+			d += rest
+		}
+		return d
+	}
+	v, _ := strconv.ParseInt(s, 10, 64)
+	return time.Duration(v)
+}
+
 func NewJWT(cfg JWTConfig) *JWT {
-	expires, _ := time.ParseDuration(cfg.ExpiresTime)
-	buffer, _ := time.ParseDuration(cfg.BufferTime)
+	expires := parseDuration(cfg.ExpiresTime)
+	buffer := parseDuration(cfg.BufferTime)
 	return &JWT{
 		SigningKey: []byte(cfg.SigningKey),
 		Issuer:     cfg.Issuer,
