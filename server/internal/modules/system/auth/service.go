@@ -61,7 +61,6 @@ func (s *Service) Login(ctx context.Context, username, password string) (LoginRe
 	if err != nil {
 		return LoginResponse{}, apperrors.New(apperrors.Internal, 0, "create token failed", err)
 	}
-	utils.SetToken(nil, token, 0)
 	return LoginResponse{
 		User:  userToDTO(user),
 		Token: token,

@@ -15,6 +15,9 @@ func GetToken(c *gin.Context) string {
 }
 
 func SetToken(c *gin.Context, token string, maxAge int) {
+	if c == nil {
+		return
+	}
 	host, _, err := net.SplitHostPort(c.Request.Host)
 	if err != nil {
 		host = c.Request.Host
@@ -27,6 +30,9 @@ func SetToken(c *gin.Context, token string, maxAge int) {
 }
 
 func ClearToken(c *gin.Context) {
+	if c == nil {
+		return
+	}
 	host, _, err := net.SplitHostPort(c.Request.Host)
 	if err != nil {
 		host = c.Request.Host
@@ -39,6 +45,9 @@ func ClearToken(c *gin.Context) {
 }
 
 func GetClaimsFromContext(c *gin.Context) (*CustomClaims, bool) {
+	if c == nil {
+		return nil, false
+	}
 	claims, ok := c.Get("claims")
 	if !ok {
 		return nil, false

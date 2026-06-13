@@ -1,6 +1,7 @@
 package auth
 
 import (
+	platformauth "github.com/flipped-aurora/gin-vue-admin/server/internal/platform/auth"
 	"github.com/flipped-aurora/gin-vue-admin/server/internal/platform/response"
 	"github.com/gin-gonic/gin"
 )
@@ -43,6 +44,7 @@ func (h *Handler) Login(c *gin.Context) {
 		response.Error(c, err)
 		return
 	}
+	platformauth.SetToken(c, result.Token, 7*24*60*60)
 	response.OK(c, result)
 }
 
