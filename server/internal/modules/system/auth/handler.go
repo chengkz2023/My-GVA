@@ -16,6 +16,7 @@ func NewHandler(service *Service) *Handler {
 func (h *Handler) Register(authenticated *gin.RouterGroup, public *gin.RouterGroup) {
 	authenticated.Group("/system/auth").GET("/me", h.Me)
 	public.POST("/login", h.Login)
+	public.POST("/base/captcha", h.Captcha)
 }
 
 func (h *Handler) Me(c *gin.Context) {
@@ -33,10 +34,19 @@ func (h *Handler) Login(c *gin.Context) {
 		response.Error(c, err)
 		return
 	}
+	if !VerifyCaptcha(req.CaptchaId, req.Captcha) {
+		response.Fail(c, 400, 7, "验证码错误")
+		return
+	}
 	result, err := h.service.Login(c.Request.Context(), req.Username, req.Password)
 	if err != nil {
 		response.Error(c, err)
 		return
 	}
+	response.OK(c, result)
+}
+
+func (h *Handler) Captcha(c *gin.Context) {
+	result := GenerateCaptcha()
 	response.OK(c, result)
 }

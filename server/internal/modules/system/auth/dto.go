@@ -26,6 +26,15 @@ type UserDTO struct {
 }
 
 type LoginRequest struct {
-	Username string `json:"username"`
-	Password string `json:"password"`
+	Username  string `json:"username"`
+	Password  string `json:"password"`
+	Captcha   string `json:"captcha"`
+	CaptchaId string `json:"captchaId"`
+}
+
+type CaptchaResponse struct {
+	CaptchaId     string `json:"captchaId"`
+	PicPath       string `json:"picPath"`
+	CaptchaLength int    `json:"captchaLength"`
+	OpenCaptcha   bool   `json:"openCaptcha"`
 }

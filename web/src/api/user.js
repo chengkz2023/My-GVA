@@ -11,4 +11,4 @@ export const setUserAuthorities = (data) => service({ url: `/v2/system/user/${da
 export const resetPassword = (data) => service({ url: `/v2/system/user/${data.ID||data.id}/reset-password`, method: 'post', data: {password: data.password||data.Password} })
 export const setUserAuthority = (data) => service({ url: `/v2/system/user/${data.id||data.ID}/authorities`, method: 'put', data: {authorityIds: [data.authorityId]} })
 export const setSelfSetting = () => service({ url: '/v2/system/user/profile', method: 'put', data: {} })
-export const captcha = () => service({ url: '/base/captcha', method: 'post' })
+export const captcha = () => service({ url: '/v2/base/captcha', method: 'post' })
