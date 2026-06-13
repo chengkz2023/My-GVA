@@ -6,6 +6,7 @@ import (
 	"github.com/flipped-aurora/gin-vue-admin/server/global"
 	apimysql "github.com/flipped-aurora/gin-vue-admin/server/internal/modules/system/api/infrastructure/mysql"
 	"github.com/flipped-aurora/gin-vue-admin/server/model/system"
+	"github.com/flipped-aurora/gin-vue-admin/server/utils"
 	"github.com/google/uuid"
 	"go.uber.org/zap"
 	"gorm.io/gorm"
@@ -53,7 +54,7 @@ func seedAdminUser(db *gorm.DB) {
 	user := system.SysUser{
 		UUID:        uuid.New(),
 		Username:    adminUsername,
-		Password:    "$2a$10$7JB720yubVSZvUI0rEqK/.VqGOZTH.ulu33dHOiBE8ByOhJIrdAu2",
+		Password:    utils.BcryptHash("123456"),
 		NickName:    "管理员",
 		HeaderImg:   "https://qmplusimg.henrongyi.top/gva_header.jpg",
 		AuthorityId: adminAuthorityID,
