@@ -4,6 +4,7 @@ import (
 	"flag"
 	"fmt"
 	"os"
+	"path/filepath"
 
 	legacyconfig "github.com/flipped-aurora/gin-vue-admin/server/config"
 	"github.com/flipped-aurora/gin-vue-admin/server/global"
@@ -67,12 +68,27 @@ func getConfigPath() string {
 		config = ConfigReleaseFile
 	case gin.TestMode:
 		config = ConfigTestFile
+	default:
+		config = ConfigDefaultFile
 	}
 	fmt.Printf("gin mode %s, config: %s\n", gin.Mode(), config)
 
-	if _, err := os.Stat(config); err != nil || os.IsNotExist(err) {
-		config = ConfigDefaultFile
-		fmt.Printf("config not found, using default: %s\n", config)
+	// Check configs/ directory first, then root directory
+	configsPath := filepath.Join("configs", config)
+	if _, err := os.Stat(configsPath); err == nil {
+		fmt.Printf("using configs/ directory: %s\n", configsPath)
+		return configsPath
 	}
-	return config
+	if _, err := os.Stat(config); err == nil {
+		return config
+	}
+
+	// Fallback: try configs/config.yaml, then config.yaml
+	configsDefault := filepath.Join("configs", ConfigDefaultFile)
+	if _, err := os.Stat(configsDefault); err == nil {
+		fmt.Printf("fallback to configs/ default: %s\n", configsDefault)
+		return configsDefault
+	}
+	fmt.Printf("using default config: %s\n", ConfigDefaultFile)
+	return ConfigDefaultFile
 }

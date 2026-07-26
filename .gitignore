@@ -29,6 +29,8 @@ rm_file/
 /server/__debug_bin*
 /server/*.local.yaml
 /server/config.debug.yaml
+/server/configs/config.debug.yaml
+/server/configs/*.local.yaml
 /server/.gocache/
 server/uploads/
 
