@@ -2,7 +2,7 @@ package internal
 
 import (
 	"fmt"
-	"github.com/flipped-aurora/gin-vue-admin/server/global"
+	"github.com/flipped-aurora/gin-vue-admin/server/config"
 	astutil "github.com/flipped-aurora/gin-vue-admin/server/utils/ast"
 	"github.com/flipped-aurora/gin-vue-admin/server/utils/stacktrace"
 	"go.uber.org/zap"
@@ -13,29 +13,30 @@ import (
 )
 
 type ZapCore struct {
-	level zapcore.Level
+	level  zapcore.Level
+	zapCfg config.Zap
 	zapcore.Core
 }
 
-func NewZapCore(level zapcore.Level) *ZapCore {
-	entity := &ZapCore{level: level}
+func NewZapCore(level zapcore.Level, zapCfg config.Zap) *ZapCore {
+	entity := &ZapCore{level: level, zapCfg: zapCfg}
 	syncer := entity.WriteSyncer()
 	levelEnabler := zap.LevelEnablerFunc(func(l zapcore.Level) bool {
 		return l == level
 	})
-	entity.Core = zapcore.NewCore(global.GVA_CONFIG.Zap.Encoder(), syncer, levelEnabler)
+	entity.Core = zapcore.NewCore(zapCfg.Encoder(), syncer, levelEnabler)
 	return entity
 }
 
 func (z *ZapCore) WriteSyncer(formats ...string) zapcore.WriteSyncer {
 	cutter := NewCutter(
-		global.GVA_CONFIG.Zap.Director,
+		z.zapCfg.Director,
 		z.level.String(),
-		global.GVA_CONFIG.Zap.RetentionDay,
+		z.zapCfg.RetentionDay,
 		CutterWithLayout(time.DateOnly),
 		CutterWithFormats(formats...),
 	)
-	if global.GVA_CONFIG.Zap.LogInConsole {
+	if z.zapCfg.LogInConsole {
 		multiSyncer := zapcore.NewMultiWriteSyncer(os.Stdout, cutter)
 		return zapcore.AddSync(multiSyncer)
 	}
@@ -61,7 +62,7 @@ func (z *ZapCore) Write(entry zapcore.Entry, fields []zapcore.Field) error {
 	for i := 0; i < len(fields); i++ {
 		if fields[i].Key == "business" || fields[i].Key == "folder" || fields[i].Key == "directory" {
 			syncer := z.WriteSyncer(fields[i].String)
-			z.Core = zapcore.NewCore(global.GVA_CONFIG.Zap.Encoder(), syncer, z.level)
+			z.Core = zapcore.NewCore(z.zapCfg.Encoder(), syncer, z.level)
 		}
 	}
 	// 先写入原日志目标

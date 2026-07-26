@@ -10,8 +10,7 @@ type Module struct {
 }
 
 func NewModule(c *container.Container) *Module {
-	_ = c
-	repo := NewRuntimeRepository()
+	repo := NewRuntimeRepository(c.Config)
 	service := NewService(repo)
 	return &Module{
 		handler: NewHandler(service),

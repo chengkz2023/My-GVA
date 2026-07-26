@@ -1,11 +1,11 @@
 package system
 
 import (
-	"github.com/flipped-aurora/gin-vue-admin/server/global"
+	"github.com/flipped-aurora/gin-vue-admin/server/model/common"
 )
 
 type SysBaseMenu struct {
-	global.GVA_MODEL
+	common.GVA_MODEL
 	MenuLevel     uint                   `json:"-"`
 	ParentId      uint                   `json:"parentId" gorm:"comment:父菜单ID"`          // 父菜单ID
 	Path          string                 `json:"path" gorm:"comment:路由path"`              // 路由path
@@ -31,7 +31,7 @@ type Meta struct {
 }
 
 type SysBaseMenuParameter struct {
-	global.GVA_MODEL
+	common.GVA_MODEL
 	SysBaseMenuID uint
 	Type          string `json:"type" gorm:"comment:地址栏携带参数为params还是query"` // 地址栏携带参数为params还是query
 	Key           string `json:"key" gorm:"comment:地址栏携带参数的key"`              // 地址栏携带参数的key

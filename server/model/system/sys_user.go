@@ -1,7 +1,6 @@
 package system
 
 import (
-	"github.com/flipped-aurora/gin-vue-admin/server/global"
 	"github.com/flipped-aurora/gin-vue-admin/server/model/common"
 	"github.com/google/uuid"
 )
@@ -18,7 +17,7 @@ type Login interface {
 var _ Login = new(SysUser)
 
 type SysUser struct {
-	global.GVA_MODEL
+	common.GVA_MODEL
 	UUID          uuid.UUID      `json:"uuid" gorm:"index;comment:用户UUID"`                                                                   // 用户UUID
 	Username      string         `json:"userName" gorm:"index;comment:用户登录名"`                                                                // 用户登录名
 	Password      string         `json:"-"  gorm:"comment:用户登录密码"`                                                                           // 用户登录密码

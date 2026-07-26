@@ -7,7 +7,6 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/flipped-aurora/gin-vue-admin/server/global"
 	platformconfig "github.com/flipped-aurora/gin-vue-admin/server/internal/platform/config"
 	"github.com/flipped-aurora/gin-vue-admin/server/internal/platform/database"
 	"github.com/flipped-aurora/gin-vue-admin/server/internal/platform/logger"
@@ -31,48 +30,36 @@ type RunOptions struct {
 	DSN     string
 }
 
-func InitDB() error {
-	global.GVA_VP, _ = platformconfig.Load()
-	global.GVA_LOG = logger.New()
-	zap.ReplaceGlobals(global.GVA_LOG)
-	global.GVA_DB = database.Open()
-	return nil
+func InitDB() (*gorm.DB, error) {
+	_, cfg := platformconfig.Load()
+	log := logger.New(cfg.Zap)
+	zap.ReplaceGlobals(log)
+	db := database.Open(cfg.Mysql, log)
+	return db, nil
 }
 
-func InitDBWithDSN(dsn string) error {
+func InitDBWithDSN(dsn string) (*gorm.DB, error) {
 	if dsn == "" {
 		return InitDB()
 	}
-	global.GVA_LOG = zap.NewNop()
-	var err error
-	global.GVA_DB, err = gorm.Open(nil, &gorm.Config{})
+	db, err := gorm.Open(nil, &gorm.Config{})
 	if err != nil {
-		return fmt.Errorf("connect: %w", err)
+		return nil, fmt.Errorf("connect: %w", err)
 	}
-	return nil
+	return db, nil
 }
 
-func MustDB() (*gorm.DB, error) {
-	if global.GVA_DB == nil {
+func MustDB(db *gorm.DB) (*gorm.DB, error) {
+	if db == nil {
 		return nil, fmt.Errorf("database not available")
 	}
-	if err := global.GVA_DB.AutoMigrate(&MigrationRecord{}); err != nil {
+	if err := db.AutoMigrate(&MigrationRecord{}); err != nil {
 		return nil, fmt.Errorf("init migration table: %w", err)
 	}
-	return global.GVA_DB, nil
+	return db, nil
 }
 
-func RunUp(opts RunOptions) error {
-	if global.GVA_DB == nil {
-		if err := InitDB(); err != nil {
-			return err
-		}
-	}
-	db, err := MustDB()
-	if err != nil {
-		return err
-	}
-
+func RunUp(db *gorm.DB, opts RunOptions) error {
 	groups, err := List(opts.RootDir, opts.Dir)
 	if err != nil {
 		return err
@@ -133,17 +120,7 @@ func RunUp(opts RunOptions) error {
 	return nil
 }
 
-func RunDown(opts RunOptions) error {
-	if global.GVA_DB == nil {
-		if err := InitDB(); err != nil {
-			return err
-		}
-	}
-	db, err := MustDB()
-	if err != nil {
-		return err
-	}
-
+func RunDown(db *gorm.DB, opts RunOptions) error {
 	var last MigrationRecord
 	if err := db.Order("version desc").First(&last).Error; err != nil {
 		if err == gorm.ErrRecordNotFound {
@@ -192,17 +169,7 @@ func RunDown(opts RunOptions) error {
 	return nil
 }
 
-func RunStatus(opts RunOptions) error {
-	if global.GVA_DB == nil {
-		if err := InitDB(); err != nil {
-			return err
-		}
-	}
-	db, err := MustDB()
-	if err != nil {
-		return err
-	}
-
+func RunStatus(db *gorm.DB, opts RunOptions) error {
 	groups, err := List(opts.RootDir, opts.Dir)
 	if err != nil {
 		return err

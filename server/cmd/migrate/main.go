@@ -118,7 +118,15 @@ func up(args []string) error {
 	if err != nil {
 		return err
 	}
-	return migration.RunUp(opts)
+	db, err := migration.InitDB()
+	if err != nil {
+		return err
+	}
+	db, err = migration.MustDB(db)
+	if err != nil {
+		return err
+	}
+	return migration.RunUp(db, opts)
 }
 
 func down(args []string) error {
@@ -126,7 +134,15 @@ func down(args []string) error {
 	if err != nil {
 		return err
 	}
-	return migration.RunDown(opts)
+	db, err := migration.InitDB()
+	if err != nil {
+		return err
+	}
+	db, err = migration.MustDB(db)
+	if err != nil {
+		return err
+	}
+	return migration.RunDown(db, opts)
 }
 
 func status(args []string) error {
@@ -134,7 +150,15 @@ func status(args []string) error {
 	if err != nil {
 		return err
 	}
-	return migration.RunStatus(opts)
+	db, err := migration.InitDB()
+	if err != nil {
+		return err
+	}
+	db, err = migration.MustDB(db)
+	if err != nil {
+		return err
+	}
+	return migration.RunStatus(db, opts)
 }
 
 func usage() {

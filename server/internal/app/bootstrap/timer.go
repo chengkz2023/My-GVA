@@ -2,20 +2,20 @@ package bootstrap
 
 import (
 	"fmt"
+
 	"github.com/flipped-aurora/gin-vue-admin/server/task"
+	"github.com/flipped-aurora/gin-vue-admin/server/utils/timer"
 
 	"github.com/robfig/cron/v3"
-
-	"github.com/flipped-aurora/gin-vue-admin/server/global"
+	"gorm.io/gorm"
 )
 
-func Timer() {
+func InitTimer(db *gorm.DB, t timer.Timer) {
 	go func() {
 		var option []cron.Option
 		option = append(option, cron.WithSeconds())
-		// 清理DB定时任务
-		_, err := global.GVA_Timer.AddTaskByFunc("ClearDB", "@daily", func() {
-			err := task.ClearTable(global.GVA_DB) // 定时任务方法定在task文件包中
+		_, err := t.AddTaskByFunc("ClearDB", "@daily", func() {
+			err := task.ClearTable(db)
 			if err != nil {
 				fmt.Println("timer error:", err)
 			}
@@ -23,15 +23,5 @@ func Timer() {
 		if err != nil {
 			fmt.Println("add timer error:", err)
 		}
-
-		// 其他定时任务定在这里 参考上方使用方法
-
-		//_, err := global.GVA_Timer.AddTaskByFunc("定时任务标识", "corn表达式", func() {
-		//	具体执行内容...
-		//  ......
-		//}, option...)
-		//if err != nil {
-		//	fmt.Println("add timer error:", err)
-		//}
 	}()
 }

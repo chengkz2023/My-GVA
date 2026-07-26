@@ -16,11 +16,13 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+var testRoutes = func() gin.RoutesInfo { return nil }
+
 func TestList(t *testing.T) {
 	gin.SetMode(gin.TestMode)
 	engine := gin.New()
 	group := engine.Group("/v2")
-	NewHandler(application.NewService(fakeRepository{}, nil, nil, false)).Register(group)
+	NewHandler(application.NewService(fakeRepository{}, nil, nil, false), testRoutes).Register(group)
 
 	req := httptest.NewRequest(http.MethodGet, "/v2/system/api/list?page=1&pageSize=10", nil)
 	rec := httptest.NewRecorder()
@@ -49,7 +51,7 @@ func TestGetAll(t *testing.T) {
 		}))
 	})
 	group := engine.Group("/v2")
-	NewHandler(application.NewService(fakeRepository{}, nil, nil, false)).Register(group)
+	NewHandler(application.NewService(fakeRepository{}, nil, nil, false), testRoutes).Register(group)
 
 	req := httptest.NewRequest(http.MethodGet, "/v2/system/api/all", nil)
 	rec := httptest.NewRecorder()
@@ -64,7 +66,7 @@ func TestGroups(t *testing.T) {
 	gin.SetMode(gin.TestMode)
 	engine := gin.New()
 	group := engine.Group("/v2")
-	NewHandler(application.NewService(fakeRepository{groups: []string{"admin", "api"}}, nil, nil, false)).Register(group)
+	NewHandler(application.NewService(fakeRepository{groups: []string{"admin", "api"}}, nil, nil, false), testRoutes).Register(group)
 
 	req := httptest.NewRequest(http.MethodGet, "/v2/system/api/groups", nil)
 	rec := httptest.NewRecorder()
@@ -79,7 +81,7 @@ func TestPolicies(t *testing.T) {
 	gin.SetMode(gin.TestMode)
 	engine := gin.New()
 	group := engine.Group("/v2")
-	NewHandler(application.NewService(fakeRepository{}, &fakePolicyProvider{}, nil, false)).Register(group)
+	NewHandler(application.NewService(fakeRepository{}, &fakePolicyProvider{}, nil, false), testRoutes).Register(group)
 
 	req := httptest.NewRequest(http.MethodGet, "/v2/system/api/policies/888", nil)
 	rec := httptest.NewRecorder()
@@ -115,13 +117,13 @@ type fakePolicyProvider struct{}
 
 type fakePolicySyncer struct{}
 
-func (fakePolicySyncer) RefreshPolicies() error { return nil }
+func (fakePolicySyncer) RefreshPolicies() error                                    { return nil }
 func (fakePolicySyncer) SyncPolicies(authorityID uint, policies []authz.Policy) error { return nil }
 
 func (fakePolicyProvider) Policies(authorityID uint) ([]authz.Policy, error) {
 	return []authz.Policy{{Path: "/api/test", Method: "GET"}}, nil
 }
-func (fakePolicySyncer) RemovePolicies(path, method string) error { return nil }
+func (fakePolicySyncer) RemovePolicies(path, method string) error                     { return nil }
 func (fakeRepository) Save(ctx context.Context, input domain.SaveApiInput) (uint, error) { return 1, nil }
 func (fakeRepository) Delete(ctx context.Context, id uint) (domain.SaveApiInput, error) {
 	return domain.SaveApiInput{Path: "/api/x", Method: "GET"}, nil
@@ -134,7 +136,7 @@ func (fakeRepository) FindByID(ctx context.Context, id uint) (domain.Api, error)
 }
 func (fakeRepository) GetIgnored(ctx context.Context) ([]domain.Api, error)           { return nil, nil }
 func (fakeRepository) Ignore(ctx context.Context, path, method string, flag bool) error { return nil }
-func (fakeRepository) BatchCreate(ctx context.Context, apis []domain.SaveApiInput) error { return nil }
+func (fakeRepository) BatchCreate(ctx context.Context, apis []domain.SaveApiInput) error  { return nil }
 func (fakeRepository) BatchDeleteByPathMethod(ctx context.Context, apis []domain.SaveApiInput) error {
 	return nil
 }

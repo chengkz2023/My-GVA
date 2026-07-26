@@ -83,8 +83,7 @@ type CaptchaSnapshot struct {
 	OpenCaptchaTimeout int `json:"openCaptchaTimeout"`
 }
 
-func SafeSnapshot() Snapshot {
-	cfg := Current()
+func SafeSnapshot(cfg Config) Snapshot {
 	return Snapshot{
 		System: SystemSnapshot{
 			RouterPrefix:       cfg.System.RouterPrefix,

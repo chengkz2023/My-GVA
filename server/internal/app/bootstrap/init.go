@@ -3,13 +3,12 @@
 package bootstrap
 
 import (
+	"github.com/flipped-aurora/gin-vue-admin/server/internal/app/container"
 	"github.com/flipped-aurora/gin-vue-admin/server/utils"
 )
 
-// 初始化全局函数
-func SetupHandlers() {
-	// 注册系统重载处理函数
+func SetupHandlers(c *container.Container) {
 	utils.GlobalSystemEvents.RegisterReloadHandler(func() error {
-		return Reload()
+		return Reload(c)
 	})
 }

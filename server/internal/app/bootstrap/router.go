@@ -4,10 +4,9 @@ import (
 	"net/http"
 	"os"
 
-	"github.com/flipped-aurora/gin-vue-admin/server/global"
+	"github.com/flipped-aurora/gin-vue-admin/server/internal/app/container"
 	"github.com/flipped-aurora/gin-vue-admin/server/internal/interfaces/http/middleware"
 	"github.com/gin-gonic/gin"
-	"go.uber.org/zap"
 )
 
 type justFilesFilesystem struct {
@@ -29,25 +28,25 @@ func (fs justFilesFilesystem) Open(name string) (http.File, error) {
 	return f, nil
 }
 
-func Routers(log *zap.Logger) *gin.Engine {
+func Routers(c *container.Container) *gin.Engine {
 	engine := gin.New()
-	engine.Use(middleware.GinRecovery(log, true))
+	engine.Use(middleware.GinRecovery(c.Logger, true))
 	if gin.Mode() == gin.DebugMode {
 		engine.Use(gin.Logger())
 	}
 
-	engine.StaticFS(global.GVA_CONFIG.Local.StorePath, justFilesFilesystem{http.Dir(global.GVA_CONFIG.Local.StorePath)})
+	engine.StaticFS(c.Config.Local.StorePath, justFilesFilesystem{http.Dir(c.Config.Local.StorePath)})
 
-	publicGroup := engine.Group(global.GVA_CONFIG.System.RouterPrefix)
-	privateGroup := engine.Group(global.GVA_CONFIG.System.RouterPrefix)
+	publicGroup := engine.Group(c.Config.System.RouterPrefix)
+	privateGroup := engine.Group(c.Config.System.RouterPrefix)
 	privateGroup.Use(middleware.JWTAuthWithConfig(middleware.JWTConfig{
-		ExpiresTime: global.GVA_CONFIG.JWT.ExpiresTime,
-		BufferTime:  global.GVA_CONFIG.JWT.BufferTime,
-		SigningKey:  global.GVA_CONFIG.JWT.SigningKey,
+		ExpiresTime: c.Config.JWT.ExpiresTime,
+		BufferTime:  c.Config.JWT.BufferTime,
+		SigningKey:  c.Config.JWT.SigningKey,
 		BlacklistCheck: func(token string) bool {
-			_, ok := global.BlackCache.Get(token)
-			return ok
-		},
+				_, ok := c.BlackCache.Get(token)
+				return ok
+			},
 	})).Use(middleware.CasbinHandler())
 
 	publicGroup.GET("/health", func(c *gin.Context) {
@@ -56,7 +55,6 @@ func Routers(log *zap.Logger) *gin.Engine {
 
 	initBizRouter(privateGroup, publicGroup)
 
-	global.GVA_ROUTERS = engine.Routes()
-	log.Info("router register success")
+	c.Logger.Info("router register success")
 	return engine
 }

@@ -7,8 +7,8 @@ import (
 	"strings"
 	"testing"
 
-	legacyconfig "github.com/flipped-aurora/gin-vue-admin/server/config"
-	"github.com/flipped-aurora/gin-vue-admin/server/global"
+	"github.com/flipped-aurora/gin-vue-admin/server/config"
+	"github.com/flipped-aurora/gin-vue-admin/server/internal/app/container"
 	v2http "github.com/flipped-aurora/gin-vue-admin/server/internal/interfaces/http"
 	"github.com/flipped-aurora/gin-vue-admin/server/internal/platform/response"
 	"github.com/gin-gonic/gin"
@@ -16,17 +16,17 @@ import (
 
 func TestModuleInfoRedactsSecrets(t *testing.T) {
 	gin.SetMode(gin.TestMode)
-	global.GVA_CONFIG = legacyconfig.Server{}
-	global.GVA_CONFIG.System.Addr = 8888
-	global.GVA_CONFIG.JWT.SigningKey = "secret"
-	global.GVA_CONFIG.JWT.Issuer = "boyking-admin"
-	global.GVA_CONFIG.Mysql.Path = "127.0.0.1"
-	global.GVA_CONFIG.Mysql.Dbname = "boyking_admin"
-	global.GVA_CONFIG.Mysql.Password = "mysql-secret"
-	global.GVA_CONFIG.Redis.Password = "redis-secret"
+	cfg := config.Server{}
+	cfg.System.Addr = 8888
+	cfg.JWT.SigningKey = "secret"
+	cfg.JWT.Issuer = "boyking-admin"
+	cfg.Mysql.Path = "127.0.0.1"
+	cfg.Mysql.Dbname = "boyking_admin"
+	cfg.Mysql.Password = "mysql-secret"
+	cfg.Redis.Password = "redis-secret"
 
 	engine := gin.New()
-	v2http.RegisterV2(engine, v2http.Config{}, NewModule(nil))
+	v2http.RegisterV2(engine, v2http.Config{}, NewModule(&container.Container{Config: cfg}))
 
 	req := httptest.NewRequest(http.MethodGet, "/v2/system/config/info", nil)
 	rec := httptest.NewRecorder()

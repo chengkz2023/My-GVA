@@ -8,7 +8,7 @@ import (
 )
 
 func TestServiceMe(t *testing.T) {
-	service := NewService(nil)
+	service := NewService(nil, nil, nil)
 	got, err := service.Me(platformauth.ContextWithActor(context.Background(), platformauth.Actor{
 		UserID:      1,
 		AuthorityID: 888,
@@ -27,7 +27,7 @@ func TestServiceMe(t *testing.T) {
 }
 
 func TestServiceMeMissingActor(t *testing.T) {
-	_, err := NewService(nil).Me(context.Background())
+	_, err := NewService(nil, nil, nil).Me(context.Background())
 	if err == nil {
 		t.Fatal("Me() error is nil, want missing actor")
 	}

@@ -1,36 +1,31 @@
 package bootstrap
 
 import (
-	"github.com/flipped-aurora/gin-vue-admin/server/global"
+	"github.com/flipped-aurora/gin-vue-admin/server/internal/app/container"
 	"github.com/flipped-aurora/gin-vue-admin/server/internal/platform/database"
 	"go.uber.org/zap"
 )
 
-func Reload() error {
-	global.GVA_LOG.Info("reloading system config...")
-
-	if err := global.GVA_VP.ReadInConfig(); err != nil {
-		global.GVA_LOG.Error("re-read config failed", zap.Error(err))
+func Reload(c *container.Container) error {
+	c.Logger.Info("reloading system config...")
+	if err := c.VP.ReadInConfig(); err != nil {
+		c.Logger.Error("re-read config failed", zap.Error(err))
 		return err
 	}
-
-	if global.GVA_DB != nil {
-		db, _ := global.GVA_DB.DB()
+	if c.DB != nil {
+		db, _ := c.DB.DB()
 		if err := db.Close(); err != nil {
-			global.GVA_LOG.Error("close old db failed", zap.Error(err))
+			c.Logger.Error("close old db failed", zap.Error(err))
 			return err
 		}
 	}
-
-	global.GVA_DB = database.Open()
-	OtherInit()
-
-	if global.GVA_DB != nil {
-		RegisterTables()
-		EnsureSystemSeedData()
+	c.DB = database.Open(c.Config.Mysql, c.Logger)
+	c.BlackCache = InitBlackCache(c.Config.JWT)
+	if c.DB != nil {
+		RegisterTables(c.DB, c.Logger, c.Config.System.DisableAutoMigrate)
+		EnsureSystemSeedData(c.DB, c.Logger)
 	}
-
-	Timer()
-	global.GVA_LOG.Info("system config reloaded")
+	InitTimer(c.DB, c.Timer)
+	c.Logger.Info("system config reloaded")
 	return nil
 }

@@ -1,9 +1,8 @@
 package bootstrap
 
-import "github.com/flipped-aurora/gin-vue-admin/server/global"
+import "gorm.io/gorm"
 
-func bizModel() error {
-	db := global.GVA_DB
+func bizModel(db *gorm.DB) error {
 	err := db.AutoMigrate()
 	if err != nil {
 		return err

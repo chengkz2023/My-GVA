@@ -1,10 +1,10 @@
 package system
 
 import (
-	"github.com/flipped-aurora/gin-vue-admin/server/global"
+	"github.com/flipped-aurora/gin-vue-admin/server/model/common"
 )
 
 type JwtBlacklist struct {
-	global.GVA_MODEL
+	common.GVA_MODEL
 	Jwt string `gorm:"type:text;comment:jwt"`
 }

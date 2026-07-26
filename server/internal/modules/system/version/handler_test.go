@@ -6,7 +6,7 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/flipped-aurora/gin-vue-admin/server/global"
+	"github.com/flipped-aurora/gin-vue-admin/server/internal/platform/buildinfo"
 	v2http "github.com/flipped-aurora/gin-vue-admin/server/internal/interfaces/http"
 	"github.com/flipped-aurora/gin-vue-admin/server/internal/platform/response"
 	"github.com/gin-gonic/gin"
@@ -36,10 +36,10 @@ func TestModuleInfo(t *testing.T) {
 	if !ok {
 		t.Fatalf("data type = %T, want map[string]any", body.Data)
 	}
-	if data["version"] != global.Version {
-		t.Fatalf("version = %v, want %s", data["version"], global.Version)
+	if data["version"] != buildinfo.Version {
+		t.Fatalf("version = %v, want %s", data["version"], buildinfo.Version)
 	}
-	if data["appName"] != global.AppName {
-		t.Fatalf("appName = %v, want %s", data["appName"], global.AppName)
+	if data["appName"] != buildinfo.AppName {
+		t.Fatalf("appName = %v, want %s", data["appName"], buildinfo.AppName)
 	}
 }

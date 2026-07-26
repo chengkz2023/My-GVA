@@ -8,6 +8,7 @@ import (
 	apimysql "github.com/flipped-aurora/gin-vue-admin/server/internal/modules/system/api/infrastructure/mysql"
 	apihttp "github.com/flipped-aurora/gin-vue-admin/server/internal/modules/system/api/transport/http"
 	"github.com/flipped-aurora/gin-vue-admin/server/internal/platform/authz"
+	"github.com/gin-gonic/gin"
 )
 
 type Module struct {
@@ -31,7 +32,7 @@ func NewModule(c *container.Container) *Module {
 	}
 	service := application.NewService(repo, pp, ps, strict)
 	return &Module{
-		handler: apihttp.NewHandler(service),
+		handler: apihttp.NewHandler(service, func() gin.RoutesInfo { return c.Routes }),
 	}
 }
 

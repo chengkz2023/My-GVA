@@ -3,12 +3,12 @@ package mysql
 import (
 	"time"
 
-	"github.com/flipped-aurora/gin-vue-admin/server/global"
+	"github.com/flipped-aurora/gin-vue-admin/server/model/common"
 	"github.com/flipped-aurora/gin-vue-admin/server/model/system"
 )
 
 type SysOperationRecord struct {
-	global.GVA_MODEL
+	common.GVA_MODEL
 	Ip           string        `json:"ip" form:"ip" gorm:"column:ip;comment:请求ip"`
 	Method       string        `json:"method" form:"method" gorm:"column:method;comment:请求方法"`
 	Path         string        `json:"path" form:"path" gorm:"column:path;comment:请求路径"`

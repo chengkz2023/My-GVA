@@ -5,24 +5,19 @@ import (
 	"strings"
 
 	"github.com/flipped-aurora/gin-vue-admin/server/config"
-	"github.com/flipped-aurora/gin-vue-admin/server/global"
 	"github.com/flipped-aurora/gin-vue-admin/server/internal/platform/database/internal"
 	_ "github.com/go-sql-driver/mysql"
+	"go.uber.org/zap"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 )
 
-func Open() *gorm.DB {
-	global.GVA_ACTIVE_DBNAME = &global.GVA_CONFIG.Mysql.Dbname
-	return openMySQL(global.GVA_CONFIG.Mysql)
+func Open(cfg config.Mysql, log *zap.Logger) *gorm.DB {
+	return openMySQL(cfg, log)
 }
 
-func OpenByConfig(m config.Mysql) *gorm.DB {
-	return openMySQL(m)
-}
-
-func Current() *gorm.DB {
-	return global.GVA_DB
+func OpenByConfig(m config.Mysql, log *zap.Logger) *gorm.DB {
+	return openMySQL(m, log)
 }
 
 func Ping(ctx context.Context, db *gorm.DB) error {
@@ -36,7 +31,7 @@ func Ping(ctx context.Context, db *gorm.DB) error {
 	return sqlDB.PingContext(ctx)
 }
 
-func openMySQL(m config.Mysql) *gorm.DB {
+func openMySQL(m config.Mysql, log *zap.Logger) *gorm.DB {
 	if m.Dbname == "" {
 		return nil
 	}
@@ -50,7 +45,7 @@ func openMySQL(m config.Mysql) *gorm.DB {
 		SkipInitializeWithVersion: false,
 	}
 	general := m.GeneralDB
-	db, err := gorm.Open(mysql.New(mysqlConfig), internal.Gorm.Config(general))
+	db, err := gorm.Open(mysql.New(mysqlConfig), internal.Gorm.Config(general, log))
 	if err != nil {
 		panic(err)
 	}

@@ -3,7 +3,6 @@ package bootstrap
 import (
 	"strconv"
 
-	"github.com/flipped-aurora/gin-vue-admin/server/global"
 	apimysql "github.com/flipped-aurora/gin-vue-admin/server/internal/modules/system/api/infrastructure/mysql"
 	"github.com/flipped-aurora/gin-vue-admin/server/model/system"
 	"github.com/flipped-aurora/gin-vue-admin/server/utils"
@@ -17,19 +16,18 @@ const (
 	adminUsername    = "admin"
 )
 
-func EnsureSystemSeedData() {
-	if global.GVA_DB == nil {
+func EnsureSystemSeedData(db *gorm.DB, log *zap.Logger) {
+	if db == nil {
 		return
 	}
-	db := global.GVA_DB
-	seedAuthority(db)
-	seedAdminUser(db)
-	seedMenus(db)
-	seedAPIs(db)
-	global.GVA_LOG.Info("seed data complete")
+	seedAuthority(db, log)
+	seedAdminUser(db, log)
+	seedMenus(db, log)
+	seedAPIs(db, log)
+	log.Info("seed data complete")
 }
 
-func seedAuthority(db *gorm.DB) {
+func seedAuthority(db *gorm.DB, log *zap.Logger) {
 	var count int64
 	db.Model(&system.SysAuthority{}).Where("authority_id = ?", adminAuthorityID).Count(&count)
 	if count > 0 {
@@ -41,11 +39,11 @@ func seedAuthority(db *gorm.DB) {
 		DefaultRouter: "authority",
 	}
 	if err := db.Create(&auth).Error; err != nil {
-		global.GVA_LOG.Error("seed authority failed", zap.Error(err))
+		log.Error("seed authority failed", zap.Error(err))
 	}
 }
 
-func seedAdminUser(db *gorm.DB) {
+func seedAdminUser(db *gorm.DB, log *zap.Logger) {
 	var count int64
 	db.Model(&system.SysUser{}).Where("username = ?", adminUsername).Count(&count)
 	if count > 0 {
@@ -61,7 +59,7 @@ func seedAdminUser(db *gorm.DB) {
 		Enable:      1,
 	}
 	if err := db.Create(&user).Error; err != nil {
-		global.GVA_LOG.Error("seed admin user failed", zap.Error(err))
+		log.Error("seed admin user failed", zap.Error(err))
 		return
 	}
 	db.Create(&system.SysUserAuthority{
@@ -70,7 +68,7 @@ func seedAdminUser(db *gorm.DB) {
 	})
 }
 
-func seedMenus(db *gorm.DB) {
+func seedMenus(db *gorm.DB, log *zap.Logger) {
 	var count int64
 	db.Model(&system.SysBaseMenu{}).Count(&count)
 	if count > 0 {
@@ -111,7 +109,7 @@ func seedMenus(db *gorm.DB) {
 	}
 	for i := range menus {
 		if err := db.Create(&menus[i]).Error; err != nil {
-			global.GVA_LOG.Error("seed menu failed", zap.Error(err))
+			log.Error("seed menu failed", zap.Error(err))
 			continue
 		}
 		db.Create(&system.SysAuthorityMenu{
@@ -121,7 +119,7 @@ func seedMenus(db *gorm.DB) {
 	}
 }
 
-func seedAPIs(db *gorm.DB) {
+func seedAPIs(db *gorm.DB, log *zap.Logger) {
 	var count int64
 	db.Model(&apimysql.SysApi{}).Count(&count)
 	if count > 0 {

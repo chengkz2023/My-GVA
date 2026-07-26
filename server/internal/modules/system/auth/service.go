@@ -6,17 +6,17 @@ import (
 	platformauth "github.com/flipped-aurora/gin-vue-admin/server/internal/platform/auth"
 	apperrors "github.com/flipped-aurora/gin-vue-admin/server/internal/platform/errors"
 	legacymodel "github.com/flipped-aurora/gin-vue-admin/server/model/system"
-	"github.com/flipped-aurora/gin-vue-admin/server/model/system/request"
-	"github.com/flipped-aurora/gin-vue-admin/server/utils"
 	"gorm.io/gorm"
 )
 
 type Service struct {
-	db *gorm.DB
+	db     *gorm.DB
+	jwt    *platformauth.JWT
+	hasher platformauth.PasswordHasher
 }
 
-func NewService(db *gorm.DB) *Service {
-	return &Service{db: db}
+func NewService(db *gorm.DB, jwt *platformauth.JWT, hasher platformauth.PasswordHasher) *Service {
+	return &Service{db: db, jwt: jwt, hasher: hasher}
 }
 
 func (s *Service) Me(ctx context.Context) (MeResponse, error) {
@@ -66,22 +66,21 @@ func (s *Service) Login(ctx context.Context, username, password string) (LoginRe
 	if err := s.db.WithContext(ctx).Where("username = ?", username).First(&user).Error; err != nil {
 		return LoginResponse{}, apperrors.WithMessage(apperrors.Unauthorized, "invalid username or password")
 	}
-	if !utils.BcryptCheck(password, user.Password) {
+	if !s.hasher.Check(password, user.Password) {
 		return LoginResponse{}, apperrors.WithMessage(apperrors.Unauthorized, "invalid username or password")
 	}
 	if user.Enable != 1 {
 		return LoginResponse{}, apperrors.WithMessage(apperrors.Forbidden, "account is disabled")
 	}
 
-	j := utils.NewJWT()
-	claims := j.CreateClaims(request.BaseClaims{
+	claims := s.jwt.CreateClaims(platformauth.BaseClaims{
 		UUID:        user.UUID,
 		ID:          user.ID,
-		NickName:    user.NickName,
 		Username:    user.Username,
+		NickName:    user.NickName,
 		AuthorityId: user.AuthorityId,
 	})
-	token, err := j.CreateToken(claims)
+	token, err := s.jwt.CreateToken(claims)
 	if err != nil {
 		return LoginResponse{}, apperrors.New(apperrors.Internal, 0, "create token failed", err)
 	}

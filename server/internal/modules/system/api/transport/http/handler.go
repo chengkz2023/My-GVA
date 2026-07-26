@@ -3,7 +3,6 @@ package http
 import (
 	"strconv"
 
-	"github.com/flipped-aurora/gin-vue-admin/server/global"
 	"github.com/flipped-aurora/gin-vue-admin/server/internal/modules/system/api/application"
 	"github.com/flipped-aurora/gin-vue-admin/server/internal/modules/system/api/domain"
 	"github.com/flipped-aurora/gin-vue-admin/server/internal/platform/pagination"
@@ -13,10 +12,11 @@ import (
 
 type Handler struct {
 	service *application.Service
+	routes  func() gin.RoutesInfo
 }
 
-func NewHandler(service *application.Service) *Handler {
-	return &Handler{service: service}
+func NewHandler(service *application.Service, routes func() gin.RoutesInfo) *Handler {
+	return &Handler{service: service, routes: routes}
 }
 
 func (h *Handler) Register(group *gin.RouterGroup) {
@@ -205,7 +205,7 @@ func (h *Handler) FreshCasbin(c *gin.Context) {
 
 func (h *Handler) Sync(c *gin.Context) {
 	routes := make([]domain.RouteInfo, 0)
-	for _, r := range global.GVA_ROUTERS {
+	for _, r := range h.routes() {
 		routes = append(routes, domain.RouteInfo{Path: r.Path, Method: r.Method})
 	}
 	result, err := h.service.Sync(routes)

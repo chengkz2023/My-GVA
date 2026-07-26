@@ -6,15 +6,9 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/flipped-aurora/gin-vue-admin/server/global"
 	"github.com/flipped-aurora/gin-vue-admin/server/internal/platform/response"
 	"github.com/gin-gonic/gin"
-	"go.uber.org/zap"
 )
-
-func init() {
-	global.GVA_LOG = zap.NewNop()
-}
 
 func TestRegisterV2Health(t *testing.T) {
 	gin.SetMode(gin.TestMode)

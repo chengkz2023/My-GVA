@@ -7,7 +7,6 @@ import (
 	"path/filepath"
 
 	legacyconfig "github.com/flipped-aurora/gin-vue-admin/server/config"
-	"github.com/flipped-aurora/gin-vue-admin/server/global"
 	"github.com/fsnotify/fsnotify"
 	"github.com/gin-gonic/gin"
 	"github.com/spf13/viper"
@@ -26,6 +25,7 @@ type Config = legacyconfig.Server
 func Load() (*viper.Viper, Config) {
 	configPath := getConfigPath()
 
+	var cfg Config
 	v := viper.New()
 	v.SetConfigFile(configPath)
 	v.SetConfigType("yaml")
@@ -35,17 +35,13 @@ func Load() (*viper.Viper, Config) {
 	v.WatchConfig()
 	v.OnConfigChange(func(e fsnotify.Event) {
 		fmt.Println("config file changed:", e.Name)
-		_ = v.Unmarshal(&global.GVA_CONFIG)
+		_ = v.Unmarshal(&cfg)
 	})
-	if err := v.Unmarshal(&global.GVA_CONFIG); err != nil {
+	if err := v.Unmarshal(&cfg); err != nil {
 		panic(fmt.Errorf("fatal error unmarshal config: %w", err))
 	}
 
-	return v, global.GVA_CONFIG
-}
-
-func Current() Config {
-	return global.GVA_CONFIG
+	return v, cfg
 }
 
 func getConfigPath() string {

@@ -10,7 +10,10 @@ import (
 	"github.com/flipped-aurora/gin-vue-admin/server/utils"
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt/v5"
+	"golang.org/x/sync/singleflight"
 )
+
+var jwtConcurrency = &singleflight.Group{}
 
 type JWTConfig struct {
 	ExpiresTime string
@@ -35,7 +38,7 @@ func JWTAuthWithConfig(cfg JWTConfig) gin.HandlerFunc {
 			return
 		}
 
-		j := utils.NewJWTWithKey([]byte(cfg.SigningKey))
+		j := &utils.JWT{JWT: platformauth.NewJWT(platformauth.JWTConfig{SigningKey: cfg.SigningKey}), ConcurrencyControl: jwtConcurrency}
 		claims, err := j.ParseToken(token)
 		if err != nil {
 			if errors.Is(err, utils.TokenExpired) {

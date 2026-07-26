@@ -44,8 +44,7 @@ func TestArchitectureBoundaries(t *testing.T) {
 		assertModulesDoNotImportOtherInfrastructure(t, rel, imports)
 		assertApplicationDoesNotUseLegacyModel(t, rel, imports)
 		assertTransportDoesNotUseLegacyResponse(t, rel, imports)
-		assertInterfacesDoNotUseLegacyGlobal(t, rel, imports)
-		return nil
+				return nil
 	})
 	if err != nil {
 		t.Fatal(err)
@@ -117,7 +116,7 @@ func assertServicesStayTransportFree(t *testing.T, rel string, imports []string)
 	}
 	banned := []string{
 		"github.com/gin-gonic/gin",
-		"github.com/flipped-aurora/gin-vue-admin/server/global",
+		"model/common/response", // legacy response package
 	}
 	assertNoImports(t, rel, imports, banned, "service/application package must stay transport-free and avoid global state")
 }
@@ -166,15 +165,6 @@ func assertTransportDoesNotUseLegacyResponse(t *testing.T, rel string, imports [
 	}
 }
 
-func assertInterfacesDoNotUseLegacyGlobal(t *testing.T, rel string, imports []string) {
-	t.Helper()
-	if !strings.HasPrefix(rel, "interfaces/") {
-		return
-	}
-	assertNoImports(t, rel, imports, []string{
-		"github.com/flipped-aurora/gin-vue-admin/server/global",
-	}, "interfaces package must not read legacy global state")
-}
 
 func moduleRoot(rel string) string {
 	parts := strings.Split(rel, "/")

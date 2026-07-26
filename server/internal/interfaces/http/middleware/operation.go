@@ -11,8 +11,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/flipped-aurora/gin-vue-admin/server/utils"
-
+	platformauth "github.com/flipped-aurora/gin-vue-admin/server/internal/platform/auth"
 	operationmysql "github.com/flipped-aurora/gin-vue-admin/server/internal/modules/system/operation-record/infrastructure/mysql"
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
@@ -53,9 +52,8 @@ func OperationRecord(db *gorm.DB, log *zap.Logger) gin.HandlerFunc {
 			}
 			body, _ = json.Marshal(&m)
 		}
-		claims, _ := utils.GetClaims(c)
-		if claims != nil && claims.BaseClaims.ID != 0 {
-			userId = int(claims.BaseClaims.ID)
+		if actor, ok := platformauth.ActorFromContext(c.Request.Context()); ok {
+			userId = int(actor.UserID)
 		} else {
 			id, err := strconv.Atoi(c.Request.Header.Get("x-user-id"))
 			if err != nil {
