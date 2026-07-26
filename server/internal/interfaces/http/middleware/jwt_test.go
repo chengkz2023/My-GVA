@@ -6,7 +6,6 @@ import (
 	"testing"
 
 	platformauth "github.com/flipped-aurora/gin-vue-admin/server/internal/platform/auth"
-	legacyrequest "github.com/flipped-aurora/gin-vue-admin/server/model/system/request"
 	"github.com/flipped-aurora/gin-vue-admin/server/utils"
 	"github.com/gin-gonic/gin"
 	"github.com/songzhibin97/gkit/cache/local_cache"
@@ -23,7 +22,7 @@ func TestJWTAuthInjectsActor(t *testing.T) {
 		Issuer:      "boyking-admin",
 	})
 	j := &utils.JWT{JWT: pjwt}
-	token, err := j.CreateToken(j.CreateClaims(legacyrequest.BaseClaims{
+	token, err := j.CreateToken(j.CreateClaims(platformauth.BaseClaims{
 		ID:          1,
 		Username:    "admin",
 		NickName:    "Admin",

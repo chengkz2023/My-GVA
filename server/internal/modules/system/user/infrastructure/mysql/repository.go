@@ -7,7 +7,7 @@ import (
 
 	"github.com/flipped-aurora/gin-vue-admin/server/internal/modules/system/user/domain"
 	"github.com/flipped-aurora/gin-vue-admin/server/internal/platform/pagination"
-	legacysystem "github.com/flipped-aurora/gin-vue-admin/server/model/system"
+	platformdb "github.com/flipped-aurora/gin-vue-admin/server/internal/platform/database"
 	"github.com/google/uuid"
 	"gorm.io/gorm"
 )
@@ -25,7 +25,7 @@ func (r *Repository) FindByID(ctx context.Context, id uint) (domain.User, error)
 		return domain.User{}, domain.ErrRepositoryUnavailable
 	}
 
-	var user legacysystem.SysUser
+	var user platformdb.SysUser
 	err := r.db.WithContext(ctx).Select(
 		"id",
 		"uuid",
@@ -56,7 +56,7 @@ func (r *Repository) List(ctx context.Context, query domain.ListQuery) (paginati
 		}, domain.ErrRepositoryUnavailable
 	}
 
-	db := r.db.WithContext(ctx).Model(&legacysystem.SysUser{})
+	db := r.db.WithContext(ctx).Model(&platformdb.SysUser{})
 	if query.NickName != "" {
 		db = db.Where("nick_name LIKE ?", "%"+query.NickName+"%")
 	}
@@ -75,7 +75,7 @@ func (r *Repository) List(ctx context.Context, query domain.ListQuery) (paginati
 		return pagination.Result[domain.User]{}, err
 	}
 
-	var users []legacysystem.SysUser
+	var users []platformdb.SysUser
 	err := db.Select(
 		"id",
 		"uuid",
@@ -108,7 +108,7 @@ func (r *Repository) FindPasswordHashByID(ctx context.Context, id uint) (string,
 		return "", domain.ErrRepositoryUnavailable
 	}
 
-	var user legacysystem.SysUser
+	var user platformdb.SysUser
 	err := r.db.WithContext(ctx).Select("id", "password").First(&user, id).Error
 	if errors.Is(err, gorm.ErrRecordNotFound) {
 		return "", domain.ErrUserNotFound
@@ -123,7 +123,7 @@ func (r *Repository) UpdatePasswordHash(ctx context.Context, id uint, passwordHa
 	if r == nil || r.db == nil {
 		return domain.ErrRepositoryUnavailable
 	}
-	return r.db.WithContext(ctx).Model(&legacysystem.SysUser{}).Where("id = ?", id).Update("password", passwordHash).Error
+	return r.db.WithContext(ctx).Model(&platformdb.SysUser{}).Where("id = ?", id).Update("password", passwordHash).Error
 }
 
 func (r *Repository) UpdateProfile(ctx context.Context, id uint, profile domain.ProfilePatch) (domain.User, error) {
@@ -131,7 +131,7 @@ func (r *Repository) UpdateProfile(ctx context.Context, id uint, profile domain.
 		return domain.User{}, domain.ErrRepositoryUnavailable
 	}
 
-	result := r.db.WithContext(ctx).Model(&legacysystem.SysUser{}).Where("id = ?", id).Updates(map[string]any{
+	result := r.db.WithContext(ctx).Model(&platformdb.SysUser{}).Where("id = ?", id).Updates(map[string]any{
 		"updated_at": time.Now(),
 		"nick_name":  profile.NickName,
 		"header_img": profile.HeaderImg,
@@ -152,12 +152,12 @@ func (r *Repository) Create(ctx context.Context, input domain.CreateUserInput) (
 		return domain.User{}, domain.ErrRepositoryUnavailable
 	}
 
-	authorities := make([]legacysystem.SysAuthority, 0, len(input.AuthorityIDs))
+	authorities := make([]platformdb.SysAuthority, 0, len(input.AuthorityIDs))
 	for _, id := range input.AuthorityIDs {
-		authorities = append(authorities, legacysystem.SysAuthority{AuthorityId: id})
+		authorities = append(authorities, platformdb.SysAuthority{AuthorityId: id})
 	}
 
-	user := legacysystem.SysUser{
+	user := platformdb.SysUser{
 		UUID:        uuid.New(),
 		Username:    input.Username,
 		Password:    input.PasswordHash,
@@ -194,10 +194,10 @@ func (r *Repository) Delete(ctx context.Context, id uint) error {
 		return domain.ErrRepositoryUnavailable
 	}
 	return r.db.WithContext(ctx).Transaction(func(tx *gorm.DB) error {
-		if err := tx.Where("id = ?", id).Delete(&legacysystem.SysUser{}).Error; err != nil {
+		if err := tx.Where("id = ?", id).Delete(&platformdb.SysUser{}).Error; err != nil {
 			return err
 		}
-		return tx.Where("sys_user_id = ?", id).Delete(&legacysystem.SysUserAuthority{}).Error
+		return tx.Where("sys_user_id = ?", id).Delete(&platformdb.SysUserAuthority{}).Error
 	})
 }
 
@@ -206,7 +206,7 @@ func (r *Repository) SetAuthorities(ctx context.Context, input domain.SetAuthori
 		return domain.ErrRepositoryUnavailable
 	}
 	return r.db.WithContext(ctx).Transaction(func(tx *gorm.DB) error {
-		var user legacysystem.SysUser
+		var user platformdb.SysUser
 		if err := tx.First(&user, input.UserID).Error; err != nil {
 			if errors.Is(err, gorm.ErrRecordNotFound) {
 				return domain.ErrUserNotFound
@@ -214,14 +214,14 @@ func (r *Repository) SetAuthorities(ctx context.Context, input domain.SetAuthori
 			return err
 		}
 
-		if err := tx.Where("sys_user_id = ?", input.UserID).Delete(&legacysystem.SysUserAuthority{}).Error; err != nil {
+		if err := tx.Where("sys_user_id = ?", input.UserID).Delete(&platformdb.SysUserAuthority{}).Error; err != nil {
 			return err
 		}
 
 		if len(input.AuthorityIDs) > 0 {
-			userAuthorities := make([]legacysystem.SysUserAuthority, 0, len(input.AuthorityIDs))
+			userAuthorities := make([]platformdb.SysUserAuthority, 0, len(input.AuthorityIDs))
 			for _, authID := range input.AuthorityIDs {
-				userAuthorities = append(userAuthorities, legacysystem.SysUserAuthority{
+				userAuthorities = append(userAuthorities, platformdb.SysUserAuthority{
 					SysUserId:               input.UserID,
 					SysAuthorityAuthorityId: authID,
 				})
@@ -238,7 +238,7 @@ func (r *Repository) SetAuthorities(ctx context.Context, input domain.SetAuthori
 	})
 }
 
-func mapUser(user legacysystem.SysUser) domain.User {
+func mapUser(user platformdb.SysUser) domain.User {
 	return domain.User{
 		ID:          user.ID,
 		UUID:        user.UUID.String(),

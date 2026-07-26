@@ -5,7 +5,7 @@ import (
 
 	platformauth "github.com/flipped-aurora/gin-vue-admin/server/internal/platform/auth"
 	apperrors "github.com/flipped-aurora/gin-vue-admin/server/internal/platform/errors"
-	legacymodel "github.com/flipped-aurora/gin-vue-admin/server/model/system"
+	platformdb "github.com/flipped-aurora/gin-vue-admin/server/internal/platform/database"
 	"gorm.io/gorm"
 )
 
@@ -33,7 +33,7 @@ func (s *Service) Me(ctx context.Context) (MeResponse, error) {
 		Authorities: []any{},
 	}
 	if s.db != nil {
-		var user legacymodel.SysUser
+		var user platformdb.SysUser
 		if err := s.db.WithContext(ctx).
 			Preload("Authority").
 			Where("id = ?", actor.UserID).
@@ -62,7 +62,7 @@ func (s *Service) Login(ctx context.Context, username, password string) (LoginRe
 	if s.db == nil {
 		return LoginResponse{}, apperrors.WithMessage(apperrors.Internal, "database unavailable")
 	}
-	var user legacymodel.SysUser
+	var user platformdb.SysUser
 	if err := s.db.WithContext(ctx).Where("username = ?", username).First(&user).Error; err != nil {
 		return LoginResponse{}, apperrors.WithMessage(apperrors.Unauthorized, "invalid username or password")
 	}
@@ -90,7 +90,7 @@ func (s *Service) Login(ctx context.Context, username, password string) (LoginRe
 	}, nil
 }
 
-func userToDTO(user legacymodel.SysUser) UserDTO {
+func userToDTO(user platformdb.SysUser) UserDTO {
 	return UserDTO{
 		ID:          user.ID,
 		UUID:        user.UUID.String(),

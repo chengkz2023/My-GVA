@@ -42,8 +42,6 @@ func TestArchitectureBoundaries(t *testing.T) {
 		assertHandlersDoNotUsePersistence(t, rel, imports)
 		assertServicesStayTransportFree(t, rel, imports)
 		assertModulesDoNotImportOtherInfrastructure(t, rel, imports)
-		assertApplicationDoesNotUseLegacyModel(t, rel, imports)
-		assertTransportDoesNotUseLegacyResponse(t, rel, imports)
 				return nil
 	})
 	if err != nil {
@@ -116,7 +114,6 @@ func assertServicesStayTransportFree(t *testing.T, rel string, imports []string)
 	}
 	banned := []string{
 		"github.com/gin-gonic/gin",
-		"model/common/response", // legacy response package
 	}
 	assertNoImports(t, rel, imports, banned, "service/application package must stay transport-free and avoid global state")
 }
@@ -139,32 +136,6 @@ func assertModulesDoNotImportOtherInfrastructure(t *testing.T, rel string, impor
 		}
 	}
 }
-
-func assertApplicationDoesNotUseLegacyModel(t *testing.T, rel string, imports []string) {
-	t.Helper()
-	if !strings.Contains(rel, "/application/") {
-		return
-	}
-	banned := []string{
-		"server/model/system",
-		"server/model/example",
-		"server/model/common",
-	}
-	assertNoImports(t, rel, imports, banned, "application must not import legacy model")
-}
-
-func assertTransportDoesNotUseLegacyResponse(t *testing.T, rel string, imports []string) {
-	t.Helper()
-	if !strings.Contains(rel, "/transport/http/") {
-		return
-	}
-	for _, imp := range imports {
-		if strings.Contains(imp, "server/model/common/response") {
-			t.Fatalf("%s: transport must not use legacy response package %q", rel, imp)
-		}
-	}
-}
-
 
 func moduleRoot(rel string) string {
 	parts := strings.Split(rel, "/")

@@ -1,12 +1,14 @@
 package utils
 
-import (
-	"github.com/flipped-aurora/gin-vue-admin/server/model/common/request"
-	"testing"
-)
+import "testing"
+
+type pageInfo struct {
+	Page     int
+	PageSize int
+}
 
 type PageInfoTest struct {
-	PageInfo request.PageInfo
+	PageInfo pageInfo
 	Name     string
 }
 

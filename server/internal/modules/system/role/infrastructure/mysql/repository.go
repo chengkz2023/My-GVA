@@ -5,7 +5,7 @@ import (
 	"strconv"
 
 	"github.com/flipped-aurora/gin-vue-admin/server/internal/modules/system/role/domain"
-	legacysystem "github.com/flipped-aurora/gin-vue-admin/server/model/system"
+	platformdb "github.com/flipped-aurora/gin-vue-admin/server/internal/platform/database"
 	"gorm.io/gorm"
 )
 
@@ -22,7 +22,7 @@ func (r *Repository) Tree(ctx context.Context, authorityID uint, strict bool) ([
 		return []domain.Role{}, domain.ErrRepositoryUnavailable
 	}
 
-	query := r.db.WithContext(ctx).Model(&legacysystem.SysAuthority{})
+	query := r.db.WithContext(ctx).Model(&platformdb.SysAuthority{})
 	if strict {
 		current, err := r.find(ctx, authorityID)
 		if err != nil {
@@ -37,7 +37,7 @@ func (r *Repository) Tree(ctx context.Context, authorityID uint, strict bool) ([
 		query = query.Where("parent_id = ?", 0)
 	}
 
-	var authorities []legacysystem.SysAuthority
+	var authorities []platformdb.SysAuthority
 	if err := query.Order("authority_id asc").Find(&authorities).Error; err != nil {
 		return nil, err
 	}
@@ -59,7 +59,7 @@ func (r *Repository) Save(ctx context.Context, input domain.SaveRoleInput) error
 	}
 
 	updating := false
-	var existing legacysystem.SysAuthority
+	var existing platformdb.SysAuthority
 	err := r.db.WithContext(ctx).Where("authority_id = ?", input.AuthorityID).First(&existing).Error
 	if err == nil {
 		updating = true
@@ -70,7 +70,7 @@ func (r *Repository) Save(ctx context.Context, input domain.SaveRoleInput) error
 	if !updating {
 		if input.ParentID == nil || *input.ParentID == 0 {
 		}
-		auth := legacysystem.SysAuthority{
+		auth := platformdb.SysAuthority{
 			AuthorityId:   input.AuthorityID,
 			AuthorityName: input.AuthorityName,
 			ParentId:      input.ParentID,
@@ -100,7 +100,7 @@ func (r *Repository) Delete(ctx context.Context, authorityID uint) (domain.SaveR
 		return domain.SaveRoleInput{}, domain.ErrRepositoryUnavailable
 	}
 
-	var auth legacysystem.SysAuthority
+	var auth platformdb.SysAuthority
 	err := r.db.WithContext(ctx).
 		Preload("Users").
 		Where("authority_id = ?", authorityID).
@@ -114,7 +114,7 @@ func (r *Repository) Delete(ctx context.Context, authorityID uint) (domain.SaveR
 	}
 
 	var childCount int64
-	r.db.WithContext(ctx).Model(&legacysystem.SysAuthority{}).Where("parent_id = ?", authorityID).Count(&childCount)
+	r.db.WithContext(ctx).Model(&platformdb.SysAuthority{}).Where("parent_id = ?", authorityID).Count(&childCount)
 	if childCount > 0 {
 		return domain.SaveRoleInput{}, domain.ErrRoleHasChildren
 	}
@@ -127,18 +127,18 @@ func (r *Repository) Delete(ctx context.Context, authorityID uint) (domain.SaveR
 	}
 
 	err = r.db.WithContext(ctx).Transaction(func(tx *gorm.DB) error {
-		var del legacysystem.SysAuthority
+		var del platformdb.SysAuthority
 		if err := tx.Where("authority_id = ?", authorityID).First(&del).Error; err != nil {
 			return err
 		}
 		// Remove menu associations
-		tx.Where("sys_authority_authority_id = ?", authorityID).Delete(&legacysystem.SysAuthorityMenu{})
+		tx.Where("sys_authority_authority_id = ?", authorityID).Delete(&platformdb.SysAuthorityMenu{})
 		// Remove data authority associations
 		tx.Exec("DELETE FROM sys_data_authority_id WHERE sys_authority_id = ?", authorityID)
 		// Remove user associations
-		tx.Where("sys_authority_authority_id = ?", authorityID).Delete(&legacysystem.SysUserAuthority{})
+		tx.Where("sys_authority_authority_id = ?", authorityID).Delete(&platformdb.SysUserAuthority{})
 		// Remove authority buttons
-		tx.Where("authority_id = ?", authorityID).Delete(&legacysystem.SysAuthorityBtn{})
+		tx.Where("authority_id = ?", authorityID).Delete(&platformdb.SysAuthorityBtn{})
 		// Hard delete the authority
 		tx.Unscoped().Delete(&del)
 		return nil
@@ -161,7 +161,7 @@ func (r *Repository) FindMenuIDs(ctx context.Context, authorityID uint) ([]uint,
 	if r == nil || r.db == nil {
 		return nil, domain.ErrRepositoryUnavailable
 	}
-	var menus []legacysystem.SysAuthorityMenu
+	var menus []platformdb.SysAuthorityMenu
 	if err := r.db.WithContext(ctx).Where("sys_authority_authority_id = ?", authorityID).Find(&menus).Error; err != nil {
 		return nil, err
 	}
@@ -182,23 +182,23 @@ func (r *Repository) CopyMenusAndButtons(ctx context.Context, oldAuthorityID, ne
 	}
 	return r.db.WithContext(ctx).Transaction(func(tx *gorm.DB) error {
 		// Copy menu assignments
-		var oldMenus []legacysystem.SysAuthorityMenu
+		var oldMenus []platformdb.SysAuthorityMenu
 		if err := tx.Where("sys_authority_authority_id = ?", oldAuthorityID).Find(&oldMenus).Error; err != nil {
 			return err
 		}
 		for _, m := range oldMenus {
-			tx.Create(&legacysystem.SysAuthorityMenu{
+			tx.Create(&platformdb.SysAuthorityMenu{
 				MenuId:      m.MenuId,
 				AuthorityId: strconv.FormatUint(uint64(newAuthorityID), 10),
 			})
 		}
 		// Copy authority buttons
-		var oldBtns []legacysystem.SysAuthorityBtn
+		var oldBtns []platformdb.SysAuthorityBtn
 		if err := tx.Where("authority_id = ?", oldAuthorityID).Find(&oldBtns).Error; err != nil {
 			return err
 		}
 		for _, b := range oldBtns {
-			tx.Create(&legacysystem.SysAuthorityBtn{
+			tx.Create(&platformdb.SysAuthorityBtn{
 				AuthorityId:      newAuthorityID,
 				SysMenuID:        b.SysMenuID,
 				SysBaseMenuBtnID: b.SysBaseMenuBtnID,
@@ -212,13 +212,13 @@ func (r *Repository) SetDataAuthority(ctx context.Context, input domain.DataAuth
 	if r == nil || r.db == nil {
 		return domain.ErrRepositoryUnavailable
 	}
-	var auth legacysystem.SysAuthority
+	var auth platformdb.SysAuthority
 	if err := r.db.WithContext(ctx).Where("authority_id = ?", input.AuthorityID).First(&auth).Error; err != nil {
 		return err
 	}
-	dataAuths := make([]legacysystem.SysAuthority, 0, len(input.DataAuthorityIDs))
+	dataAuths := make([]platformdb.SysAuthority, 0, len(input.DataAuthorityIDs))
 	for _, id := range input.DataAuthorityIDs {
-		dataAuths = append(dataAuths, legacysystem.SysAuthority{AuthorityId: id})
+		dataAuths = append(dataAuths, platformdb.SysAuthority{AuthorityId: id})
 	}
 	return r.db.WithContext(ctx).Model(&auth).Association("DataAuthorityId").Replace(dataAuths)
 }
@@ -227,7 +227,7 @@ func (r *Repository) GetDataAuthorities(ctx context.Context, authorityID uint) (
 	if r == nil || r.db == nil {
 		return nil, domain.ErrRepositoryUnavailable
 	}
-	var auth legacysystem.SysAuthority
+	var auth platformdb.SysAuthority
 	if err := r.db.WithContext(ctx).Preload("DataAuthorityId").Where("authority_id = ?", authorityID).First(&auth).Error; err != nil {
 		return nil, err
 	}
@@ -238,16 +238,16 @@ func (r *Repository) GetDataAuthorities(ctx context.Context, authorityID uint) (
 	return ids, nil
 }
 
-func (r *Repository) find(ctx context.Context, authorityID uint) (legacysystem.SysAuthority, error) {
-	var authority legacysystem.SysAuthority
+func (r *Repository) find(ctx context.Context, authorityID uint) (platformdb.SysAuthority, error) {
+	var authority platformdb.SysAuthority
 	err := r.db.WithContext(ctx).Where("authority_id = ?", authorityID).First(&authority).Error
 	return authority, err
 }
 
-func (r *Repository) mapWithChildren(ctx context.Context, authority legacysystem.SysAuthority) (domain.Role, error) {
+func (r *Repository) mapWithChildren(ctx context.Context, authority platformdb.SysAuthority) (domain.Role, error) {
 	role := mapRole(authority)
 
-	var children []legacysystem.SysAuthority
+	var children []platformdb.SysAuthority
 	err := r.db.WithContext(ctx).Where("parent_id = ?", authority.AuthorityId).Order("authority_id asc").Find(&children).Error
 	if err != nil {
 		return domain.Role{}, err
@@ -264,14 +264,14 @@ func (r *Repository) mapWithChildren(ctx context.Context, authority legacysystem
 }
 
 func (r *Repository) assignMenu(ctx context.Context, authorityID, menuID uint) {
-	var auth legacysystem.SysAuthority
+	var auth platformdb.SysAuthority
 	auth.AuthorityId = authorityID
-	menus := []legacysystem.SysBaseMenu{{}}
+	menus := []platformdb.SysBaseMenu{{}}
 	menus[0].ID = menuID
 	_ = r.db.WithContext(ctx).Model(&auth).Association("SysBaseMenus").Append(menus)
 }
 
-func mapRole(authority legacysystem.SysAuthority) domain.Role {
+func mapRole(authority platformdb.SysAuthority) domain.Role {
 	return domain.Role{
 		AuthorityID:   authority.AuthorityId,
 		AuthorityName: authority.AuthorityName,
@@ -292,7 +292,7 @@ func (r *Repository) GetDescendantIDs(ctx context.Context, authorityID uint) ([]
 }
 
 func (r *Repository) collectDescendants(ctx context.Context, parentID uint, ids *[]uint) error {
-	var children []legacysystem.SysAuthority
+	var children []platformdb.SysAuthority
 	if err := r.db.WithContext(ctx).Where("parent_id = ?", parentID).Find(&children).Error; err != nil {
 		return err
 	}

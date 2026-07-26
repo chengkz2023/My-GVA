@@ -2,8 +2,8 @@ package ast
 
 import (
 	"fmt"
-	"github.com/flipped-aurora/gin-vue-admin/server/model/system"
 	apimysql "github.com/flipped-aurora/gin-vue-admin/server/internal/modules/system/api/infrastructure/mysql"
+	platformdb "github.com/flipped-aurora/gin-vue-admin/server/internal/platform/database"
 	"go/ast"
 	"go/parser"
 	"go/token"
@@ -74,7 +74,7 @@ func FindArray(astNode ast.Node, identName, selectorExprName string) *ast.Compos
 	return assignStmt
 }
 
-func CreateMenuStructAst(menus []system.SysBaseMenu) *[]ast.Expr {
+func CreateMenuStructAst(menus []platformdb.SysBaseMenu) *[]ast.Expr {
 	var menuElts []ast.Expr
 	for i := range menus {
 		elts := []ast.Expr{ // 结构体的字段
@@ -306,7 +306,7 @@ func VariableExistsInBlock(block *ast.BlockStmt, varName string) bool {
 	return exists
 }
 
-func CreateDictionaryStructAst(dictionaries []system.SysDictionary) *[]ast.Expr {
+func CreateDictionaryStructAst(dictionaries []platformdb.SysDictionary) *[]ast.Expr {
 	var dictElts []ast.Expr
 	for i := range dictionaries {
 		statusStr := "true"

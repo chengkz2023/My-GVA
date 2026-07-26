@@ -1,4 +1,4 @@
-package common
+package database
 
 import (
 	"database/sql/driver"
@@ -27,17 +27,10 @@ func (m *JSONMap) Scan(value interface{}) error {
 	case string:
 		err = json.Unmarshal([]byte(value.(string)), m)
 	default:
-		err = errors.New("basetypes.JSONMap.Scan: invalid value type")
+		err = errors.New("database.JSONMap.Scan: invalid value type")
 	}
 	if err != nil {
 		return err
 	}
 	return nil
-}
-
-type TreeNode[T any] interface {
-	GetChildren() []T
-	SetChildren(children T)
-	GetID() int
-	GetParentID() int
 }

@@ -4,7 +4,7 @@ import (
 	"strconv"
 
 	apimysql "github.com/flipped-aurora/gin-vue-admin/server/internal/modules/system/api/infrastructure/mysql"
-	"github.com/flipped-aurora/gin-vue-admin/server/model/system"
+	platformdb "github.com/flipped-aurora/gin-vue-admin/server/internal/platform/database"
 	"github.com/flipped-aurora/gin-vue-admin/server/utils"
 	"github.com/google/uuid"
 	"go.uber.org/zap"
@@ -29,11 +29,11 @@ func EnsureSystemSeedData(db *gorm.DB, log *zap.Logger) {
 
 func seedAuthority(db *gorm.DB, log *zap.Logger) {
 	var count int64
-	db.Model(&system.SysAuthority{}).Where("authority_id = ?", adminAuthorityID).Count(&count)
+	db.Model(&platformdb.SysAuthority{}).Where("authority_id = ?", adminAuthorityID).Count(&count)
 	if count > 0 {
 		return
 	}
-	auth := system.SysAuthority{
+	auth := platformdb.SysAuthority{
 		AuthorityId:   adminAuthorityID,
 		AuthorityName: "超级管理员",
 		DefaultRouter: "authority",
@@ -45,11 +45,11 @@ func seedAuthority(db *gorm.DB, log *zap.Logger) {
 
 func seedAdminUser(db *gorm.DB, log *zap.Logger) {
 	var count int64
-	db.Model(&system.SysUser{}).Where("username = ?", adminUsername).Count(&count)
+	db.Model(&platformdb.SysUser{}).Where("username = ?", adminUsername).Count(&count)
 	if count > 0 {
 		return
 	}
-	user := system.SysUser{
+	user := platformdb.SysUser{
 		UUID:        uuid.New(),
 		Username:    adminUsername,
 		Password:    utils.BcryptHash("123456"),
@@ -62,7 +62,7 @@ func seedAdminUser(db *gorm.DB, log *zap.Logger) {
 		log.Error("seed admin user failed", zap.Error(err))
 		return
 	}
-	db.Create(&system.SysUserAuthority{
+	db.Create(&platformdb.SysUserAuthority{
 		SysUserId:               user.ID,
 		SysAuthorityAuthorityId: adminAuthorityID,
 	})
@@ -70,41 +70,41 @@ func seedAdminUser(db *gorm.DB, log *zap.Logger) {
 
 func seedMenus(db *gorm.DB, log *zap.Logger) {
 	var count int64
-	db.Model(&system.SysBaseMenu{}).Count(&count)
+	db.Model(&platformdb.SysBaseMenu{}).Count(&count)
 	if count > 0 {
 		return
 	}
 
-	menus := []system.SysBaseMenu{
+	menus := []platformdb.SysBaseMenu{
 		{
 			ParentId: 0, Path: "admin", Name: "superAdmin", Hidden: false,
 			Component: "view/superAdmin/index.vue", Sort: 1,
-			Meta: system.Meta{Title: "超级管理员", Icon: "user"},
+			Meta: platformdb.Meta{Title: "超级管理员", Icon: "user"},
 		},
 		{
 			ParentId: 1, Path: "authority", Name: "authority", Hidden: false,
 			Component: "view/superAdmin/authority/authority.vue", Sort: 1,
-			Meta: system.Meta{Title: "角色管理", Icon: "avatar"},
+			Meta: platformdb.Meta{Title: "角色管理", Icon: "avatar"},
 		},
 		{
 			ParentId: 1, Path: "menu", Name: "menu", Hidden: false,
 			Component: "view/superAdmin/menu/menu.vue", Sort: 2,
-			Meta: system.Meta{Title: "菜单管理", Icon: "tickets", KeepAlive: true},
+			Meta: platformdb.Meta{Title: "菜单管理", Icon: "tickets", KeepAlive: true},
 		},
 		{
 			ParentId: 1, Path: "api", Name: "api", Hidden: false,
 			Component: "view/superAdmin/api/api.vue", Sort: 3,
-			Meta: system.Meta{Title: "API管理", Icon: "platform", KeepAlive: true},
+			Meta: platformdb.Meta{Title: "API管理", Icon: "platform", KeepAlive: true},
 		},
 		{
 			ParentId: 1, Path: "user", Name: "user", Hidden: false,
 			Component: "view/superAdmin/user/user.vue", Sort: 4,
-			Meta: system.Meta{Title: "用户管理", Icon: "coordinate"},
+			Meta: platformdb.Meta{Title: "用户管理", Icon: "coordinate"},
 		},
 		{
 			ParentId: 1, Path: "operation", Name: "operation", Hidden: false,
 			Component: "view/superAdmin/operation/sysOperationRecord.vue", Sort: 5,
-			Meta: system.Meta{Title: "操作历史", Icon: "pie-chart"},
+			Meta: platformdb.Meta{Title: "操作历史", Icon: "pie-chart"},
 		},
 	}
 	for i := range menus {
@@ -112,7 +112,7 @@ func seedMenus(db *gorm.DB, log *zap.Logger) {
 			log.Error("seed menu failed", zap.Error(err))
 			continue
 		}
-		db.Create(&system.SysAuthorityMenu{
+		db.Create(&platformdb.SysAuthorityMenu{
 			MenuId:      strconv.Itoa(int(menus[i].ID)),
 			AuthorityId: strconv.Itoa(adminAuthorityID),
 		})

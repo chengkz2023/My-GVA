@@ -4,7 +4,6 @@ import (
 	"golang.org/x/sync/singleflight"
 
 	platformauth "github.com/flipped-aurora/gin-vue-admin/server/internal/platform/auth"
-	"github.com/flipped-aurora/gin-vue-admin/server/model/system/request"
 )
 
 type JWT struct {
@@ -27,7 +26,7 @@ func NewJWTWithKey(key []byte) *JWT {
 	})}
 }
 
-func (j *JWT) CreateClaims(baseClaims request.BaseClaims) request.CustomClaims {
+func (j *JWT) CreateClaims(baseClaims platformauth.BaseClaims) platformauth.CustomClaims {
 	pc := j.JWT.CreateClaims(platformauth.BaseClaims{
 		UUID:        baseClaims.UUID,
 		ID:          baseClaims.ID,
@@ -35,14 +34,14 @@ func (j *JWT) CreateClaims(baseClaims request.BaseClaims) request.CustomClaims {
 		NickName:    baseClaims.NickName,
 		AuthorityId: baseClaims.AuthorityId,
 	})
-	return request.CustomClaims{
+	return platformauth.CustomClaims{
 		BaseClaims: baseClaims,
 		BufferTime: pc.BufferTime,
 		RegisteredClaims: pc.RegisteredClaims,
 	}
 }
 
-func (j *JWT) CreateToken(claims request.CustomClaims) (string, error) {
+func (j *JWT) CreateToken(claims platformauth.CustomClaims) (string, error) {
 	return j.JWT.CreateToken(platformauth.CustomClaims{
 		BaseClaims:       platformauth.BaseClaims(claims.BaseClaims),
 		BufferTime:       claims.BufferTime,
@@ -50,13 +49,13 @@ func (j *JWT) CreateToken(claims request.CustomClaims) (string, error) {
 	})
 }
 
-func (j *JWT) ParseToken(tokenString string) (*request.CustomClaims, error) {
+func (j *JWT) ParseToken(tokenString string) (*platformauth.CustomClaims, error) {
 	claims, err := j.JWT.ParseToken(tokenString)
 	if err != nil {
 		return nil, err
 	}
-	return &request.CustomClaims{
-		BaseClaims: request.BaseClaims{
+	return &platformauth.CustomClaims{
+		BaseClaims: platformauth.BaseClaims{
 			UUID:        claims.UUID,
 			ID:          claims.BaseClaims.ID,
 			Username:    claims.Username,
@@ -68,7 +67,7 @@ func (j *JWT) ParseToken(tokenString string) (*request.CustomClaims, error) {
 	}, nil
 }
 
-func (j *JWT) CreateTokenByOldToken(oldToken string, claims request.CustomClaims) (string, error) {
+func (j *JWT) CreateTokenByOldToken(oldToken string, claims platformauth.CustomClaims) (string, error) {
 	v, err, _ := j.ConcurrencyControl.Do("JWT:"+oldToken, func() (interface{}, error) {
 		return j.JWT.CreateToken(platformauth.CustomClaims{
 			BaseClaims:       platformauth.BaseClaims(claims.BaseClaims),

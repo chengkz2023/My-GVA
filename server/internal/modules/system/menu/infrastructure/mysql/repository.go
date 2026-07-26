@@ -5,7 +5,7 @@ import (
 	"strconv"
 
 	"github.com/flipped-aurora/gin-vue-admin/server/internal/modules/system/menu/domain"
-	legacysystem "github.com/flipped-aurora/gin-vue-admin/server/model/system"
+	platformdb "github.com/flipped-aurora/gin-vue-admin/server/internal/platform/database"
 	"gorm.io/gorm"
 )
 
@@ -22,7 +22,7 @@ func (r *Repository) TreeByAuthority(ctx context.Context, authorityID uint) ([]d
 		return []domain.Menu{}, domain.ErrRepositoryUnavailable
 	}
 
-	var authorityMenus []legacysystem.SysAuthorityMenu
+	var authorityMenus []platformdb.SysAuthorityMenu
 	if err := r.db.WithContext(ctx).
 		Where("sys_authority_authority_id = ?", authorityID).
 		Find(&authorityMenus).Error; err != nil {
@@ -41,7 +41,7 @@ func (r *Repository) TreeByAuthority(ctx context.Context, authorityID uint) ([]d
 		return []domain.Menu{}, nil
 	}
 
-	var baseMenus []legacysystem.SysBaseMenu
+	var baseMenus []platformdb.SysBaseMenu
 	if err := r.db.WithContext(ctx).
 		Where("id IN ?", menuIDs).
 		Order("sort").
@@ -49,7 +49,7 @@ func (r *Repository) TreeByAuthority(ctx context.Context, authorityID uint) ([]d
 		return nil, err
 	}
 
-	treeMap := make(map[uint][]legacysystem.SysBaseMenu)
+	treeMap := make(map[uint][]platformdb.SysBaseMenu)
 	for _, bm := range baseMenus {
 		treeMap[bm.ParentId] = append(treeMap[bm.ParentId], bm)
 	}
@@ -62,11 +62,11 @@ func (r *Repository) All(ctx context.Context) ([]domain.Menu, error) {
 	if r == nil || r.db == nil {
 		return []domain.Menu{}, domain.ErrRepositoryUnavailable
 	}
-	var baseMenus []legacysystem.SysBaseMenu
+	var baseMenus []platformdb.SysBaseMenu
 	if err := r.db.WithContext(ctx).Order("sort asc").Find(&baseMenus).Error; err != nil {
 		return nil, err
 	}
-	treeMap := make(map[uint][]legacysystem.SysBaseMenu)
+	treeMap := make(map[uint][]platformdb.SysBaseMenu)
 	for _, bm := range baseMenus {
 		treeMap[bm.ParentId] = append(treeMap[bm.ParentId], bm)
 	}
@@ -74,7 +74,7 @@ func (r *Repository) All(ctx context.Context) ([]domain.Menu, error) {
 	return keepScaffoldMenus(domainMenus), nil
 }
 
-func buildTree(treeMap map[uint][]legacysystem.SysBaseMenu, parentID uint) []domain.Menu {
+func buildTree(treeMap map[uint][]platformdb.SysBaseMenu, parentID uint) []domain.Menu {
 	baseMenus := treeMap[parentID]
 	domainMenus := make([]domain.Menu, 0, len(baseMenus))
 	for _, bm := range baseMenus {
@@ -104,13 +104,13 @@ func (r *Repository) AssignMenus(ctx context.Context, authorityID uint, menuIDs 
 		return domain.ErrRepositoryUnavailable
 	}
 
-	menus := make([]legacysystem.SysBaseMenu, 0, len(menuIDs))
+	menus := make([]platformdb.SysBaseMenu, 0, len(menuIDs))
 	for _, id := range menuIDs {
-		menus = append(menus, legacysystem.SysBaseMenu{})
+		menus = append(menus, platformdb.SysBaseMenu{})
 		menus[len(menus)-1].ID = id
 	}
 
-	var authority legacysystem.SysAuthority
+	var authority platformdb.SysAuthority
 	authority.AuthorityId = authorityID
 	authority.SysBaseMenus = menus
 
@@ -127,20 +127,20 @@ func (r *Repository) Save(ctx context.Context, input domain.SaveMenuInput) (uint
 	err := r.db.WithContext(ctx).Transaction(func(tx *gorm.DB) error {
 		// Name uniqueness check
 		if updating {
-			var old legacysystem.SysBaseMenu
+			var old platformdb.SysBaseMenu
 			if err := tx.Where("id = ?", input.ID).First(&old).Error; err != nil {
 				return domain.ErrMenuNotFound
 			}
 			if old.Name != input.Name {
 				var count int64
-				tx.Model(&legacysystem.SysBaseMenu{}).Where("id <> ? AND name = ?", input.ID, input.Name).Count(&count)
+				tx.Model(&platformdb.SysBaseMenu{}).Where("id <> ? AND name = ?", input.ID, input.Name).Count(&count)
 				if count > 0 {
 					return domain.ErrMenuNameDuplicate
 				}
 			}
 		} else {
 			var count int64
-			tx.Model(&legacysystem.SysBaseMenu{}).Where("name = ?", input.Name).Count(&count)
+			tx.Model(&platformdb.SysBaseMenu{}).Where("name = ?", input.Name).Count(&count)
 			if count > 0 {
 				return domain.ErrMenuNameDuplicate
 			}
@@ -148,24 +148,24 @@ func (r *Repository) Save(ctx context.Context, input domain.SaveMenuInput) (uint
 
 		// Parent check
 		if input.ParentID != 0 {
-			var parent legacysystem.SysBaseMenu
+			var parent platformdb.SysBaseMenu
 			if err := tx.Where("id = ?", input.ParentID).First(&parent).Error; err != nil {
 				return domain.ErrParentNotFound
 			}
 			// Leaf-to-branch transition
 			var childCount int64
-			tx.Model(&legacysystem.SysBaseMenu{}).Where("parent_id = ?", input.ParentID).Count(&childCount)
+			tx.Model(&platformdb.SysBaseMenu{}).Where("parent_id = ?", input.ParentID).Count(&childCount)
 			if childCount == 0 && !updating {
 				var defaultCount int64
-				tx.Model(&legacysystem.SysAuthority{}).Where("default_router = ?", parent.Name).Count(&defaultCount)
+				tx.Model(&platformdb.SysAuthority{}).Where("default_router = ?", parent.Name).Count(&defaultCount)
 				if defaultCount > 0 {
 					return domain.ErrParentIsDefaultRouter
 				}
-				tx.Where("sys_base_menu_id = ?", input.ParentID).Delete(&legacysystem.SysAuthorityMenu{})
+				tx.Where("sys_base_menu_id = ?", input.ParentID).Delete(&platformdb.SysAuthorityMenu{})
 			}
 		}
 
-		var menu legacysystem.SysBaseMenu
+		var menu platformdb.SysBaseMenu
 		if updating {
 			menu.ID = input.ID
 		}
@@ -175,7 +175,7 @@ func (r *Repository) Save(ctx context.Context, input domain.SaveMenuInput) (uint
 		menu.Hidden = input.Hidden
 		menu.Component = input.Component
 		menu.Sort = input.Sort
-		menu.Meta = legacysystem.Meta{
+		menu.Meta = platformdb.Meta{
 			Title:          input.Title,
 			Icon:           input.Icon,
 			ActiveName:     input.ActiveName,
@@ -196,9 +196,9 @@ func (r *Repository) Save(ctx context.Context, input domain.SaveMenuInput) (uint
 		}
 
 		// Rebuild parameters
-		tx.Unscoped().Where("sys_base_menu_id = ?", menu.ID).Delete(&legacysystem.SysBaseMenuParameter{})
+		tx.Unscoped().Where("sys_base_menu_id = ?", menu.ID).Delete(&platformdb.SysBaseMenuParameter{})
 		for _, p := range input.Parameters {
-			if err := tx.Create(&legacysystem.SysBaseMenuParameter{
+			if err := tx.Create(&platformdb.SysBaseMenuParameter{
 				SysBaseMenuID: menu.ID,
 				Type:          p.Type,
 				Key:           p.Key,
@@ -209,9 +209,9 @@ func (r *Repository) Save(ctx context.Context, input domain.SaveMenuInput) (uint
 		}
 
 		// Rebuild buttons
-		tx.Unscoped().Where("sys_base_menu_id = ?", menu.ID).Delete(&legacysystem.SysBaseMenuBtn{})
+		tx.Unscoped().Where("sys_base_menu_id = ?", menu.ID).Delete(&platformdb.SysBaseMenuBtn{})
 		for _, b := range input.Buttons {
-			if err := tx.Create(&legacysystem.SysBaseMenuBtn{
+			if err := tx.Create(&platformdb.SysBaseMenuBtn{
 				SysBaseMenuID: menu.ID,
 				Name:          b.Name,
 				Desc:          b.Desc,
@@ -232,28 +232,28 @@ func (r *Repository) Delete(ctx context.Context, id uint) error {
 	}
 
 	return r.db.WithContext(ctx).Transaction(func(tx *gorm.DB) error {
-		var menu legacysystem.SysBaseMenu
+		var menu platformdb.SysBaseMenu
 		if err := tx.Where("id = ?", id).First(&menu).Error; err != nil {
 			return domain.ErrMenuNotFound
 		}
 
 		var childCount int64
-		tx.Model(&legacysystem.SysBaseMenu{}).Where("parent_id = ?", id).Count(&childCount)
+		tx.Model(&platformdb.SysBaseMenu{}).Where("parent_id = ?", id).Count(&childCount)
 		if childCount > 0 {
 			return domain.ErrMenuHasChildren
 		}
 
 		var defaultCount int64
-		tx.Model(&legacysystem.SysAuthority{}).Where("default_router = ?", menu.Name).Count(&defaultCount)
+		tx.Model(&platformdb.SysAuthority{}).Where("default_router = ?", menu.Name).Count(&defaultCount)
 		if defaultCount > 0 {
 			return domain.ErrMenuIsDefaultRouter
 		}
 
-		tx.Delete(&legacysystem.SysBaseMenu{}, "id = ?", id)
-		tx.Delete(&legacysystem.SysBaseMenuParameter{}, "sys_base_menu_id = ?", id)
-		tx.Delete(&legacysystem.SysBaseMenuBtn{}, "sys_base_menu_id = ?", id)
-		tx.Delete(&legacysystem.SysAuthorityBtn{}, "sys_menu_id = ?", id)
-		tx.Delete(&legacysystem.SysAuthorityMenu{}, "sys_base_menu_id = ?", id)
+		tx.Delete(&platformdb.SysBaseMenu{}, "id = ?", id)
+		tx.Delete(&platformdb.SysBaseMenuParameter{}, "sys_base_menu_id = ?", id)
+		tx.Delete(&platformdb.SysBaseMenuBtn{}, "sys_base_menu_id = ?", id)
+		tx.Delete(&platformdb.SysAuthorityBtn{}, "sys_menu_id = ?", id)
+		tx.Delete(&platformdb.SysAuthorityMenu{}, "sys_base_menu_id = ?", id)
 		return nil
 	})
 }
@@ -263,7 +263,7 @@ func (r *Repository) FindByID(ctx context.Context, id uint) (domain.MenuDetail, 
 		return domain.MenuDetail{}, domain.ErrRepositoryUnavailable
 	}
 
-	var menu legacysystem.SysBaseMenu
+	var menu platformdb.SysBaseMenu
 	err := r.db.WithContext(ctx).
 		Preload("Parameters").
 		Preload("MenuBtn").

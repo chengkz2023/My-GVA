@@ -3,7 +3,6 @@ package task
 import (
 	"errors"
 	"fmt"
-	"github.com/flipped-aurora/gin-vue-admin/server/model/common"
 	"time"
 
 	"gorm.io/gorm"
@@ -15,16 +14,22 @@ import (
 //@param: db(数据库对象) *gorm.DB, tableName(表名) string, compareField(比较字段) string, interval(间隔) string
 //@return: error
 
-func ClearTable(db *gorm.DB) error {
-	var ClearTableDetail []common.ClearDB
+type ClearDB struct {
+	TableName    string
+	CompareField string
+	Interval     string
+}
 
-	ClearTableDetail = append(ClearTableDetail, common.ClearDB{
+func ClearTable(db *gorm.DB) error {
+	var ClearTableDetail []ClearDB
+
+	ClearTableDetail = append(ClearTableDetail, ClearDB{
 		TableName:    "sys_operation_records",
 		CompareField: "created_at",
 		Interval:     "2160h",
 	})
 
-	ClearTableDetail = append(ClearTableDetail, common.ClearDB{
+	ClearTableDetail = append(ClearTableDetail, ClearDB{
 		TableName:    "jwt_blacklists",
 		CompareField: "created_at",
 		Interval:     "168h",

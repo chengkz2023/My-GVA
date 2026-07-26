@@ -4,9 +4,8 @@ import (
 	"os"
 
 	adapter "github.com/casbin/gorm-adapter/v3"
-	"github.com/flipped-aurora/gin-vue-admin/server/model/example"
-	"github.com/flipped-aurora/gin-vue-admin/server/model/system"
 	apimysql "github.com/flipped-aurora/gin-vue-admin/server/internal/modules/system/api/infrastructure/mysql"
+	platformdb "github.com/flipped-aurora/gin-vue-admin/server/internal/platform/database"
 	operationmysql "github.com/flipped-aurora/gin-vue-admin/server/internal/modules/system/operation-record/infrastructure/mysql"
 	filemysql "github.com/flipped-aurora/gin-vue-admin/server/internal/modules/business/file/infrastructure/mysql"
 	"go.uber.org/zap"
@@ -21,26 +20,22 @@ func RegisterTables(db *gorm.DB, log *zap.Logger, disableAutoMigrate bool) {
 
 	tables := []interface{}{
 		apimysql.SysApi{},
-		system.SysUser{},
-		system.SysBaseMenu{},
-		system.JwtBlacklist{},
-		system.SysAuthority{},
-		system.SysDictionary{},
+		platformdb.SysUser{},
+		platformdb.SysBaseMenu{},
+		platformdb.JwtBlacklist{},
+		platformdb.SysAuthority{},
+		platformdb.SysDictionary{},
 		operationmysql.SysOperationRecord{},
-		system.SysDictionaryDetail{},
-		system.SysBaseMenuParameter{},
-		system.SysBaseMenuBtn{},
-		system.SysAuthorityBtn{},
-		system.SysParams{},
-		system.SysVersion{},
-		system.SysError{},
+		platformdb.SysDictionaryDetail{},
+		platformdb.SysBaseMenuParameter{},
+		platformdb.SysBaseMenuBtn{},
+		platformdb.SysAuthorityBtn{},
+		platformdb.SysParams{},
+		platformdb.SysVersion{},
+		platformdb.SysError{},
 		adapter.CasbinRule{},
 
-		example.ExaFile{},
-		example.ExaCustomer{},
-		example.ExaFileChunk{},
 		filemysql.ExaFileUploadAndDownload{},
-		example.ExaAttachmentCategory{},
 	}
 	for _, t := range tables {
 		if err := db.AutoMigrate(t); err != nil {

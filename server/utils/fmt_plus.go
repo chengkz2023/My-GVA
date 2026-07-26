@@ -2,7 +2,6 @@ package utils
 
 import (
 	"fmt"
-	"github.com/flipped-aurora/gin-vue-admin/server/model/common"
 	"math/rand"
 	"reflect"
 	"strings"
@@ -99,8 +98,15 @@ func RandomInt(min, max int) int {
 	return min + rand.Intn(max-min)
 }
 
+type TreeNode[T any] interface {
+	GetChildren() []T
+	SetChildren(children T)
+	GetID() int
+	GetParentID() int
+}
+
 // BuildTree 用于构建一个树形结构
-func BuildTree[T common.TreeNode[T]](nodes []T) []T {
+func BuildTree[T TreeNode[T]](nodes []T) []T {
 	nodeMap := make(map[int]T)
 	// 创建一个基本map
 	for i := range nodes {

@@ -2,7 +2,6 @@ package utils
 
 import (
 	platformauth "github.com/flipped-aurora/gin-vue-admin/server/internal/platform/auth"
-	systemReq "github.com/flipped-aurora/gin-vue-admin/server/model/system/request"
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 )
@@ -19,7 +18,7 @@ func ClearToken(c *gin.Context) {
 	platformauth.ClearToken(c)
 }
 
-func GetClaims(c *gin.Context) (*systemReq.CustomClaims, error) {
+func GetClaims(c *gin.Context) (*platformauth.CustomClaims, error) {
 	token := platformauth.GetToken(c)
 	j := NewJWTWithKey(nil)
 	claims, err := j.ParseToken(token)
@@ -59,10 +58,10 @@ func GetUserAuthorityId(c *gin.Context) uint {
 	return 0
 }
 
-func GetUserInfo(c *gin.Context) *systemReq.CustomClaims {
+func GetUserInfo(c *gin.Context) *platformauth.CustomClaims {
 	if claims, ok := platformauth.GetClaimsFromContext(c); ok {
-		return &systemReq.CustomClaims{
-			BaseClaims: systemReq.BaseClaims{
+		return &platformauth.CustomClaims{
+			BaseClaims: platformauth.BaseClaims{
 				UUID:        claims.UUID,
 				ID:          claims.BaseClaims.ID,
 				Username:    claims.Username,
