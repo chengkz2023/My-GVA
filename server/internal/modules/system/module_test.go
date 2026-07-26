@@ -19,7 +19,7 @@ func init() {
 func TestModuleRegistersChildren(t *testing.T) {
 	gin.SetMode(gin.TestMode)
 	engine := gin.New()
-	v2http.RegisterV2(engine, NewModule(&container.Container{}))
+	v2http.RegisterV2(engine, v2http.Config{}, NewModule(&container.Container{}))
 
 	paths := map[string]int{
 		"/v2/system/api/groups":       http.StatusUnauthorized,
@@ -50,7 +50,7 @@ func TestModuleRegistersChildren(t *testing.T) {
 func TestModuleRegistersProtectedPostRoutes(t *testing.T) {
 	gin.SetMode(gin.TestMode)
 	engine := gin.New()
-	v2http.RegisterV2(engine, NewModule(&container.Container{}))
+	v2http.RegisterV2(engine, v2http.Config{}, NewModule(&container.Container{}))
 
 	req := httptest.NewRequest(http.MethodPost, "/v2/system/user/password", nil)
 	rec := httptest.NewRecorder()
@@ -64,7 +64,7 @@ func TestModuleRegistersProtectedPostRoutes(t *testing.T) {
 func TestModuleRegistersProtectedPutRoutes(t *testing.T) {
 	gin.SetMode(gin.TestMode)
 	engine := gin.New()
-	v2http.RegisterV2(engine, NewModule(&container.Container{}))
+	v2http.RegisterV2(engine, v2http.Config{}, NewModule(&container.Container{}))
 
 	req := httptest.NewRequest(http.MethodPut, "/v2/system/user/profile", nil)
 	rec := httptest.NewRecorder()

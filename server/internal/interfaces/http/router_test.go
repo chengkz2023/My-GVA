@@ -19,7 +19,7 @@ func init() {
 func TestRegisterV2Health(t *testing.T) {
 	gin.SetMode(gin.TestMode)
 	engine := gin.New()
-	RegisterV2(engine)
+	RegisterV2(engine, Config{})
 
 	req := httptest.NewRequest(http.MethodGet, "/v2/health", nil)
 	rec := httptest.NewRecorder()
@@ -48,7 +48,7 @@ func TestRegisterV2Health(t *testing.T) {
 func TestRegisterV2Module(t *testing.T) {
 	gin.SetMode(gin.TestMode)
 	engine := gin.New()
-	RegisterV2(engine, testModule{})
+	RegisterV2(engine, Config{}, testModule{})
 
 	req := httptest.NewRequest(http.MethodGet, "/v2/test-module/ping", nil)
 	rec := httptest.NewRecorder()
@@ -62,7 +62,7 @@ func TestRegisterV2Module(t *testing.T) {
 func TestRegisterV2AuthenticatedModule(t *testing.T) {
 	gin.SetMode(gin.TestMode)
 	engine := gin.New()
-	RegisterV2(engine, authenticatedTestModule{})
+	RegisterV2(engine, Config{}, authenticatedTestModule{})
 
 	req := httptest.NewRequest(http.MethodGet, "/v2/test-module/me", nil)
 	rec := httptest.NewRecorder()

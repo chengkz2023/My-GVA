@@ -42,6 +42,9 @@ func TestArchitectureBoundaries(t *testing.T) {
 		assertHandlersDoNotUsePersistence(t, rel, imports)
 		assertServicesStayTransportFree(t, rel, imports)
 		assertModulesDoNotImportOtherInfrastructure(t, rel, imports)
+		assertApplicationDoesNotUseLegacyModel(t, rel, imports)
+		assertTransportDoesNotUseLegacyResponse(t, rel, imports)
+		assertInterfacesDoNotUseLegacyGlobal(t, rel, imports)
 		return nil
 	})
 	if err != nil {
@@ -161,6 +164,16 @@ func assertTransportDoesNotUseLegacyResponse(t *testing.T, rel string, imports [
 			t.Fatalf("%s: transport must not use legacy response package %q", rel, imp)
 		}
 	}
+}
+
+func assertInterfacesDoNotUseLegacyGlobal(t *testing.T, rel string, imports []string) {
+	t.Helper()
+	if !strings.HasPrefix(rel, "interfaces/") {
+		return
+	}
+	assertNoImports(t, rel, imports, []string{
+		"github.com/flipped-aurora/gin-vue-admin/server/global",
+	}, "interfaces package must not read legacy global state")
 }
 
 func moduleRoot(rel string) string {

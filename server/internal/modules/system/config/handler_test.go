@@ -26,7 +26,7 @@ func TestModuleInfoRedactsSecrets(t *testing.T) {
 	global.GVA_CONFIG.Redis.Password = "redis-secret"
 
 	engine := gin.New()
-	v2http.RegisterV2(engine, NewModule(nil))
+	v2http.RegisterV2(engine, v2http.Config{}, NewModule(nil))
 
 	req := httptest.NewRequest(http.MethodGet, "/v2/system/config/info", nil)
 	rec := httptest.NewRecorder()

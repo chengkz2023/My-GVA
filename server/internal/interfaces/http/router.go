@@ -1,7 +1,6 @@
 package http
 
 import (
-	"github.com/flipped-aurora/gin-vue-admin/server/global"
 	v2middleware "github.com/flipped-aurora/gin-vue-admin/server/internal/interfaces/http/middleware"
 	"github.com/flipped-aurora/gin-vue-admin/server/internal/platform/response"
 	"github.com/gin-gonic/gin"
@@ -18,18 +17,14 @@ type Routes struct {
 	Authenticated *gin.RouterGroup
 }
 
-func RegisterV2(engine *gin.Engine, modules ...Module) {
+type Config struct {
+	JWT v2middleware.JWTConfig
+}
+
+func RegisterV2(engine *gin.Engine, cfg Config, modules ...Module) {
 	v2 := engine.Group(V2Prefix)
 	authenticated := engine.Group(V2Prefix)
-	authenticated.Use(v2middleware.JWTAuthWithConfig(v2middleware.JWTConfig{
-		ExpiresTime: global.GVA_CONFIG.JWT.ExpiresTime,
-		BufferTime:  global.GVA_CONFIG.JWT.BufferTime,
-		SigningKey:  global.GVA_CONFIG.JWT.SigningKey,
-		BlacklistCheck: func(token string) bool {
-			_, ok := global.BlackCache.Get(token)
-			return ok
-		},
-	})).Use(v2middleware.CasbinHandler())
+	authenticated.Use(v2middleware.JWTAuthWithConfig(cfg.JWT)).Use(v2middleware.CasbinHandler())
 
 	routes := Routes{
 		Public:        v2,

@@ -12,6 +12,7 @@ import (
 	"github.com/flipped-aurora/gin-vue-admin/server/global"
 	"github.com/flipped-aurora/gin-vue-admin/server/internal/app/container"
 	v2http "github.com/flipped-aurora/gin-vue-admin/server/internal/interfaces/http"
+	"github.com/flipped-aurora/gin-vue-admin/server/internal/interfaces/http/middleware"
 	"github.com/flipped-aurora/gin-vue-admin/server/internal/modules"
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
@@ -35,8 +36,22 @@ func Router(c *container.Container) *gin.Engine {
 		Redis()
 	}
 	engine := Routers(c.Logger)
-	v2http.RegisterV2(engine, modules.HTTPModules(c)...)
+	v2http.RegisterV2(engine, v2Config(c), modules.HTTPModules(c)...)
 	return engine
+}
+
+func v2Config(c *container.Container) v2http.Config {
+	return v2http.Config{
+		JWT: middleware.JWTConfig{
+			ExpiresTime: c.Config.JWT.ExpiresTime,
+			BufferTime:  c.Config.JWT.BufferTime,
+			SigningKey:  c.Config.JWT.SigningKey,
+			BlacklistCheck: func(token string) bool {
+				_, ok := global.BlackCache.Get(token)
+				return ok
+			},
+		},
+	}
 }
 
 func Serve(address string, router *gin.Engine, readTimeout, writeTimeout time.Duration) {

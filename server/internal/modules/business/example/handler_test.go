@@ -14,7 +14,7 @@ import (
 func TestModuleInfo(t *testing.T) {
 	gin.SetMode(gin.TestMode)
 	engine := gin.New()
-	v2http.RegisterV2(engine, NewModule(nil))
+	v2http.RegisterV2(engine, v2http.Config{}, NewModule(nil))
 
 	req := httptest.NewRequest(http.MethodGet, "/v2/example/info", nil)
 	rec := httptest.NewRecorder()
@@ -43,7 +43,7 @@ func TestModuleInfo(t *testing.T) {
 func TestModuleMissing(t *testing.T) {
 	gin.SetMode(gin.TestMode)
 	engine := gin.New()
-	v2http.RegisterV2(engine, NewModule(nil))
+	v2http.RegisterV2(engine, v2http.Config{}, NewModule(nil))
 
 	req := httptest.NewRequest(http.MethodGet, "/v2/example/missing", nil)
 	rec := httptest.NewRecorder()

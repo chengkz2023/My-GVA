@@ -15,7 +15,7 @@ import (
 func TestModuleInfoWithoutDatabase(t *testing.T) {
 	gin.SetMode(gin.TestMode)
 	engine := gin.New()
-	v2http.RegisterV2(engine, NewModule(&container.Container{}))
+	v2http.RegisterV2(engine, v2http.Config{}, NewModule(&container.Container{}))
 
 	req := httptest.NewRequest(http.MethodGet, "/v2/system/status/info", nil)
 	rec := httptest.NewRecorder()

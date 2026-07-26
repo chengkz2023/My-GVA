@@ -214,7 +214,7 @@ import (
 func TestModuleInfo(t *testing.T) {
 	gin.SetMode(gin.TestMode)
 	engine := gin.New()
-	v2http.RegisterV2(engine, NewModule(nil))
+	v2http.RegisterV2(engine, v2http.Config{}, NewModule(nil))
 
 	req := httptest.NewRequest(http.MethodGet, "/v2{{.RoutePath}}/info", nil)
 	rec := httptest.NewRecorder()
