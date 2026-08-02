@@ -4,9 +4,9 @@ import (
 	"context"
 	"errors"
 
-	"github.com/flipped-aurora/gin-vue-admin/server/internal/modules/system/operation-record/domain"
-	apperrors "github.com/flipped-aurora/gin-vue-admin/server/internal/platform/errors"
-	"github.com/flipped-aurora/gin-vue-admin/server/internal/platform/pagination"
+	"github.com/chengkz2023/My-GVA/server/internal/modules/system/operation-record/domain"
+	apperrors "github.com/chengkz2023/My-GVA/server/internal/platform/errors"
+	"github.com/chengkz2023/My-GVA/server/internal/platform/pagination"
 )
 
 type Service struct {

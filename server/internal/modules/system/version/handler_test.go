@@ -6,18 +6,18 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/flipped-aurora/gin-vue-admin/server/internal/platform/buildinfo"
-	v2http "github.com/flipped-aurora/gin-vue-admin/server/internal/interfaces/http"
-	"github.com/flipped-aurora/gin-vue-admin/server/internal/platform/response"
+	"github.com/chengkz2023/My-GVA/server/internal/platform/buildinfo"
+	apphttp "github.com/chengkz2023/My-GVA/server/internal/interfaces/http"
+	"github.com/chengkz2023/My-GVA/server/internal/platform/response"
 	"github.com/gin-gonic/gin"
 )
 
 func TestModuleInfo(t *testing.T) {
 	gin.SetMode(gin.TestMode)
 	engine := gin.New()
-	v2http.RegisterV2(engine, v2http.Config{}, NewModule(nil))
+	apphttp.RegisterRoutes(engine, apphttp.Config{}, NewModule(nil))
 
-	req := httptest.NewRequest(http.MethodGet, "/v2/system/version/info", nil)
+	req := httptest.NewRequest(http.MethodGet, "/api/system/version/info", nil)
 	rec := httptest.NewRecorder()
 	engine.ServeHTTP(rec, req)
 

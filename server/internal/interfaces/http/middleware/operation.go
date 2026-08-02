@@ -11,8 +11,8 @@ import (
 	"sync"
 	"time"
 
-	platformauth "github.com/flipped-aurora/gin-vue-admin/server/internal/platform/auth"
-	operationmysql "github.com/flipped-aurora/gin-vue-admin/server/internal/modules/system/operation-record/infrastructure/mysql"
+	platformauth "github.com/chengkz2023/My-GVA/server/internal/platform/auth"
+	operationmysql "github.com/chengkz2023/My-GVA/server/internal/modules/system/operation-record/infrastructure/mysql"
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
 	"gorm.io/gorm"

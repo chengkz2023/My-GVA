@@ -7,12 +7,12 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/flipped-aurora/gin-vue-admin/server/internal/modules/system/api/application"
-	"github.com/flipped-aurora/gin-vue-admin/server/internal/modules/system/api/domain"
-	platformauth "github.com/flipped-aurora/gin-vue-admin/server/internal/platform/auth"
-	"github.com/flipped-aurora/gin-vue-admin/server/internal/platform/authz"
-	"github.com/flipped-aurora/gin-vue-admin/server/internal/platform/pagination"
-	"github.com/flipped-aurora/gin-vue-admin/server/internal/platform/response"
+	"github.com/chengkz2023/My-GVA/server/internal/modules/system/api/application"
+	"github.com/chengkz2023/My-GVA/server/internal/modules/system/api/domain"
+	platformauth "github.com/chengkz2023/My-GVA/server/internal/platform/auth"
+	"github.com/chengkz2023/My-GVA/server/internal/platform/authz"
+	"github.com/chengkz2023/My-GVA/server/internal/platform/pagination"
+	"github.com/chengkz2023/My-GVA/server/internal/platform/response"
 	"github.com/gin-gonic/gin"
 )
 
@@ -21,10 +21,10 @@ var testRoutes = func() gin.RoutesInfo { return nil }
 func TestList(t *testing.T) {
 	gin.SetMode(gin.TestMode)
 	engine := gin.New()
-	group := engine.Group("/v2")
+	group := engine.Group("/api")
 	NewHandler(application.NewService(fakeRepository{}, nil, nil, false), testRoutes).Register(group)
 
-	req := httptest.NewRequest(http.MethodGet, "/v2/system/api/list?page=1&pageSize=10", nil)
+	req := httptest.NewRequest(http.MethodGet, "/api/system/api/list?page=1&pageSize=10", nil)
 	rec := httptest.NewRecorder()
 	engine.ServeHTTP(rec, req)
 
@@ -50,10 +50,10 @@ func TestGetAll(t *testing.T) {
 			NickName:    "Admin",
 		}))
 	})
-	group := engine.Group("/v2")
+	group := engine.Group("/api")
 	NewHandler(application.NewService(fakeRepository{}, nil, nil, false), testRoutes).Register(group)
 
-	req := httptest.NewRequest(http.MethodGet, "/v2/system/api/all", nil)
+	req := httptest.NewRequest(http.MethodGet, "/api/system/api/all", nil)
 	rec := httptest.NewRecorder()
 	engine.ServeHTTP(rec, req)
 
@@ -65,10 +65,10 @@ func TestGetAll(t *testing.T) {
 func TestGroups(t *testing.T) {
 	gin.SetMode(gin.TestMode)
 	engine := gin.New()
-	group := engine.Group("/v2")
+	group := engine.Group("/api")
 	NewHandler(application.NewService(fakeRepository{groups: []string{"admin", "api"}}, nil, nil, false), testRoutes).Register(group)
 
-	req := httptest.NewRequest(http.MethodGet, "/v2/system/api/groups", nil)
+	req := httptest.NewRequest(http.MethodGet, "/api/system/api/groups", nil)
 	rec := httptest.NewRecorder()
 	engine.ServeHTTP(rec, req)
 
@@ -80,10 +80,10 @@ func TestGroups(t *testing.T) {
 func TestPolicies(t *testing.T) {
 	gin.SetMode(gin.TestMode)
 	engine := gin.New()
-	group := engine.Group("/v2")
+	group := engine.Group("/api")
 	NewHandler(application.NewService(fakeRepository{}, &fakePolicyProvider{}, nil, false), testRoutes).Register(group)
 
-	req := httptest.NewRequest(http.MethodGet, "/v2/system/api/policies/888", nil)
+	req := httptest.NewRequest(http.MethodGet, "/api/system/api/policies/888", nil)
 	rec := httptest.NewRecorder()
 	engine.ServeHTTP(rec, req)
 

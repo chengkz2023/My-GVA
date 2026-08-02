@@ -1,9 +1,9 @@
 package auth
 
 import (
-	"github.com/flipped-aurora/gin-vue-admin/server/internal/app/container"
-	v2http "github.com/flipped-aurora/gin-vue-admin/server/internal/interfaces/http"
-	platformauth "github.com/flipped-aurora/gin-vue-admin/server/internal/platform/auth"
+	"github.com/chengkz2023/My-GVA/server/internal/app/container"
+	apphttp "github.com/chengkz2023/My-GVA/server/internal/interfaces/http"
+	platformauth "github.com/chengkz2023/My-GVA/server/internal/platform/auth"
 )
 
 type Module struct {
@@ -24,6 +24,6 @@ func NewModule(c *container.Container) *Module {
 	}
 }
 
-func (m *Module) RegisterHTTP(routes v2http.Routes) {
+func (m *Module) RegisterHTTP(routes apphttp.Routes) {
 	m.handler.Register(routes.Authenticated, routes.Public)
 }

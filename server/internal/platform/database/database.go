@@ -4,8 +4,8 @@ import (
 	"context"
 	"strings"
 
-	"github.com/flipped-aurora/gin-vue-admin/server/config"
-	"github.com/flipped-aurora/gin-vue-admin/server/internal/platform/database/internal"
+	"github.com/chengkz2023/My-GVA/server/config"
+	"github.com/chengkz2023/My-GVA/server/internal/platform/database/internal"
 	_ "github.com/go-sql-driver/mysql"
 	"go.uber.org/zap"
 	"gorm.io/driver/mysql"

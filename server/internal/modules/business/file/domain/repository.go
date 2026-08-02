@@ -4,7 +4,7 @@ import (
 	"context"
 	"errors"
 
-	"github.com/flipped-aurora/gin-vue-admin/server/internal/platform/pagination"
+	"github.com/chengkz2023/My-GVA/server/internal/platform/pagination"
 )
 
 var ErrRepositoryUnavailable = errors.New("file repository unavailable")

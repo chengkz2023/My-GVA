@@ -4,7 +4,7 @@ import (
 	stderrors "errors"
 	"net/http"
 
-	apperrors "github.com/flipped-aurora/gin-vue-admin/server/internal/platform/errors"
+	apperrors "github.com/chengkz2023/My-GVA/server/internal/platform/errors"
 	"github.com/gin-gonic/gin"
 )
 

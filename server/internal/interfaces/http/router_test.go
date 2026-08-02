@@ -6,16 +6,16 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/flipped-aurora/gin-vue-admin/server/internal/platform/response"
+	"github.com/chengkz2023/My-GVA/server/internal/platform/response"
 	"github.com/gin-gonic/gin"
 )
 
-func TestRegisterV2Health(t *testing.T) {
+func TestRegisterRoutesHealth(t *testing.T) {
 	gin.SetMode(gin.TestMode)
 	engine := gin.New()
-	RegisterV2(engine, Config{})
+	RegisterRoutes(engine, Config{})
 
-	req := httptest.NewRequest(http.MethodGet, "/v2/health", nil)
+	req := httptest.NewRequest(http.MethodGet, "/api/health", nil)
 	rec := httptest.NewRecorder()
 	engine.ServeHTTP(rec, req)
 
@@ -39,12 +39,12 @@ func TestRegisterV2Health(t *testing.T) {
 	}
 }
 
-func TestRegisterV2Module(t *testing.T) {
+func TestRegisterRoutesModule(t *testing.T) {
 	gin.SetMode(gin.TestMode)
 	engine := gin.New()
-	RegisterV2(engine, Config{}, testModule{})
+	RegisterRoutes(engine, Config{}, testModule{})
 
-	req := httptest.NewRequest(http.MethodGet, "/v2/test-module/ping", nil)
+	req := httptest.NewRequest(http.MethodGet, "/api/test-module/ping", nil)
 	rec := httptest.NewRecorder()
 	engine.ServeHTTP(rec, req)
 
@@ -53,12 +53,12 @@ func TestRegisterV2Module(t *testing.T) {
 	}
 }
 
-func TestRegisterV2AuthenticatedModule(t *testing.T) {
+func TestRegisterRoutesAuthenticatedModule(t *testing.T) {
 	gin.SetMode(gin.TestMode)
 	engine := gin.New()
-	RegisterV2(engine, Config{}, authenticatedTestModule{})
+	RegisterRoutes(engine, Config{}, authenticatedTestModule{})
 
-	req := httptest.NewRequest(http.MethodGet, "/v2/test-module/me", nil)
+	req := httptest.NewRequest(http.MethodGet, "/api/test-module/me", nil)
 	rec := httptest.NewRecorder()
 	engine.ServeHTTP(rec, req)
 

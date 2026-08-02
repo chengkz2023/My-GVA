@@ -3,7 +3,7 @@ package utils
 import (
 	"golang.org/x/sync/singleflight"
 
-	platformauth "github.com/flipped-aurora/gin-vue-admin/server/internal/platform/auth"
+	platformauth "github.com/chengkz2023/My-GVA/server/internal/platform/auth"
 )
 
 type JWT struct {

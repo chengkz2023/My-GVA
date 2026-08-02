@@ -3,7 +3,7 @@ package middleware
 import (
 	"net/http"
 
-	"github.com/flipped-aurora/gin-vue-admin/server/config"
+	"github.com/chengkz2023/My-GVA/server/config"
 	"github.com/gin-gonic/gin"
 )
 

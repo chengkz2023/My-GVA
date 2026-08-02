@@ -1,13 +1,13 @@
 package api
 
 import (
-	"github.com/flipped-aurora/gin-vue-admin/server/internal/app/container"
-	v2http "github.com/flipped-aurora/gin-vue-admin/server/internal/interfaces/http"
-	"github.com/flipped-aurora/gin-vue-admin/server/internal/modules/system/api/application"
-	"github.com/flipped-aurora/gin-vue-admin/server/internal/modules/system/api/domain"
-	apimysql "github.com/flipped-aurora/gin-vue-admin/server/internal/modules/system/api/infrastructure/mysql"
-	apihttp "github.com/flipped-aurora/gin-vue-admin/server/internal/modules/system/api/transport/http"
-	"github.com/flipped-aurora/gin-vue-admin/server/internal/platform/authz"
+	"github.com/chengkz2023/My-GVA/server/internal/app/container"
+	apphttp "github.com/chengkz2023/My-GVA/server/internal/interfaces/http"
+	"github.com/chengkz2023/My-GVA/server/internal/modules/system/api/application"
+	"github.com/chengkz2023/My-GVA/server/internal/modules/system/api/domain"
+	apimysql "github.com/chengkz2023/My-GVA/server/internal/modules/system/api/infrastructure/mysql"
+	apihttp "github.com/chengkz2023/My-GVA/server/internal/modules/system/api/transport/http"
+	"github.com/chengkz2023/My-GVA/server/internal/platform/authz"
 	"github.com/gin-gonic/gin"
 )
 
@@ -36,6 +36,6 @@ func NewModule(c *container.Container) *Module {
 	}
 }
 
-func (m *Module) RegisterHTTP(routes v2http.Routes) {
+func (m *Module) RegisterHTTP(routes apphttp.Routes) {
 	m.handler.Register(routes.Authenticated)
 }

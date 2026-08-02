@@ -3,7 +3,7 @@ package version
 import (
 	"context"
 
-	"github.com/flipped-aurora/gin-vue-admin/server/internal/platform/buildinfo"
+	"github.com/chengkz2023/My-GVA/server/internal/platform/buildinfo"
 )
 
 type Repository interface {

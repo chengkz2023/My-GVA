@@ -4,10 +4,10 @@ import (
 	"context"
 	"errors"
 
-	"github.com/flipped-aurora/gin-vue-admin/server/internal/modules/system/role/domain"
-	platformauth "github.com/flipped-aurora/gin-vue-admin/server/internal/platform/auth"
-	"github.com/flipped-aurora/gin-vue-admin/server/internal/platform/authz"
-	apperrors "github.com/flipped-aurora/gin-vue-admin/server/internal/platform/errors"
+	"github.com/chengkz2023/My-GVA/server/internal/modules/system/role/domain"
+	platformauth "github.com/chengkz2023/My-GVA/server/internal/platform/auth"
+	"github.com/chengkz2023/My-GVA/server/internal/platform/authz"
+	apperrors "github.com/chengkz2023/My-GVA/server/internal/platform/errors"
 )
 
 var defaultCasbinPolicies = []authz.Policy{

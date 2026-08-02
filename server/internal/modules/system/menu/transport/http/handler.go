@@ -3,8 +3,8 @@ package http
 import (
 	"strconv"
 
-	"github.com/flipped-aurora/gin-vue-admin/server/internal/modules/system/menu/application"
-	"github.com/flipped-aurora/gin-vue-admin/server/internal/platform/response"
+	"github.com/chengkz2023/My-GVA/server/internal/modules/system/menu/application"
+	"github.com/chengkz2023/My-GVA/server/internal/platform/response"
 	"github.com/gin-gonic/gin"
 )
 

@@ -8,11 +8,11 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/flipped-aurora/gin-vue-admin/server/internal/modules/system/user/application"
-	"github.com/flipped-aurora/gin-vue-admin/server/internal/modules/system/user/domain"
-	platformauth "github.com/flipped-aurora/gin-vue-admin/server/internal/platform/auth"
-	"github.com/flipped-aurora/gin-vue-admin/server/internal/platform/pagination"
-	"github.com/flipped-aurora/gin-vue-admin/server/internal/platform/response"
+	"github.com/chengkz2023/My-GVA/server/internal/modules/system/user/application"
+	"github.com/chengkz2023/My-GVA/server/internal/modules/system/user/domain"
+	platformauth "github.com/chengkz2023/My-GVA/server/internal/platform/auth"
+	"github.com/chengkz2023/My-GVA/server/internal/platform/pagination"
+	"github.com/chengkz2023/My-GVA/server/internal/platform/response"
 	"github.com/gin-gonic/gin"
 )
 
@@ -27,10 +27,10 @@ func TestMe(t *testing.T) {
 			NickName:    "Admin",
 		}))
 	})
-	group := engine.Group("/v2")
+	group := engine.Group("/api")
 	NewHandler(application.NewService(nil, platformauth.NewBcryptPasswordHasher(), nil)).Register(group)
 
-	req := httptest.NewRequest(http.MethodGet, "/v2/system/user/me", nil)
+	req := httptest.NewRequest(http.MethodGet, "/api/system/user/me", nil)
 	rec := httptest.NewRecorder()
 	engine.ServeHTTP(rec, req)
 
@@ -65,10 +65,10 @@ func TestList(t *testing.T) {
 			NickName:    "Admin",
 		}))
 	})
-	group := engine.Group("/v2")
+	group := engine.Group("/api")
 	NewHandler(application.NewService(nil, platformauth.NewBcryptPasswordHasher(), nil)).Register(group)
 
-	req := httptest.NewRequest(http.MethodGet, "/v2/system/user/list?page=0&pageSize=200&username=admin", nil)
+	req := httptest.NewRequest(http.MethodGet, "/api/system/user/list?page=0&pageSize=200&username=admin", nil)
 	rec := httptest.NewRecorder()
 	engine.ServeHTTP(rec, req)
 
@@ -100,10 +100,10 @@ func TestChangePassword(t *testing.T) {
 			NickName:    "Admin",
 		}))
 	})
-	group := engine.Group("/v2")
+	group := engine.Group("/api")
 	NewHandler(application.NewService(repo, fakeHasher{}, nil)).Register(group)
 
-	req := httptest.NewRequest(http.MethodPost, "/v2/system/user/password", bytes.NewBufferString(`{"oldPassword":"old-password","newPassword":"new-password"}`))
+	req := httptest.NewRequest(http.MethodPost, "/api/system/user/password", bytes.NewBufferString(`{"oldPassword":"old-password","newPassword":"new-password"}`))
 	req.Header.Set("Content-Type", "application/json")
 	rec := httptest.NewRecorder()
 	engine.ServeHTTP(rec, req)
@@ -136,10 +136,10 @@ func TestUpdateProfile(t *testing.T) {
 			NickName:    "Admin",
 		}))
 	})
-	group := engine.Group("/v2")
+	group := engine.Group("/api")
 	NewHandler(application.NewService(repo, fakeHasher{}, nil)).Register(group)
 
-	req := httptest.NewRequest(http.MethodPut, "/v2/system/user/profile", bytes.NewBufferString(`{"nickName":"New Admin","headerImg":"avatar.png","phone":"10086","email":"admin@example.com","enable":2}`))
+	req := httptest.NewRequest(http.MethodPut, "/api/system/user/profile", bytes.NewBufferString(`{"nickName":"New Admin","headerImg":"avatar.png","phone":"10086","email":"admin@example.com","enable":2}`))
 	req.Header.Set("Content-Type", "application/json")
 	rec := httptest.NewRecorder()
 	engine.ServeHTTP(rec, req)

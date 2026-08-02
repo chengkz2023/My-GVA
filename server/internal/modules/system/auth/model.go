@@ -1,6 +1,6 @@
 package auth
 
-import platformauth "github.com/flipped-aurora/gin-vue-admin/server/internal/platform/auth"
+import platformauth "github.com/chengkz2023/My-GVA/server/internal/platform/auth"
 
 type Me struct {
 	Actor platformauth.Actor

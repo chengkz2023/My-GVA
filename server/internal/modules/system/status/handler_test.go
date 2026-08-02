@@ -6,18 +6,18 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/flipped-aurora/gin-vue-admin/server/internal/app/container"
-	v2http "github.com/flipped-aurora/gin-vue-admin/server/internal/interfaces/http"
-	"github.com/flipped-aurora/gin-vue-admin/server/internal/platform/response"
+	"github.com/chengkz2023/My-GVA/server/internal/app/container"
+	apphttp "github.com/chengkz2023/My-GVA/server/internal/interfaces/http"
+	"github.com/chengkz2023/My-GVA/server/internal/platform/response"
 	"github.com/gin-gonic/gin"
 )
 
 func TestModuleInfoWithoutDatabase(t *testing.T) {
 	gin.SetMode(gin.TestMode)
 	engine := gin.New()
-	v2http.RegisterV2(engine, v2http.Config{}, NewModule(&container.Container{}))
+	apphttp.RegisterRoutes(engine, apphttp.Config{}, NewModule(&container.Container{}))
 
-	req := httptest.NewRequest(http.MethodGet, "/v2/system/status/info", nil)
+	req := httptest.NewRequest(http.MethodGet, "/api/system/status/info", nil)
 	rec := httptest.NewRecorder()
 	engine.ServeHTTP(rec, req)
 

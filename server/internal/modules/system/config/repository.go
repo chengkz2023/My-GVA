@@ -3,8 +3,8 @@ package config
 import (
 	"context"
 
-	"github.com/flipped-aurora/gin-vue-admin/server/config"
-	platformconfig "github.com/flipped-aurora/gin-vue-admin/server/internal/platform/config"
+	"github.com/chengkz2023/My-GVA/server/config"
+	platformconfig "github.com/chengkz2023/My-GVA/server/internal/platform/config"
 )
 
 type Repository interface {

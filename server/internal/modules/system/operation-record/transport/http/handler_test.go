@@ -7,20 +7,20 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/flipped-aurora/gin-vue-admin/server/internal/modules/system/operation-record/application"
-	"github.com/flipped-aurora/gin-vue-admin/server/internal/modules/system/operation-record/domain"
-	"github.com/flipped-aurora/gin-vue-admin/server/internal/platform/pagination"
-	"github.com/flipped-aurora/gin-vue-admin/server/internal/platform/response"
+	"github.com/chengkz2023/My-GVA/server/internal/modules/system/operation-record/application"
+	"github.com/chengkz2023/My-GVA/server/internal/modules/system/operation-record/domain"
+	"github.com/chengkz2023/My-GVA/server/internal/platform/pagination"
+	"github.com/chengkz2023/My-GVA/server/internal/platform/response"
 	"github.com/gin-gonic/gin"
 )
 
 func TestListHandler(t *testing.T) {
 	gin.SetMode(gin.TestMode)
 	engine := gin.New()
-	group := engine.Group("/v2")
+	group := engine.Group("/api")
 	NewHandler(application.NewService(fakeRepo{})).Register(group)
 
-	req := httptest.NewRequest(http.MethodGet, "/v2/system/operation-record/list?page=1&pageSize=10", nil)
+	req := httptest.NewRequest(http.MethodGet, "/api/system/operation-record/list?page=1&pageSize=10", nil)
 	rec := httptest.NewRecorder()
 	engine.ServeHTTP(rec, req)
 
@@ -37,10 +37,10 @@ func TestListHandler(t *testing.T) {
 func TestFindByIDHandler(t *testing.T) {
 	gin.SetMode(gin.TestMode)
 	engine := gin.New()
-	group := engine.Group("/v2")
+	group := engine.Group("/api")
 	NewHandler(application.NewService(fakeRepo{})).Register(group)
 
-	req := httptest.NewRequest(http.MethodGet, "/v2/system/operation-record/1", nil)
+	req := httptest.NewRequest(http.MethodGet, "/api/system/operation-record/1", nil)
 	rec := httptest.NewRecorder()
 	engine.ServeHTTP(rec, req)
 
@@ -52,10 +52,10 @@ func TestFindByIDHandler(t *testing.T) {
 func TestDeleteHandler(t *testing.T) {
 	gin.SetMode(gin.TestMode)
 	engine := gin.New()
-	group := engine.Group("/v2")
+	group := engine.Group("/api")
 	NewHandler(application.NewService(fakeRepo{})).Register(group)
 
-	req := httptest.NewRequest(http.MethodDelete, "/v2/system/operation-record/1", nil)
+	req := httptest.NewRequest(http.MethodDelete, "/api/system/operation-record/1", nil)
 	rec := httptest.NewRecorder()
 	engine.ServeHTTP(rec, req)
 

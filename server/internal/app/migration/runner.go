@@ -7,9 +7,9 @@ import (
 	"sort"
 	"strings"
 
-	platformconfig "github.com/flipped-aurora/gin-vue-admin/server/internal/platform/config"
-	"github.com/flipped-aurora/gin-vue-admin/server/internal/platform/database"
-	"github.com/flipped-aurora/gin-vue-admin/server/internal/platform/logger"
+	platformconfig "github.com/chengkz2023/My-GVA/server/internal/platform/config"
+	"github.com/chengkz2023/My-GVA/server/internal/platform/database"
+	"github.com/chengkz2023/My-GVA/server/internal/platform/logger"
 	"go.uber.org/zap"
 	"gorm.io/gorm"
 )

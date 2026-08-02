@@ -4,8 +4,8 @@ import (
 	"net/http"
 	"os"
 
-	"github.com/flipped-aurora/gin-vue-admin/server/internal/app/container"
-	"github.com/flipped-aurora/gin-vue-admin/server/internal/interfaces/http/middleware"
+	"github.com/chengkz2023/My-GVA/server/internal/app/container"
+	"github.com/chengkz2023/My-GVA/server/internal/interfaces/http/middleware"
 	"github.com/gin-gonic/gin"
 )
 

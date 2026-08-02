@@ -5,8 +5,8 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	platformauth "github.com/flipped-aurora/gin-vue-admin/server/internal/platform/auth"
-	"github.com/flipped-aurora/gin-vue-admin/server/utils"
+	platformauth "github.com/chengkz2023/My-GVA/server/internal/platform/auth"
+	"github.com/chengkz2023/My-GVA/server/utils"
 	"github.com/gin-gonic/gin"
 	"github.com/songzhibin97/gkit/cache/local_cache"
 )

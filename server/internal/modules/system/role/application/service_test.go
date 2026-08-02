@@ -5,9 +5,9 @@ import (
 	"errors"
 	"testing"
 
-	"github.com/flipped-aurora/gin-vue-admin/server/internal/modules/system/role/domain"
-	platformauth "github.com/flipped-aurora/gin-vue-admin/server/internal/platform/auth"
-	apperrors "github.com/flipped-aurora/gin-vue-admin/server/internal/platform/errors"
+	"github.com/chengkz2023/My-GVA/server/internal/modules/system/role/domain"
+	platformauth "github.com/chengkz2023/My-GVA/server/internal/platform/auth"
+	apperrors "github.com/chengkz2023/My-GVA/server/internal/platform/errors"
 )
 
 func TestTree(t *testing.T) {

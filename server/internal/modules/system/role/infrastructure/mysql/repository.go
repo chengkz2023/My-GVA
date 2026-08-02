@@ -4,8 +4,8 @@ import (
 	"context"
 	"strconv"
 
-	"github.com/flipped-aurora/gin-vue-admin/server/internal/modules/system/role/domain"
-	platformdb "github.com/flipped-aurora/gin-vue-admin/server/internal/platform/database"
+	"github.com/chengkz2023/My-GVA/server/internal/modules/system/role/domain"
+	platformdb "github.com/chengkz2023/My-GVA/server/internal/platform/database"
 	"gorm.io/gorm"
 )
 

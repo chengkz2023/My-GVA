@@ -1,6 +1,6 @@
 import service from '@/utils/request'
 
-// SysError endpoints were removed in V2 (sys_errors table has no business logic).
+// SysError endpoints were removed (sys_errors table has no business logic).
 // These functions are kept as no-ops to prevent 404 loops from error-handel.js.
 export const createSysError = () => Promise.resolve({ code: 0 })
 export const deleteSysError = () => Promise.resolve({ code: 0 })

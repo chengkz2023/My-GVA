@@ -7,19 +7,19 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/flipped-aurora/gin-vue-admin/server/internal/modules/business/file/application"
-	"github.com/flipped-aurora/gin-vue-admin/server/internal/modules/business/file/domain"
-	"github.com/flipped-aurora/gin-vue-admin/server/internal/platform/pagination"
+	"github.com/chengkz2023/My-GVA/server/internal/modules/business/file/application"
+	"github.com/chengkz2023/My-GVA/server/internal/modules/business/file/domain"
+	"github.com/chengkz2023/My-GVA/server/internal/platform/pagination"
 	"github.com/gin-gonic/gin"
 )
 
 func TestListHandler(t *testing.T) {
 	gin.SetMode(gin.TestMode)
 	engine := gin.New()
-	group := engine.Group("/v2")
+	group := engine.Group("/api")
 	NewHandler(application.NewService(fakeFileRepo{}, "/tmp")).Register(group)
 
-	req := httptest.NewRequest(http.MethodGet, "/v2/file/list?page=1&pageSize=10", nil)
+	req := httptest.NewRequest(http.MethodGet, "/api/file/list?page=1&pageSize=10", nil)
 	rec := httptest.NewRecorder()
 	engine.ServeHTTP(rec, req)
 
@@ -31,10 +31,10 @@ func TestListHandler(t *testing.T) {
 func TestDeleteHandler(t *testing.T) {
 	gin.SetMode(gin.TestMode)
 	engine := gin.New()
-	group := engine.Group("/v2")
+	group := engine.Group("/api")
 	NewHandler(application.NewService(fakeFileRepo{files: []domain.File{{ID: 1, Key: "test.png"}}}, "/tmp")).Register(group)
 
-	req := httptest.NewRequest(http.MethodDelete, "/v2/file/1", nil)
+	req := httptest.NewRequest(http.MethodDelete, "/api/file/1", nil)
 	rec := httptest.NewRecorder()
 	engine.ServeHTTP(rec, req)
 
@@ -46,11 +46,11 @@ func TestDeleteHandler(t *testing.T) {
 func TestUpdateHandler(t *testing.T) {
 	gin.SetMode(gin.TestMode)
 	engine := gin.New()
-	group := engine.Group("/v2")
+	group := engine.Group("/api")
 	NewHandler(application.NewService(fakeFileRepo{files: []domain.File{{ID: 1}}}, "/tmp")).Register(group)
 
 	body, _ := json.Marshal(map[string]string{"name": "new.png", "tag": "png"})
-	req := httptest.NewRequest(http.MethodPut, "/v2/file/1", bytesReader(body))
+	req := httptest.NewRequest(http.MethodPut, "/api/file/1", bytesReader(body))
 	req.Header.Set("Content-Type", "application/json")
 	rec := httptest.NewRecorder()
 	engine.ServeHTTP(rec, req)

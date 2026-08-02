@@ -2,8 +2,8 @@ package ast
 
 import (
 	"fmt"
-	apimysql "github.com/flipped-aurora/gin-vue-admin/server/internal/modules/system/api/infrastructure/mysql"
-	platformdb "github.com/flipped-aurora/gin-vue-admin/server/internal/platform/database"
+	apimysql "github.com/chengkz2023/My-GVA/server/internal/modules/system/api/infrastructure/mysql"
+	platformdb "github.com/chengkz2023/My-GVA/server/internal/platform/database"
 	"go/ast"
 	"go/parser"
 	"go/token"

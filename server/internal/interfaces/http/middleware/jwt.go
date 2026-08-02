@@ -5,9 +5,9 @@ import (
 	"strconv"
 	"time"
 
-	platformauth "github.com/flipped-aurora/gin-vue-admin/server/internal/platform/auth"
-	"github.com/flipped-aurora/gin-vue-admin/server/internal/platform/response"
-	"github.com/flipped-aurora/gin-vue-admin/server/utils"
+	platformauth "github.com/chengkz2023/My-GVA/server/internal/platform/auth"
+	"github.com/chengkz2023/My-GVA/server/internal/platform/response"
+	"github.com/chengkz2023/My-GVA/server/utils"
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt/v5"
 	"golang.org/x/sync/singleflight"

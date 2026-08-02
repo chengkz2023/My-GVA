@@ -4,10 +4,10 @@ import (
 	"os"
 
 	adapter "github.com/casbin/gorm-adapter/v3"
-	apimysql "github.com/flipped-aurora/gin-vue-admin/server/internal/modules/system/api/infrastructure/mysql"
-	platformdb "github.com/flipped-aurora/gin-vue-admin/server/internal/platform/database"
-	operationmysql "github.com/flipped-aurora/gin-vue-admin/server/internal/modules/system/operation-record/infrastructure/mysql"
-	filemysql "github.com/flipped-aurora/gin-vue-admin/server/internal/modules/business/file/infrastructure/mysql"
+	apimysql "github.com/chengkz2023/My-GVA/server/internal/modules/system/api/infrastructure/mysql"
+	platformdb "github.com/chengkz2023/My-GVA/server/internal/platform/database"
+	operationmysql "github.com/chengkz2023/My-GVA/server/internal/modules/system/operation-record/infrastructure/mysql"
+	filemysql "github.com/chengkz2023/My-GVA/server/internal/modules/business/file/infrastructure/mysql"
 	"go.uber.org/zap"
 	"gorm.io/gorm"
 )

@@ -2,7 +2,7 @@ package example
 
 import "context"
 
-import apperrors "github.com/flipped-aurora/gin-vue-admin/server/internal/platform/errors"
+import apperrors "github.com/chengkz2023/My-GVA/server/internal/platform/errors"
 
 type Service struct {
 	repo Repository

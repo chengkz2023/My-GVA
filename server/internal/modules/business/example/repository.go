@@ -15,6 +15,6 @@ func NewMemoryRepository() *MemoryRepository {
 func (r *MemoryRepository) Info(ctx context.Context) Info {
 	return Info{
 		Name:    "business/example",
-		Message: "v2 module registered",
+		Message: "module registered",
 	}
 }

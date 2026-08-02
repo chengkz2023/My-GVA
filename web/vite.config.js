@@ -72,7 +72,7 @@ export default ({ mode }) => {
       proxy: {
         // 把key的路径代理到target位置
         // detail: https://cli.vuejs.org/config/#devserver-proxy
-        '/v2': {
+        '/api': {
           target: `${process.env.VITE_BASE_PATH}:${process.env.VITE_SERVER_PORT}`, // 代理到目标路径
           changeOrigin: true,
         },

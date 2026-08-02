@@ -1,6 +1,6 @@
 package validator
 
-import "github.com/flipped-aurora/gin-vue-admin/server/utils"
+import "github.com/chengkz2023/My-GVA/server/utils"
 
 type Rules = utils.Rules
 

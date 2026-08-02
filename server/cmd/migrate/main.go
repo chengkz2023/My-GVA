@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/flipped-aurora/gin-vue-admin/server/internal/app/migration"
+	"github.com/chengkz2023/My-GVA/server/internal/app/migration"
 )
 
 func main() {

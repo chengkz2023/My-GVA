@@ -1,4 +1,4 @@
-// No V2 endpoints — SysVersion is AutoMigrate-only, version served via /system/version/info
+// No dedicated endpoints — SysVersion is AutoMigrate-only, version served via /system/version/info
 export const deleteSysVersion = () => Promise.resolve({ code: 0 })
 export const deleteSysVersionByIds = () => Promise.resolve({ code: 0 })
 export const findSysVersion = () => Promise.resolve({ code: 0, data: {} })

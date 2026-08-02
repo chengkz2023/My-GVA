@@ -7,10 +7,10 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/flipped-aurora/gin-vue-admin/server/config"
-	"github.com/flipped-aurora/gin-vue-admin/server/internal/app/container"
-	v2http "github.com/flipped-aurora/gin-vue-admin/server/internal/interfaces/http"
-	"github.com/flipped-aurora/gin-vue-admin/server/internal/platform/response"
+	"github.com/chengkz2023/My-GVA/server/config"
+	"github.com/chengkz2023/My-GVA/server/internal/app/container"
+	apphttp "github.com/chengkz2023/My-GVA/server/internal/interfaces/http"
+	"github.com/chengkz2023/My-GVA/server/internal/platform/response"
 	"github.com/gin-gonic/gin"
 )
 
@@ -26,9 +26,9 @@ func TestModuleInfoRedactsSecrets(t *testing.T) {
 	cfg.Redis.Password = "redis-secret"
 
 	engine := gin.New()
-	v2http.RegisterV2(engine, v2http.Config{}, NewModule(&container.Container{Config: cfg}))
+	apphttp.RegisterRoutes(engine, apphttp.Config{}, NewModule(&container.Container{Config: cfg}))
 
-	req := httptest.NewRequest(http.MethodGet, "/v2/system/config/info", nil)
+	req := httptest.NewRequest(http.MethodGet, "/api/system/config/info", nil)
 	rec := httptest.NewRecorder()
 	engine.ServeHTTP(rec, req)
 

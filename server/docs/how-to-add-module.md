@@ -1,6 +1,6 @@
 # 如何新增业务模块
 
-本文档说明在 BoyKing Admin 后端 V2 架构中，如何新增一个标准的业务模块。
+本文档说明在 BoyKing Admin 后端 架构中，如何新增一个标准的业务模块。
 
 ---
 
@@ -159,7 +159,7 @@ import (
     "context"
     "errors"
 
-    "github.com/flipped-aurora/gin-vue-admin/server/internal/platform/pagination"
+    "github.com/chengkz2023/My-GVA/server/internal/platform/pagination"
 )
 
 var (
@@ -208,7 +208,7 @@ type UpdateArticleInput struct {
 // internal/modules/business/article/application/dto.go
 package application
 
-import "github.com/flipped-aurora/gin-vue-admin/server/internal/platform/pagination"
+import "github.com/chengkz2023/My-GVA/server/internal/platform/pagination"
 
 // ---- 查询入参 ----
 type ListArticlesQuery struct {
@@ -271,10 +271,10 @@ package application
 import (
     "context"
 
-    "github.com/flipped-aurora/gin-vue-admin/server/internal/modules/business/article/domain"
-    platformauth "github.com/flipped-aurora/gin-vue-admin/server/internal/platform/auth"
-    apperrors "github.com/flipped-aurora/gin-vue-admin/server/internal/platform/errors"
-    "github.com/flipped-aurora/gin-vue-admin/server/internal/platform/pagination"
+    "github.com/chengkz2023/My-GVA/server/internal/modules/business/article/domain"
+    platformauth "github.com/chengkz2023/My-GVA/server/internal/platform/auth"
+    apperrors "github.com/chengkz2023/My-GVA/server/internal/platform/errors"
+    "github.com/chengkz2023/My-GVA/server/internal/platform/pagination"
 )
 
 type Service struct {
@@ -386,8 +386,8 @@ import (
     "context"
     "errors"
 
-    "github.com/flipped-aurora/gin-vue-admin/server/internal/modules/business/article/domain"
-    "github.com/flipped-aurora/gin-vue-admin/server/internal/platform/pagination"
+    "github.com/chengkz2023/My-GVA/server/internal/modules/business/article/domain"
+    "github.com/chengkz2023/My-GVA/server/internal/platform/pagination"
     "gorm.io/gorm"
 )
 
@@ -507,10 +507,10 @@ package http
 import (
     "strconv"
 
-    "github.com/flipped-aurora/gin-vue-admin/server/internal/modules/business/article/application"
-    apperrors "github.com/flipped-aurora/gin-vue-admin/server/internal/platform/errors"
-    "github.com/flipped-aurora/gin-vue-admin/server/internal/platform/pagination"
-    "github.com/flipped-aurora/gin-vue-admin/server/internal/platform/response"
+    "github.com/chengkz2023/My-GVA/server/internal/modules/business/article/application"
+    apperrors "github.com/chengkz2023/My-GVA/server/internal/platform/errors"
+    "github.com/chengkz2023/My-GVA/server/internal/platform/pagination"
+    "github.com/chengkz2023/My-GVA/server/internal/platform/response"
     "github.com/gin-gonic/gin"
 )
 
@@ -641,12 +641,12 @@ func (h *Handler) Delete(c *gin.Context) {
 package article
 
 import (
-    "github.com/flipped-aurora/gin-vue-admin/server/internal/app/container"
-    v2http "github.com/flipped-aurora/gin-vue-admin/server/internal/interfaces/http"
-    "github.com/flipped-aurora/gin-vue-admin/server/internal/modules/business/article/domain"
-    "github.com/flipped-aurora/gin-vue-admin/server/internal/modules/business/article/application"
-    articlemysql "github.com/flipped-aurora/gin-vue-admin/server/internal/modules/business/article/infrastructure/mysql"
-    articlehttp "github.com/flipped-aurora/gin-vue-admin/server/internal/modules/business/article/transport/http"
+    "github.com/chengkz2023/My-GVA/server/internal/app/container"
+    apphttp "github.com/chengkz2023/My-GVA/server/internal/interfaces/http"
+    "github.com/chengkz2023/My-GVA/server/internal/modules/business/article/domain"
+    "github.com/chengkz2023/My-GVA/server/internal/modules/business/article/application"
+    articlemysql "github.com/chengkz2023/My-GVA/server/internal/modules/business/article/infrastructure/mysql"
+    articlehttp "github.com/chengkz2023/My-GVA/server/internal/modules/business/article/transport/http"
 )
 
 type Module struct {
@@ -664,7 +664,7 @@ func NewModule(c *container.Container) *Module {
     }
 }
 
-func (m *Module) RegisterHTTP(routes v2http.Routes) {
+func (m *Module) RegisterHTTP(routes apphttp.Routes) {
     m.handler.Register(routes.Authenticated)  // 需要登录
 }
 ```
@@ -672,7 +672,7 @@ func (m *Module) RegisterHTTP(routes v2http.Routes) {
 **如果需要公开接口（无需 JWT）：**
 
 ```go
-func (m *Module) RegisterHTTP(routes v2http.Routes) {
+func (m *Module) RegisterHTTP(routes apphttp.Routes) {
     m.handler.Register(routes.Public)  // 无需认证
 }
 ```
@@ -683,8 +683,8 @@ func (m *Module) RegisterHTTP(routes v2http.Routes) {
 
 ```go
 // internal/modules/modules.go
-func HTTPModules(c *container.Container) []v2http.Module {
-    return []v2http.Module{
+func HTTPModules(c *container.Container) []apphttp.Module {
+    return []apphttp.Module{
         // ... 已有模块 ...
         businessarticle.NewModule(c),  // ← 新增这一行
     }
@@ -721,7 +721,7 @@ func HTTPModules(c *container.Container) []v2http.Module {
 │                   github.com/gin-gonic/gin           │
 ├──────────────────────────────────────────────────────┤
 │  module.go        container（DI 容器）                 │
-│                   v2http（路由注册接口）                │
+│                   apphttp（路由注册接口）                │
 │                   自身模块的四层子包                    │
 └──────────────────────────────────────────────────────┘
 ```
@@ -749,11 +749,11 @@ func HTTPModules(c *container.Container) []v2http.Module {
 
 ### 路由前缀
 
-所有 V2 模块的路由自动带 `/v2` 前缀：
+所有 模块的路由自动带 `/api` 前缀：
 
 ```
 模块注册:    group.Group("/article").GET("/list", ...)
-实际路由:    GET /v2/article/list
+实际路由:    GET /api/article/list
 ```
 
 ### 两种路由组
@@ -776,7 +776,7 @@ func (h *Handler) Register(authenticated, public *gin.RouterGroup) {
 }
 
 // module.go
-func (m *Module) RegisterHTTP(routes v2http.Routes) {
+func (m *Module) RegisterHTTP(routes apphttp.Routes) {
     m.handler.Register(routes.Authenticated, routes.Public)
 }
 ```

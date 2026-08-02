@@ -6,7 +6,7 @@ import (
 	"os"
 	"path/filepath"
 
-	legacyconfig "github.com/flipped-aurora/gin-vue-admin/server/config"
+	legacyconfig "github.com/chengkz2023/My-GVA/server/config"
 	"github.com/fsnotify/fsnotify"
 	"github.com/gin-gonic/gin"
 	"github.com/spf13/viper"

@@ -5,9 +5,9 @@ import (
 	"errors"
 	"time"
 
-	"github.com/flipped-aurora/gin-vue-admin/server/internal/modules/system/user/domain"
-	"github.com/flipped-aurora/gin-vue-admin/server/internal/platform/pagination"
-	platformdb "github.com/flipped-aurora/gin-vue-admin/server/internal/platform/database"
+	"github.com/chengkz2023/My-GVA/server/internal/modules/system/user/domain"
+	"github.com/chengkz2023/My-GVA/server/internal/platform/pagination"
+	platformdb "github.com/chengkz2023/My-GVA/server/internal/platform/database"
 	"github.com/google/uuid"
 	"gorm.io/gorm"
 )

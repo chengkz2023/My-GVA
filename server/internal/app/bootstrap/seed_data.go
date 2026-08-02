@@ -3,9 +3,9 @@ package bootstrap
 import (
 	"strconv"
 
-	apimysql "github.com/flipped-aurora/gin-vue-admin/server/internal/modules/system/api/infrastructure/mysql"
-	platformdb "github.com/flipped-aurora/gin-vue-admin/server/internal/platform/database"
-	"github.com/flipped-aurora/gin-vue-admin/server/utils"
+	apimysql "github.com/chengkz2023/My-GVA/server/internal/modules/system/api/infrastructure/mysql"
+	platformdb "github.com/chengkz2023/My-GVA/server/internal/platform/database"
+	"github.com/chengkz2023/My-GVA/server/utils"
 	"github.com/google/uuid"
 	"go.uber.org/zap"
 	"gorm.io/gorm"

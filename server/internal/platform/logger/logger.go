@@ -4,9 +4,9 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/flipped-aurora/gin-vue-admin/server/config"
-	"github.com/flipped-aurora/gin-vue-admin/server/internal/platform/logger/internal"
-	"github.com/flipped-aurora/gin-vue-admin/server/utils"
+	"github.com/chengkz2023/My-GVA/server/config"
+	"github.com/chengkz2023/My-GVA/server/internal/platform/logger/internal"
+	"github.com/chengkz2023/My-GVA/server/utils"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 )

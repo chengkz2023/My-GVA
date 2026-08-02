@@ -1,12 +1,12 @@
 package http
 
 import (
-	v2middleware "github.com/flipped-aurora/gin-vue-admin/server/internal/interfaces/http/middleware"
-	"github.com/flipped-aurora/gin-vue-admin/server/internal/platform/response"
+	mw "github.com/chengkz2023/My-GVA/server/internal/interfaces/http/middleware"
+	"github.com/chengkz2023/My-GVA/server/internal/platform/response"
 	"github.com/gin-gonic/gin"
 )
 
-const V2Prefix = "/v2"
+const APIPrefix = "/api"
 
 type Module interface {
 	RegisterHTTP(routes Routes)
@@ -18,20 +18,20 @@ type Routes struct {
 }
 
 type Config struct {
-	JWT v2middleware.JWTConfig
+	JWT mw.JWTConfig
 }
 
-func RegisterV2(engine *gin.Engine, cfg Config, modules ...Module) {
-	v2 := engine.Group(V2Prefix)
-	authenticated := engine.Group(V2Prefix)
-	authenticated.Use(v2middleware.JWTAuthWithConfig(cfg.JWT)).Use(v2middleware.CasbinHandler())
+func RegisterRoutes(engine *gin.Engine, cfg Config, modules ...Module) {
+	public := engine.Group(APIPrefix)
+	authenticated := engine.Group(APIPrefix)
+	authenticated.Use(mw.JWTAuthWithConfig(cfg.JWT)).Use(mw.CasbinHandler())
 
 	routes := Routes{
-		Public:        v2,
+		Public:        public,
 		Authenticated: authenticated,
 	}
 
-	v2.GET("/health", func(c *gin.Context) {
+	public.GET("/health", func(c *gin.Context) {
 		response.OK(c, gin.H{"status": "ok"})
 	})
 	for _, module := range modules {

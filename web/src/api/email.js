@@ -1,3 +1,3 @@
-// No V2 endpoints — email test not migrated
+// No dedicated endpoints — email test not migrated
 import service from '@/utils/request'
 export const emailTest = () => Promise.resolve({ code: 0 })

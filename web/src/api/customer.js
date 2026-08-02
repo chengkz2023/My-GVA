@@ -1,4 +1,4 @@
-// No V2 endpoints — example customer not migrated
+// No dedicated endpoints — example customer not migrated
 export const createExaCustomer = () => Promise.resolve({ code: 0 })
 export const updateExaCustomer = () => Promise.resolve({ code: 0 })
 export const deleteExaCustomer = () => Promise.resolve({ code: 0 })

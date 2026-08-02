@@ -5,8 +5,8 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/flipped-aurora/gin-vue-admin/server/internal/app/container"
-	v2http "github.com/flipped-aurora/gin-vue-admin/server/internal/interfaces/http"
+	"github.com/chengkz2023/My-GVA/server/internal/app/container"
+	apphttp "github.com/chengkz2023/My-GVA/server/internal/interfaces/http"
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
 )
@@ -20,21 +20,21 @@ func testContainer() *container.Container {
 func TestModuleRegistersChildren(t *testing.T) {
 	gin.SetMode(gin.TestMode)
 	engine := gin.New()
-	v2http.RegisterV2(engine, v2http.Config{}, NewModule(testContainer()))
+	apphttp.RegisterRoutes(engine, apphttp.Config{}, NewModule(testContainer()))
 
 	paths := map[string]int{
-		"/v2/system/api/groups":       http.StatusUnauthorized,
-		"/v2/system/api/list":         http.StatusUnauthorized,
-		"/v2/system/api/all":          http.StatusUnauthorized,
-		"/v2/system/api/policies/888": http.StatusUnauthorized,
-		"/v2/system/auth/me":          http.StatusUnauthorized,
-		"/v2/system/config/info":      http.StatusOK,
-		"/v2/system/menu/tree":        http.StatusUnauthorized,
-		"/v2/system/role/tree":        http.StatusUnauthorized,
-		"/v2/system/status/info":      http.StatusOK,
-		"/v2/system/user/list":        http.StatusUnauthorized,
-		"/v2/system/user/me":          http.StatusUnauthorized,
-		"/v2/system/version/info":     http.StatusOK,
+		"/api/system/api/groups":       http.StatusUnauthorized,
+		"/api/system/api/list":         http.StatusUnauthorized,
+		"/api/system/api/all":          http.StatusUnauthorized,
+		"/api/system/api/policies/888": http.StatusUnauthorized,
+		"/api/system/auth/me":          http.StatusUnauthorized,
+		"/api/system/config/info":      http.StatusOK,
+		"/api/system/menu/tree":        http.StatusUnauthorized,
+		"/api/system/role/tree":        http.StatusUnauthorized,
+		"/api/system/status/info":      http.StatusOK,
+		"/api/system/user/list":        http.StatusUnauthorized,
+		"/api/system/user/me":          http.StatusUnauthorized,
+		"/api/system/version/info":     http.StatusOK,
 	}
 	for path, wantStatus := range paths {
 		t.Run(path, func(t *testing.T) {
@@ -51,9 +51,9 @@ func TestModuleRegistersChildren(t *testing.T) {
 func TestModuleRegistersProtectedPostRoutes(t *testing.T) {
 	gin.SetMode(gin.TestMode)
 	engine := gin.New()
-	v2http.RegisterV2(engine, v2http.Config{}, NewModule(testContainer()))
+	apphttp.RegisterRoutes(engine, apphttp.Config{}, NewModule(testContainer()))
 
-	req := httptest.NewRequest(http.MethodPost, "/v2/system/user/password", nil)
+	req := httptest.NewRequest(http.MethodPost, "/api/system/user/password", nil)
 	rec := httptest.NewRecorder()
 	engine.ServeHTTP(rec, req)
 
@@ -65,9 +65,9 @@ func TestModuleRegistersProtectedPostRoutes(t *testing.T) {
 func TestModuleRegistersProtectedPutRoutes(t *testing.T) {
 	gin.SetMode(gin.TestMode)
 	engine := gin.New()
-	v2http.RegisterV2(engine, v2http.Config{}, NewModule(testContainer()))
+	apphttp.RegisterRoutes(engine, apphttp.Config{}, NewModule(testContainer()))
 
-	req := httptest.NewRequest(http.MethodPut, "/v2/system/user/profile", nil)
+	req := httptest.NewRequest(http.MethodPut, "/api/system/user/profile", nil)
 	rec := httptest.NewRecorder()
 	engine.ServeHTTP(rec, req)
 

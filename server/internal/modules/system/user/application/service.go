@@ -4,10 +4,10 @@ import (
 	"context"
 	"errors"
 
-	"github.com/flipped-aurora/gin-vue-admin/server/internal/modules/system/user/domain"
-	platformauth "github.com/flipped-aurora/gin-vue-admin/server/internal/platform/auth"
-	apperrors "github.com/flipped-aurora/gin-vue-admin/server/internal/platform/errors"
-	"github.com/flipped-aurora/gin-vue-admin/server/internal/platform/pagination"
+	"github.com/chengkz2023/My-GVA/server/internal/modules/system/user/domain"
+	platformauth "github.com/chengkz2023/My-GVA/server/internal/platform/auth"
+	apperrors "github.com/chengkz2023/My-GVA/server/internal/platform/errors"
+	"github.com/chengkz2023/My-GVA/server/internal/platform/pagination"
 )
 
 type AuthorityChecker func(ctx context.Context, adminID, targetID uint) error

@@ -2,9 +2,9 @@ package internal
 
 import (
 	"fmt"
-	"github.com/flipped-aurora/gin-vue-admin/server/config"
-	astutil "github.com/flipped-aurora/gin-vue-admin/server/utils/ast"
-	"github.com/flipped-aurora/gin-vue-admin/server/utils/stacktrace"
+	"github.com/chengkz2023/My-GVA/server/config"
+	astutil "github.com/chengkz2023/My-GVA/server/utils/ast"
+	"github.com/chengkz2023/My-GVA/server/utils/stacktrace"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 	"os"
@@ -114,7 +114,7 @@ func (z *ZapCore) Write(entry zapcore.Entry, fields []zapcore.Field) error {
 		}
 
 		// 使用后台上下文，避免依赖 gin.Context
-			// SysError persistence removed (V2 migration)
+			// SysError persistence removed
 	}
 	return err
 }

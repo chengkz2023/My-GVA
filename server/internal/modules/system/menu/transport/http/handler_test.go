@@ -7,10 +7,10 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/flipped-aurora/gin-vue-admin/server/internal/modules/system/menu/application"
-	"github.com/flipped-aurora/gin-vue-admin/server/internal/modules/system/menu/domain"
-	platformauth "github.com/flipped-aurora/gin-vue-admin/server/internal/platform/auth"
-	"github.com/flipped-aurora/gin-vue-admin/server/internal/platform/response"
+	"github.com/chengkz2023/My-GVA/server/internal/modules/system/menu/application"
+	"github.com/chengkz2023/My-GVA/server/internal/modules/system/menu/domain"
+	platformauth "github.com/chengkz2023/My-GVA/server/internal/platform/auth"
+	"github.com/chengkz2023/My-GVA/server/internal/platform/response"
 	"github.com/gin-gonic/gin"
 )
 
@@ -25,10 +25,10 @@ func TestTree(t *testing.T) {
 			NickName:    "Admin",
 		}))
 	})
-	group := engine.Group("/v2")
+	group := engine.Group("/api")
 	NewHandler(application.NewService(fakeRepository{}, nil)).Register(group)
 
-	req := httptest.NewRequest(http.MethodGet, "/v2/system/menu/tree", nil)
+	req := httptest.NewRequest(http.MethodGet, "/api/system/menu/tree", nil)
 	rec := httptest.NewRecorder()
 	engine.ServeHTTP(rec, req)
 

@@ -1,6 +1,6 @@
 import service from '@/utils/request'
 
-// GET /v2/system/api/list
+// GET /api/system/api/list
 export const getApiList = (params) => {
   return service({
     url: '/system/api/list',
@@ -9,7 +9,7 @@ export const getApiList = (params) => {
   })
 }
 
-// POST /v2/system/api
+// POST /api/system/api
 export const createApi = (data) => {
   return service({
     url: '/system/api',
@@ -18,7 +18,7 @@ export const createApi = (data) => {
   })
 }
 
-// GET /v2/system/api/:id
+// GET /api/system/api/:id
 export const getApiById = (id) => {
   return service({
     url: `/system/api/${id}`,
@@ -26,7 +26,7 @@ export const getApiById = (id) => {
   })
 }
 
-// PUT /v2/system/api/:id
+// PUT /api/system/api/:id
 export const updateApi = (id, data) => {
   return service({
     url: `/system/api/${id}`,
@@ -35,7 +35,7 @@ export const updateApi = (id, data) => {
   })
 }
 
-// DELETE /v2/system/api/:id
+// DELETE /api/system/api/:id
 export const deleteApi = (id) => {
   return service({
     url: `/system/api/${id}`,
@@ -43,7 +43,7 @@ export const deleteApi = (id) => {
   })
 }
 
-// POST /v2/system/api/batch-delete
+// POST /api/system/api/batch-delete
 export const deleteApisByIds = (data) => {
   return service({
     url: '/system/api/batch-delete',
@@ -52,7 +52,7 @@ export const deleteApisByIds = (data) => {
   })
 }
 
-// GET /v2/system/api/all
+// GET /api/system/api/all
 export const getAllApis = (params) => {
   return service({
     url: '/system/api/all',
@@ -61,7 +61,7 @@ export const getAllApis = (params) => {
   })
 }
 
-// GET /v2/system/api/groups
+// GET /api/system/api/groups
 export const getApiGroups = () => {
   return service({
     url: '/system/api/groups',

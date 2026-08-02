@@ -4,8 +4,8 @@ import (
 	"context"
 	"testing"
 
-	"github.com/flipped-aurora/gin-vue-admin/server/internal/modules/business/file/domain"
-	"github.com/flipped-aurora/gin-vue-admin/server/internal/platform/pagination"
+	"github.com/chengkz2023/My-GVA/server/internal/modules/business/file/domain"
+	"github.com/chengkz2023/My-GVA/server/internal/platform/pagination"
 )
 
 func TestListFiles(t *testing.T) {

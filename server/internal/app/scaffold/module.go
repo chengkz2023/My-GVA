@@ -171,7 +171,7 @@ type InfoResponse struct {
 const handlerTemplate = `package {{.PackageName}}
 
 import (
-	"github.com/flipped-aurora/gin-vue-admin/server/internal/platform/response"
+	"github.com/chengkz2023/My-GVA/server/internal/platform/response"
 	"github.com/gin-gonic/gin"
 )
 
@@ -206,17 +206,17 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	v2http "github.com/flipped-aurora/gin-vue-admin/server/internal/interfaces/http"
-	"github.com/flipped-aurora/gin-vue-admin/server/internal/platform/response"
+	apphttp "github.com/chengkz2023/My-GVA/server/internal/interfaces/http"
+	"github.com/chengkz2023/My-GVA/server/internal/platform/response"
 	"github.com/gin-gonic/gin"
 )
 
 func TestModuleInfo(t *testing.T) {
 	gin.SetMode(gin.TestMode)
 	engine := gin.New()
-	v2http.RegisterV2(engine, v2http.Config{}, NewModule(nil))
+	apphttp.RegisterRoutes(engine, apphttp.Config{}, NewModule(nil))
 
-	req := httptest.NewRequest(http.MethodGet, "/v2{{.RoutePath}}/info", nil)
+	req := httptest.NewRequest(http.MethodGet, "/api{{.RoutePath}}/info", nil)
 	rec := httptest.NewRecorder()
 	engine.ServeHTTP(rec, req)
 
@@ -252,8 +252,8 @@ type Info struct {
 const moduleTemplate = `package {{.PackageName}}
 
 import (
-	"github.com/flipped-aurora/gin-vue-admin/server/internal/app/container"
-	v2http "github.com/flipped-aurora/gin-vue-admin/server/internal/interfaces/http"
+	"github.com/chengkz2023/My-GVA/server/internal/app/container"
+	apphttp "github.com/chengkz2023/My-GVA/server/internal/interfaces/http"
 )
 
 type Module struct {
@@ -269,7 +269,7 @@ func NewModule(c *container.Container) *Module {
 	}
 }
 
-func (m *Module) RegisterHTTP(routes v2http.Routes) {
+func (m *Module) RegisterHTTP(routes apphttp.Routes) {
 	m.handler.Register(routes.Public)
 }
 `
@@ -291,7 +291,7 @@ func NewMemoryRepository() *MemoryRepository {
 func (r *MemoryRepository) Info(ctx context.Context) Info {
 	return Info{
 		Name: "{{.ModulePath}}",
-		Message: "v2 module registered",
+		Message: "module registered",
 	}
 }
 `

@@ -3,8 +3,8 @@
 package bootstrap
 
 import (
-	"github.com/flipped-aurora/gin-vue-admin/server/internal/app/container"
-	"github.com/flipped-aurora/gin-vue-admin/server/utils"
+	"github.com/chengkz2023/My-GVA/server/internal/app/container"
+	"github.com/chengkz2023/My-GVA/server/utils"
 )
 
 func SetupHandlers(c *container.Container) {

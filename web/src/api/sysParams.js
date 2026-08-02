@@ -1,4 +1,4 @@
-// No V2 endpoints yet — sys_params table is AutoMigrate-only
+// No dedicated endpoints — sys_params table is AutoMigrate-only
 export const createSysParams = () => Promise.resolve({ code: 0 })
 export const deleteSysParams = () => Promise.resolve({ code: 0 })
 export const deleteSysParamsByIds = () => Promise.resolve({ code: 0 })

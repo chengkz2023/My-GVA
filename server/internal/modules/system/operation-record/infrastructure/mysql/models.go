@@ -3,7 +3,7 @@ package mysql
 import (
 	"time"
 
-	"github.com/flipped-aurora/gin-vue-admin/server/internal/platform/database"
+	"github.com/chengkz2023/My-GVA/server/internal/platform/database"
 )
 
 type SysOperationRecord struct {

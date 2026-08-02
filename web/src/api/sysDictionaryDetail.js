@@ -1,4 +1,4 @@
-// No V2 endpoints yet — sys_dictionary_details table is AutoMigrate-only
+// No dedicated endpoints — sys_dictionary_details table is AutoMigrate-only
 export const createSysDictionaryDetail = () => Promise.resolve({ code: 0 })
 export const deleteSysDictionaryDetail = () => Promise.resolve({ code: 0 })
 export const updateSysDictionaryDetail = () => Promise.resolve({ code: 0 })

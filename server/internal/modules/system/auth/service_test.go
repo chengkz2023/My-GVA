@@ -4,7 +4,7 @@ import (
 	"context"
 	"testing"
 
-	platformauth "github.com/flipped-aurora/gin-vue-admin/server/internal/platform/auth"
+	platformauth "github.com/chengkz2023/My-GVA/server/internal/platform/auth"
 )
 
 func TestServiceMe(t *testing.T) {

@@ -1,6 +1,6 @@
 package application
 
-import "github.com/flipped-aurora/gin-vue-admin/server/internal/platform/pagination"
+import "github.com/chengkz2023/My-GVA/server/internal/platform/pagination"
 
 type CurrentUserResponse struct {
 	User SourceUser `json:"user"`

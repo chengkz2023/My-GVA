@@ -6,8 +6,8 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/flipped-aurora/gin-vue-admin/server/internal/modules/business/file/domain"
-	apperrors "github.com/flipped-aurora/gin-vue-admin/server/internal/platform/errors"
+	"github.com/chengkz2023/My-GVA/server/internal/modules/business/file/domain"
+	apperrors "github.com/chengkz2023/My-GVA/server/internal/platform/errors"
 )
 
 type Service struct {

@@ -3,8 +3,8 @@ package bootstrap
 import (
 	"fmt"
 
-	"github.com/flipped-aurora/gin-vue-admin/server/task"
-	"github.com/flipped-aurora/gin-vue-admin/server/utils/timer"
+	"github.com/chengkz2023/My-GVA/server/task"
+	"github.com/chengkz2023/My-GVA/server/utils/timer"
 
 	"github.com/robfig/cron/v3"
 	"gorm.io/gorm"

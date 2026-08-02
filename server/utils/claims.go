@@ -1,7 +1,7 @@
 package utils
 
 import (
-	platformauth "github.com/flipped-aurora/gin-vue-admin/server/internal/platform/auth"
+	platformauth "github.com/chengkz2023/My-GVA/server/internal/platform/auth"
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 )

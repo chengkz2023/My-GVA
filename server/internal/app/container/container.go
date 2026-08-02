@@ -1,10 +1,10 @@
 package container
 
 import (
-	"github.com/flipped-aurora/gin-vue-admin/server/config"
-	"github.com/flipped-aurora/gin-vue-admin/server/internal/platform/authz"
-	"github.com/flipped-aurora/gin-vue-admin/server/internal/platform/transaction"
-	"github.com/flipped-aurora/gin-vue-admin/server/utils/timer"
+	"github.com/chengkz2023/My-GVA/server/config"
+	"github.com/chengkz2023/My-GVA/server/internal/platform/authz"
+	"github.com/chengkz2023/My-GVA/server/internal/platform/transaction"
+	"github.com/chengkz2023/My-GVA/server/utils/timer"
 	"github.com/gin-gonic/gin"
 	"github.com/redis/go-redis/v9"
 	"github.com/songzhibin97/gkit/cache/local_cache"

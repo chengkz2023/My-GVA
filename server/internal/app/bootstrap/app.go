@@ -1,14 +1,14 @@
 package bootstrap
 
 import (
-	"github.com/flipped-aurora/gin-vue-admin/server/internal/app/container"
-	casbinauthz "github.com/flipped-aurora/gin-vue-admin/server/internal/platform/authz/casbin"
-	"github.com/flipped-aurora/gin-vue-admin/server/internal/platform/config"
-	"github.com/flipped-aurora/gin-vue-admin/server/internal/platform/database"
-	"github.com/flipped-aurora/gin-vue-admin/server/internal/platform/logger"
-	"github.com/flipped-aurora/gin-vue-admin/server/internal/platform/transaction"
-	rolemysql "github.com/flipped-aurora/gin-vue-admin/server/internal/modules/system/role/infrastructure/mysql"
-	"github.com/flipped-aurora/gin-vue-admin/server/utils/timer"
+	"github.com/chengkz2023/My-GVA/server/internal/app/container"
+	casbinauthz "github.com/chengkz2023/My-GVA/server/internal/platform/authz/casbin"
+	"github.com/chengkz2023/My-GVA/server/internal/platform/config"
+	"github.com/chengkz2023/My-GVA/server/internal/platform/database"
+	"github.com/chengkz2023/My-GVA/server/internal/platform/logger"
+	"github.com/chengkz2023/My-GVA/server/internal/platform/transaction"
+	rolemysql "github.com/chengkz2023/My-GVA/server/internal/modules/system/role/infrastructure/mysql"
+	"github.com/chengkz2023/My-GVA/server/utils/timer"
 	"go.uber.org/zap"
 )
 

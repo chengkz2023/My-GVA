@@ -1,7 +1,7 @@
 package auth
 
 import (
-	"github.com/flipped-aurora/gin-vue-admin/server/config"
+	"github.com/chengkz2023/My-GVA/server/config"
 	"github.com/mojocn/base64Captcha"
 	"go.uber.org/zap"
 )

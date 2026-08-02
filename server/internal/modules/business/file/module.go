@@ -1,11 +1,11 @@
 package file
 
 import (
-	"github.com/flipped-aurora/gin-vue-admin/server/internal/app/container"
-	v2http "github.com/flipped-aurora/gin-vue-admin/server/internal/interfaces/http"
-	"github.com/flipped-aurora/gin-vue-admin/server/internal/modules/business/file/application"
-	filemysql "github.com/flipped-aurora/gin-vue-admin/server/internal/modules/business/file/infrastructure/mysql"
-	filehttp "github.com/flipped-aurora/gin-vue-admin/server/internal/modules/business/file/transport/http"
+	"github.com/chengkz2023/My-GVA/server/internal/app/container"
+	apphttp "github.com/chengkz2023/My-GVA/server/internal/interfaces/http"
+	"github.com/chengkz2023/My-GVA/server/internal/modules/business/file/application"
+	filemysql "github.com/chengkz2023/My-GVA/server/internal/modules/business/file/infrastructure/mysql"
+	filehttp "github.com/chengkz2023/My-GVA/server/internal/modules/business/file/transport/http"
 )
 
 type Module struct {
@@ -24,6 +24,6 @@ func NewModule(c *container.Container) *Module {
 	}
 }
 
-func (m *Module) RegisterHTTP(routes v2http.Routes) {
+func (m *Module) RegisterHTTP(routes apphttp.Routes) {
 	m.handler.Register(routes.Authenticated)
 }

@@ -1,8 +1,8 @@
 package bootstrap
 
 import (
-	"github.com/flipped-aurora/gin-vue-admin/server/config"
-	"github.com/flipped-aurora/gin-vue-admin/server/utils"
+	"github.com/chengkz2023/My-GVA/server/config"
+	"github.com/chengkz2023/My-GVA/server/utils"
 	"github.com/songzhibin97/gkit/cache/local_cache"
 )
 

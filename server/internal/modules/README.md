@@ -1,4 +1,4 @@
-# V2 Module Guide
+# Module Guide
 
 ## Quick Start
 
@@ -24,10 +24,10 @@ internal/modules/business/order/
 Then register it in `internal/modules/modules.go`:
 
 ```go
-import businessorder "github.com/flipped-aurora/gin-vue-admin/server/internal/modules/business/order"
+import businessorder "github.com/chengkz2023/My-GVA/server/internal/modules/business/order"
 
-func HTTPModules(c *container.Container) []v2http.Module {
-    return []v2http.Module{
+func HTTPModules(c *container.Container) []apphttp.Module {
+    return []apphttp.Module{
         businessorder.NewModule(c),
         // ... existing modules
     }

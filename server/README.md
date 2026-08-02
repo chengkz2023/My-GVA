@@ -5,7 +5,7 @@ Go 1.24+ backend with Gin + GORM + Casbin + JWT.
 ## Build & Test
 
 ```bash
-go build ./cmd/admin-api       # V2 entrypoint (web server)
+go build ./cmd/admin-api       # entrypoint (web server)
 go build ./cmd/migrate         # migration CLI
 go build ./cmd/modulegen       # code generator
 go test ./...                  # all tests (28 packages)
@@ -22,7 +22,7 @@ go test ./...                  # all tests (28 packages)
 │   └── modulegen/             # module code generator
 ├── internal/
 │   ├── app/                   # bootstrap, container, migration engine, scaffold
-│   ├── interfaces/http/       # V2 router + middleware
+│   ├── interfaces/http/       # router + middleware
 │   ├── modules/               # system + business modules (11 modules, 50 endpoints)
 │   └── platform/              # shared infra (auth/JWT/claims, authz, casbin, config, db, ...)
 ├── config/                    # config struct definitions
@@ -41,5 +41,5 @@ Then register in `internal/modules/modules.go`. Architecture test enforces bound
 
 ## Documentation
 
-- `../docs/backend-v2-handoff.md` — full API list and architecture overview
+- `../docs/backend-handoff.md` — full API list and architecture overview
 - `../docs/backend-architecture-blueprint.md` — design spec

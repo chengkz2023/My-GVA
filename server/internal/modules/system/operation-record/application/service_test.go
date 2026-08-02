@@ -5,8 +5,8 @@ import (
 	"errors"
 	"testing"
 
-	"github.com/flipped-aurora/gin-vue-admin/server/internal/modules/system/operation-record/domain"
-	"github.com/flipped-aurora/gin-vue-admin/server/internal/platform/pagination"
+	"github.com/chengkz2023/My-GVA/server/internal/modules/system/operation-record/domain"
+	"github.com/chengkz2023/My-GVA/server/internal/platform/pagination"
 )
 
 func TestListRecords(t *testing.T) {

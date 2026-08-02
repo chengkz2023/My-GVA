@@ -6,7 +6,7 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/flipped-aurora/gin-vue-admin/server/internal/app/scaffold"
+	"github.com/chengkz2023/My-GVA/server/internal/app/scaffold"
 )
 
 func main() {
@@ -14,7 +14,7 @@ func main() {
 	flag.StringVar(&opts.RootDir, "dir", ".", "server root directory")
 	flag.StringVar(&opts.Group, "group", "business", "module group under internal/modules")
 	flag.StringVar(&opts.Name, "name", "", "module name, lowercase letters and digits")
-	flag.StringVar(&opts.Route, "route", "", "HTTP route under /v2, default is /<name>")
+	flag.StringVar(&opts.Route, "route", "", "HTTP route under /api, default is /<name>")
 	flag.BoolVar(&opts.Force, "force", false, "overwrite existing files")
 	flag.Parse()
 

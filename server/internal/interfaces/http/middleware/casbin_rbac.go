@@ -4,9 +4,9 @@ import (
 	"strconv"
 	"strings"
 
-	platformauth "github.com/flipped-aurora/gin-vue-admin/server/internal/platform/auth"
-	casbinauthz "github.com/flipped-aurora/gin-vue-admin/server/internal/platform/authz/casbin"
-	"github.com/flipped-aurora/gin-vue-admin/server/internal/platform/response"
+	platformauth "github.com/chengkz2023/My-GVA/server/internal/platform/auth"
+	casbinauthz "github.com/chengkz2023/My-GVA/server/internal/platform/authz/casbin"
+	"github.com/chengkz2023/My-GVA/server/internal/platform/response"
 	"github.com/gin-gonic/gin"
 )
 

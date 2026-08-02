@@ -3,7 +3,7 @@ package bootstrap
 import (
 	"context"
 
-	"github.com/flipped-aurora/gin-vue-admin/server/config"
+	"github.com/chengkz2023/My-GVA/server/config"
 
 	"github.com/redis/go-redis/v9"
 	"go.uber.org/zap"

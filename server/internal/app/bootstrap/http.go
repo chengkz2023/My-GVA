@@ -9,11 +9,11 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/flipped-aurora/gin-vue-admin/server/internal/app/container"
-	v2http "github.com/flipped-aurora/gin-vue-admin/server/internal/interfaces/http"
-	"github.com/flipped-aurora/gin-vue-admin/server/internal/interfaces/http/middleware"
-	"github.com/flipped-aurora/gin-vue-admin/server/internal/modules"
-	"github.com/flipped-aurora/gin-vue-admin/server/internal/platform/buildinfo"
+	"github.com/chengkz2023/My-GVA/server/internal/app/container"
+	apphttp "github.com/chengkz2023/My-GVA/server/internal/interfaces/http"
+	"github.com/chengkz2023/My-GVA/server/internal/interfaces/http/middleware"
+	"github.com/chengkz2023/My-GVA/server/internal/modules"
+	"github.com/chengkz2023/My-GVA/server/internal/platform/buildinfo"
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
 )
@@ -24,7 +24,7 @@ func Run() {
 	address := fmt.Sprintf(":%d", c.Config.System.Addr)
 
 	fmt.Printf(`
-	BoyKing Admin V2 started, version: %s
+	BoyKing Admin started, version: %s
 	Visit: http://127.0.0.1%s
 	`, buildinfo.Version, address)
 
@@ -36,13 +36,13 @@ func Router(c *container.Container) *gin.Engine {
 		c.Redis = InitRedis(c.Config.Redis, c.Logger)
 	}
 	engine := Routers(c)
-	v2http.RegisterV2(engine, v2Config(c), modules.HTTPModules(c)...)
+	apphttp.RegisterRoutes(engine, apiConfig(c), modules.HTTPModules(c)...)
 	c.Routes = engine.Routes()
 	return engine
 }
 
-func v2Config(c *container.Container) v2http.Config {
-	return v2http.Config{
+func apiConfig(c *container.Container) apphttp.Config {
+	return apphttp.Config{
 		JWT: middleware.JWTConfig{
 			ExpiresTime: c.Config.JWT.ExpiresTime,
 			BufferTime:  c.Config.JWT.BufferTime,

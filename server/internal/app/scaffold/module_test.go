@@ -27,9 +27,9 @@ func TestGenerateLightModule(t *testing.T) {
 		t.Fatalf("files = %d, want %d", len(result.Files), len(lightModuleFiles))
 	}
 
-	assertFileContains(t, filepath.Join(wantDir, "module.go"), "func (m *Module) RegisterHTTP(routes v2http.Routes)")
+	assertFileContains(t, filepath.Join(wantDir, "module.go"), "func (m *Module) RegisterHTTP(routes apphttp.Routes)")
 	assertFileContains(t, filepath.Join(wantDir, "handler.go"), `moduleGroup := group.Group("/customer")`)
-	assertFileContains(t, filepath.Join(wantDir, "handler_test.go"), `"/v2/customer/info"`)
+	assertFileContains(t, filepath.Join(wantDir, "handler_test.go"), `"/api/customer/info"`)
 	assertFileContains(t, filepath.Join(wantDir, "repository.go"), `Name:    "business/customer"`)
 }
 

@@ -1,6 +1,6 @@
 package bootstrap
 
-import "github.com/flipped-aurora/gin-vue-admin/server/utils"
+import "github.com/chengkz2023/My-GVA/server/utils"
 
 func init() {
 	_ = utils.RegisterRule("PageVerify",

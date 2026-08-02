@@ -1,6 +1,6 @@
 # BoyKing Admin
 
-基于 `gin + vue3 + element-plus` 精简的后台脚手架，已完成 V2 模块化重构。
+基于 `gin + vue3 + element-plus` 精简的后台脚手架，已完成模块化重构。
 
 ## 快速开始
 
@@ -28,14 +28,14 @@ DDD-lite 模块化单体，显式依赖注入，框架无关的领域层。
 server/internal/
 ├── app/bootstrap/      启动编排（初始化、路由、数据库、定时器）
 ├── app/container/      DI 容器（Config, Logger, DB, Tx, Authorizer）
-├── interfaces/http/    V2 HTTP 路由 + 中间件
+├── interfaces/http/    HTTP 路由 + 中间件
 ├── modules/system/     系统模块（auth/user/role/menu/api/operation-record/config/status/version）
 ├── modules/business/   业务模块（file/example）
 └── platform/           平台共享层（auth/authz/casbin/config/database/errors/logger/...）
 ```
 
 - 模块注册：`server/internal/modules/modules.go`
-- 50 个 V2 端点，`/v2/` 前缀
+- 50 个端点，`/api/` 前缀
 - JWT 核心逻辑（Claims、Token 生成/解析）位于 `platform/auth`，零全局依赖
 - Casbin RBAC 认证与鉴权
 - 中间件全部参数化：`JWTAuthWithConfig` / `GinRecovery(log)` / `OperationRecord(db, log)` / `NewLimiter(rdb, log, ...)`
@@ -52,5 +52,5 @@ server/internal/
 
 ## 文档
 
-- 详细 API 列表与架构说明：`docs/backend-v2-handoff.md`
+- 详细 API 列表与架构说明：`docs/backend-handoff.md`
 - 架构蓝图：`docs/backend-architecture-blueprint.md`

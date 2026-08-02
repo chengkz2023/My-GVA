@@ -1,6 +1,6 @@
 package mysql
 
-import "github.com/flipped-aurora/gin-vue-admin/server/internal/platform/database"
+import "github.com/chengkz2023/My-GVA/server/internal/platform/database"
 
 type SysApi struct {
 	database.GVA_MODEL
