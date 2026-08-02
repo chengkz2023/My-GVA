@@ -16,10 +16,6 @@ func Open(cfg config.Mysql, log *zap.Logger) *gorm.DB {
 	return openMySQL(cfg, log)
 }
 
-func OpenByConfig(m config.Mysql, log *zap.Logger) *gorm.DB {
-	return openMySQL(m, log)
-}
-
 func Ping(ctx context.Context, db *gorm.DB) error {
 	if db == nil {
 		return gorm.ErrInvalidDB

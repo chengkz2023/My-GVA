@@ -111,15 +111,6 @@ func (s SysAuthorityMenu) TableName() string {
 
 // ========== Menu types ==========
 
-type SysMenu struct {
-	SysBaseMenu
-	MenuId      uint                   `json:"menuId" gorm:"comment:菜单ID"`
-	AuthorityId uint                   `json:"-" gorm:"comment:角色ID"`
-	Children    []SysMenu              `json:"children" gorm:"-"`
-	Parameters  []SysBaseMenuParameter `json:"parameters" gorm:"foreignKey:SysBaseMenuID;references:MenuId"`
-	Btns        map[string]uint        `json:"btns" gorm:"-"`
-}
-
 type SysBaseMenu struct {
 	GVA_MODEL
 	MenuLevel     uint                   `json:"-"`
@@ -163,82 +154,4 @@ type SysBaseMenuBtn struct {
 	Name          string `json:"name" gorm:"comment:按钮关键key"`
 	Desc          string `json:"desc" gorm:"按钮备注"`
 	SysBaseMenuID uint   `json:"sysBaseMenuID" gorm:"comment:菜单ID"`
-}
-
-// ========== Other types (AutoMigrate-only) ==========
-
-type SysDictionary struct {
-	GVA_MODEL
-	Name                 string                `json:"name" form:"name" gorm:"column:name;comment:字典名（中）"`
-	Type                 string                `json:"type" form:"type" gorm:"column:type;comment:字典名（英）"`
-	Status               *bool                 `json:"status" form:"status" gorm:"column:status;comment:状态"`
-	Desc                 string                `json:"desc" form:"desc" gorm:"column:desc;comment:描述"`
-	ParentID             *uint                 `json:"parentID" form:"parentID" gorm:"column:parent_id;comment:父级字典ID"`
-	Children             []SysDictionary       `json:"children" gorm:"foreignKey:ParentID"`
-	SysDictionaryDetails []SysDictionaryDetail `json:"sysDictionaryDetails" form:"sysDictionaryDetails"`
-}
-
-func (SysDictionary) TableName() string {
-	return "sys_dictionaries"
-}
-
-type SysDictionaryDetail struct {
-	GVA_MODEL
-	Label           string                `json:"label" form:"label" gorm:"column:label;comment:展示值"`
-	Value           string                `json:"value" form:"value" gorm:"column:value;comment:字典值"`
-	Extend          string                `json:"extend" form:"extend" gorm:"column:extend;comment:扩展值"`
-	Status          *bool                 `json:"status" form:"status" gorm:"column:status;comment:启用状态"`
-	Sort            int                   `json:"sort" form:"sort" gorm:"column:sort;comment:排序标记"`
-	SysDictionaryID int                   `json:"sysDictionaryID" form:"sysDictionaryID" gorm:"column:sys_dictionary_id;comment:关联标记"`
-	ParentID        *uint                 `json:"parentID" form:"parentID" gorm:"column:parent_id;comment:父级字典详情ID"`
-	Children        []SysDictionaryDetail `json:"children" gorm:"foreignKey:ParentID"`
-	Level           int                   `json:"level" form:"level" gorm:"column:level;comment:层级深度"`
-	Path            string                `json:"path" form:"path" gorm:"column:path;comment:层级路径"`
-	Disabled        bool                  `json:"disabled" gorm:"-"`
-}
-
-func (SysDictionaryDetail) TableName() string {
-	return "sys_dictionary_details"
-}
-
-type SysError struct {
-	GVA_MODEL
-	Form     *string `json:"form" form:"form" gorm:"comment:错误来源;column:form;type:text;" binding:"required"`
-	Info     *string `json:"info" form:"info" gorm:"comment:错误内容;column:info;type:text;"`
-	Level    string  `json:"level" form:"level" gorm:"comment:日志等级;column:level;"`
-	Solution *string `json:"solution" form:"solution" gorm:"comment:解决方案;column:solution;type:text"`
-	Status   string  `json:"status" form:"status" gorm:"comment:处理状态;column:status;type:varchar(20);default:未处理;"`
-}
-
-func (SysError) TableName() string {
-	return "sys_error"
-}
-
-type JwtBlacklist struct {
-	GVA_MODEL
-	Jwt string `gorm:"type:text;comment:jwt"`
-}
-
-type SysParams struct {
-	GVA_MODEL
-	Name  string `json:"name" form:"name" gorm:"column:name;comment:参数名称;" binding:"required"`
-	Key   string `json:"key" form:"key" gorm:"column:key;comment:参数键;" binding:"required"`
-	Value string `json:"value" form:"value" gorm:"column:value;comment:参数值;" binding:"required"`
-	Desc  string `json:"desc" form:"desc" gorm:"column:desc;comment:参数说明;"`
-}
-
-func (SysParams) TableName() string {
-	return "sys_params"
-}
-
-type SysVersion struct {
-	GVA_MODEL
-	VersionName *string `json:"versionName" form:"versionName" gorm:"comment:版本名称;column:version_name;size:255;" binding:"required"`
-	VersionCode *string `json:"versionCode" form:"versionCode" gorm:"comment:版本号;column:version_code;size:100;" binding:"required"`
-	Description *string `json:"description" form:"description" gorm:"comment:版本描述;column:description;size:500;"`
-	VersionData *string `json:"versionData" form:"versionData" gorm:"comment:版本数据JSON;column:version_data;type:text;"`
-}
-
-func (SysVersion) TableName() string {
-	return "sys_versions"
 }

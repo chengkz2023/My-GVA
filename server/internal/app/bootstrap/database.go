@@ -22,17 +22,11 @@ func RegisterTables(db *gorm.DB, log *zap.Logger, disableAutoMigrate bool) {
 		apimysql.SysApi{},
 		platformdb.SysUser{},
 		platformdb.SysBaseMenu{},
-		platformdb.JwtBlacklist{},
 		platformdb.SysAuthority{},
-		platformdb.SysDictionary{},
 		operationmysql.SysOperationRecord{},
-		platformdb.SysDictionaryDetail{},
 		platformdb.SysBaseMenuParameter{},
 		platformdb.SysBaseMenuBtn{},
 		platformdb.SysAuthorityBtn{},
-		platformdb.SysParams{},
-		platformdb.SysVersion{},
-		platformdb.SysError{},
 		adapter.CasbinRule{},
 
 		filemysql.ExaFileUploadAndDownload{},
@@ -44,6 +38,5 @@ func RegisterTables(db *gorm.DB, log *zap.Logger, disableAutoMigrate bool) {
 		}
 	}
 
-	_ = bizModel(db)
 	log.Info("register table success")
 }

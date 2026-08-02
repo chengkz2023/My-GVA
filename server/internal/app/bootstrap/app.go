@@ -41,6 +41,5 @@ func Initialize() *container.Container {
 		c.AuthorityChecker = rolemysql.NewRepository(db)
 	}
 
-	SetupHandlers(c)
 	return c
 }

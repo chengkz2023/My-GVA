@@ -53,7 +53,6 @@ func Routers(c *container.Container) *gin.Engine {
 		c.JSON(http.StatusOK, "ok")
 	})
 
-	initBizRouter(privateGroup, publicGroup)
 
 	c.Logger.Info("router register success")
 	return engine

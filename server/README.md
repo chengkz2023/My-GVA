@@ -24,9 +24,7 @@ go test ./...                  # all tests
 │   ├── modules/               # system + business modules (11 modules, 50 endpoints)
 │   └── platform/              # shared infra (auth/JWT/claims, authz, casbin, config, db, ...)
 ├── config/                    # config struct definitions
-├── model/                     # legacy GORM models (25 files)
-├── utils/                     # backward-compat wrappers, timer, AST
-└── global/                    # legacy global variables
+└── utils/                     # helpers (timer, token, hash, validator)
 ```
 
 ## Adding a Module

@@ -42,7 +42,7 @@
 │  依赖: 无（或仅 platform/pagination）       │
 ├────────────────────────────────────────────┤
 │  infrastructure/   GORM 仓储实现             │
-│  mysql/            依赖: domain, model/     │
+│  mysql/            依赖: domain, database models     │
 ├────────────────────────────────────────────┤
 │  module.go         依赖注入 & 组装           │
 │  依赖: container, 以上四层                  │
@@ -392,7 +392,7 @@ import (
 )
 
 // ArticleModel 是数据库表的 GORM 映射。
-// 如果 model/ 中已有对应的表结构，可直接复用。
+// 如果 database models 中已有对应的表结构，可直接复用。
 type ArticleModel struct {
     ID        uint   `gorm:"primarykey"`
     Title     string `gorm:"column:title;type:varchar(200)"`
@@ -493,7 +493,7 @@ func (r *Repository) Create(ctx context.Context, input domain.CreateArticleInput
 ```
 
 **规则：**
-- infrastructure 层是**唯一**可以 import `gorm` 和 `model/` 的模块层
+- infrastructure 层是**唯一**可以 import `gorm` 和 `database models` 的模块层
 - nil DB 时返回 `domain.ErrRepositoryUnavailable`，不 panic
 - 负责 `domain.Xxx` ↔ ORM Model 之间的双向映射
 - 分页逻辑：先 Count 再 Limit/Offset/Order
@@ -710,7 +710,7 @@ func HTTPModules(c *container.Container) []apphttp.Module {
 │                   platform/pagination                │
 ├──────────────────────────────────────────────────────┤
 │  infrastructure/  domain（自身模块，实现接口）          │
-│  mysql/           model/*（legacy 数据库模型）         │
+│  mysql/           platform/database/models.go（共享数据库模型）         │
 │                   platform/pagination                │
 │                   gorm.io/gorm                       │
 ├──────────────────────────────────────────────────────┤

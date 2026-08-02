@@ -70,8 +70,8 @@ Enforced by `internal/architecture_test.go`:
 | Layer | Must NOT import |
 |---|---|
 | domain | Gin, GORM, Zap, Viper, Redis, Casbin, transport, infrastructure |
-| application | Gin, old `global` package, legacy `server/model/*` |
-| transport/http | GORM, infrastructure, legacy `server/model/common/response` |
+| application | Gin |
+| transport/http | GORM, infrastructure |
 | platform | Any `internal/modules` package |
 | module A | Module B's `infrastructure/` |
 
