@@ -124,7 +124,32 @@
       "Bash(cat)",
       "Bash(grep -v \"code\\\\|\\\\.list\\\\|node_modules\\\\|//\")",
       "Bash(sed -i 's/\\\\.\\\\.\\\\.res\\\\.data\\\\.resysDictionary,/...\\(res.data.resysDictionary || {}\\),/g' view/superAdmin/dictionary/sysDictionary.vue)",
-      "Bash(sed -i 's/\\\\.\\\\.\\\\.res\\\\.data\\\\.reSysDictionaryDetail,/...\\(res.data.reSysDictionaryDetail || {}\\),/g' view/superAdmin/dictionary/sysDictionaryDetail.vue)"
+      "Bash(sed -i 's/\\\\.\\\\.\\\\.res\\\\.data\\\\.reSysDictionaryDetail,/...\\(res.data.reSysDictionaryDetail || {}\\),/g' view/superAdmin/dictionary/sysDictionaryDetail.vue)",
+      "Bash(rg \"server/global\" -g \"*.go\" -l --sort path)",
+      "Bash(rg \"server/global|global\\\\\\\\.\" -g \"*.go\" server/)",
+      "Bash(rg \"model\\\\.common\\\\.\" -g \"task\\\\clearTable.go\" -n --output-mode content)",
+      "Bash(rg \"model\\\\.common\\\\.\" -g \"utils/fmt_plus.go\" -n --output-mode content)",
+      "Bash(rg \"model\\\\.common\\\\.\" -g \"utils/validator_test.go\" -n --output-mode content)",
+      "Bash(rg \"model\\\\.common/request\\\\.\" -g \"utils/validator_test.go\" -n --output-mode content)",
+      "Bash(rg \"model\\\\.common/response\\\\.\" -g \"internal/architecture_test.go\" -n --output-mode content)",
+      "Bash(rg \"model\\\\.system\\\\.\" -g \"utils/claims.go\" -n --output-mode content)",
+      "Bash(rg \"model\\\\.system\\\\.\" -g \"utils/jwt.go\" -n --output-mode content)",
+      "Bash(rg \"model\\\\.system\\\\.\" -g \"utils/ast/ast.go\" -n --output-mode content)",
+      "Bash(rg \"model\\\\.system/request\\\\.\" -g \"utils/claims.go\" -n --output-mode content)",
+      "Bash(rg \"model\\\\.system/request\\\\.\" -g \"utils/jwt.go\" -n --output-mode content)",
+      "Bash(rm model/system/*.go)",
+      "Bash(rmdir model/system/)",
+      "Bash(ls -la docs/)",
+      "Bash(ls -la *.md)",
+      "Bash(ls web/*.md web/*.json web/*.html)",
+      "Bash(rg 'RegisterV2' server/ -g '*.go' -l0)",
+      "Bash(xargs -0 sed -i 's/RegisterV2/RegisterRoutes/g')",
+      "Bash(rg 'Group\\\\\\(\"/v2\"\\\\\\)' server/ -g '*.go' -l0)",
+      "Bash(xargs -0 sed -i 's|Group\\(\"/v2\"\\)|Group\\(\"/api\"\\)|g')",
+      "Bash(rg '\"/v2/' server/ -g '*.go' -l0)",
+      "Bash(xargs -0 sed -i 's|\"/v2/|\"/api/|g')",
+      "Bash(rg 'github.com/flipped-aurora/gin-vue-admin' /d/goworkspace/gin-vue-admin/server/ -l0)",
+      "Bash(xargs -0 sed -i 's|github.com/flipped-aurora/gin-vue-admin|github.com/chengkz2023/My-GVA|g')"
     ]
   }
 }
