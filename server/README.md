@@ -6,9 +6,8 @@ Go 1.24+ backend with Gin + GORM + Casbin + JWT.
 
 ```bash
 go build ./cmd/admin-api       # entrypoint (web server)
-go build ./cmd/migrate         # migration CLI
 go build ./cmd/modulegen       # code generator
-go test ./...                  # all tests (28 packages)
+go test ./...                  # all tests
 ```
 
 ## Project Layout
@@ -17,11 +16,10 @@ go test ./...                  # all tests (28 packages)
 .
 ├── main.go                    # bootstrap.Run()
 ├── cmd/
-│   ├── admin-api/             # future entrypoint
-│   ├── migrate/               # migration CLI (up/down/status/dry-run)
+│   ├── admin-api/             # web server entrypoint
 │   └── modulegen/             # module code generator
 ├── internal/
-│   ├── app/                   # bootstrap, container, migration engine, scaffold
+│   ├── app/                   # bootstrap, container, scaffold
 │   ├── interfaces/http/       # router + middleware
 │   ├── modules/               # system + business modules (11 modules, 50 endpoints)
 │   └── platform/              # shared infra (auth/JWT/claims, authz, casbin, config, db, ...)

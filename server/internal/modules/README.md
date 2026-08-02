@@ -97,7 +97,6 @@ internal/platform/
 cd server
 go test ./...                    # All tests pass
 go build ./cmd/admin-api         # Main build
-go build ./cmd/migrate           # Migration tool
 go build ./cmd/modulegen         # Module generator
 go test ./internal -run TestArchitectureBoundaries -count=1  # Architecture rules
 ```
@@ -109,16 +108,4 @@ cd server
 go run .
 # Or:
 go run ./cmd/admin-api
-```
-
-## Migration Commands
-
-```bash
-cd server
-go run ./cmd/migrate create -name add_orders_table   # Create migration
-go run ./cmd/migrate list                              # List migrations
-go run ./cmd/migrate validate                          # Validate integrity
-go run ./cmd/migrate up                                # Apply pending
-go run ./cmd/migrate down                              # Rollback last
-go run ./cmd/migrate status                            # Show status
 ```

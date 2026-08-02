@@ -45,9 +45,6 @@ server/internal/
 
 | 命令 | 用途 |
 |------|------|
-| `go run ./cmd/migrate up` | 执行数据库迁移 |
-| `go run ./cmd/migrate status` | 查看迁移状态 |
-| `go run ./cmd/migrate up --dry-run` | 预览待执行迁移 |
 | `go run ./cmd/modulegen -name <name>` | 生成新模块代码 |
 
 ## 文档
