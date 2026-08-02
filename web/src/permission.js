@@ -175,7 +175,7 @@ router.beforeEach(async (to, from) => {
       if(!routerStore.asyncRouterFlag){
         await setupRouter(userStore)
       }
-      if (userStore.userInfo.authority.defaultRouter && router.hasRoute(userStore.userInfo.authority.defaultRouter)) {
+      if (userStore.userInfo.authority?.defaultRouter && router.hasRoute(userStore.userInfo.authority.defaultRouter)) {
         return { name: userStore.userInfo.authority.defaultRouter }
       }
       return { name: 'authority' }

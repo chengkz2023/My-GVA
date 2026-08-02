@@ -102,6 +102,7 @@ export const useUserStore = defineStore('user', () => {
       }
       setUserInfo(res.data.user)
       setToken(res.data.token)
+      await GetUserInfo()
 
       const routerStore = useRouterStore()
       await routerStore.SetAsyncRouter()

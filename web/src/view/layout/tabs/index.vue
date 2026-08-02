@@ -83,7 +83,7 @@
   const isMobile = ref(false)
   const rightActive = ref('')
   const defaultRouter = computed(
-    () => userStore.userInfo.authority.defaultRouter
+    () => userStore.userInfo.authority?.defaultRouter
   )
   const openContextMenu = (e) => {
     if (historys.value.length === 1 && route.name === defaultRouter.value) {
