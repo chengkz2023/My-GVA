@@ -1,9 +1,9 @@
 package buildinfo
 
 const (
-	Version     = "v2.8.8"
-	AppName     = "Gin-Vue-Admin"
-	Description = "使用gin+vue进行极速开发的全栈开发基础平台"
+	Version     = "v1.0.0"
+	AppName     = "BoyKing Admin"
+	Description = "模块化后台管理脚手架"
 )
 
 type Info struct {
