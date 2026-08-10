@@ -38,7 +38,7 @@ server/internal/
 - 50 个端点，`/api/` 前缀
 - JWT 核心逻辑（Claims、Token 生成/解析）位于 `platform/auth`，零全局依赖
 - Casbin RBAC 认证与鉴权
-- 中间件全部参数化：`JWTAuthWithConfig` / `GinRecovery(log)` / `OperationRecord(db, log)` / `NewLimiter(rdb, log, ...)`
+- 中间件全部参数化：`JWTAuthWithConfig` / `CasbinHandler` / `GinRecovery(log)`
 - 6 条架构边界规则自动检查：`go test ./internal -run TestArchitectureBoundaries`
 
 ## 工具

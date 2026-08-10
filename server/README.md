@@ -14,7 +14,6 @@ go test ./...                  # all tests
 
 ```
 .
-├── main.go                    # bootstrap.Run()
 ├── cmd/
 │   ├── admin-api/             # web server entrypoint
 │   └── modulegen/             # module code generator

@@ -1,8 +1,8 @@
-# 后端 V2 重构 — 完成报告
+# 后端模块化重构 — 完成报告
 
 ## 状态：已完成
 
-基于 `docs/backend-architecture-blueprint.md` 的 V2 后端重构已全部完成。所有模块、平台包和基础设施均已就位，旧架构已完全替换。
+基于 `docs/backend-architecture-blueprint.md` 的后端重构已全部完成。所有模块、平台包和基础设施均已就位，旧架构已完全替换。
 
 ## 验证命令
 
@@ -31,7 +31,7 @@ server/
 │   │   ├── migration/               # 迁移执行引擎
 │   │   └── scaffold/                # 模块生成器脚手架
 │   ├── interfaces/http/
-│   │   ├── router.go                # RegisterV2() — public + authenticated 路由组
+│   │   ├── router.go                # RegisterRoutes() — public + authenticated 路由组
 │   │   └── middleware/              # jwt, casbin_rbac, cors, error, limit_ip, operation
 │   ├── modules/
 │   │   ├── system/                  # auth, user, role, menu, api, operation-record, config, status, version
@@ -59,9 +59,9 @@ server/
 
 ### HTTP 路由
 
-- `GET /v2/health` — 公开健康检查
-- `POST /v2/login` — 登录认证
-- 其他所有端点均在 `/v2/` 路径下，使用 JWT + Casbin 中间件保护
+- `GET /api/health` — 公开健康检查
+- `POST /api/login` — 登录认证
+- 其他所有端点均在 `/api/` 路径下，使用 JWT + Casbin 中间件保护
 
 ### 模块结构
 
@@ -84,67 +84,67 @@ module/
 └── handler_test.go
 ```
 
-## 全部 V2 端点（50 个）
+## 全部端点（50 个）
 
 ### 系统模块
 
 | 模块 | 方法 | 路径 | 鉴权 |
 |------|------|------|------|
-| auth | POST | `/v2/login` | 否 |
-| auth | GET | `/v2/system/auth/me` | 是 |
-| user | GET | `/v2/system/user/me` | 是 |
-| user | GET | `/v2/system/user/list` | 是 |
-| user | GET | `/v2/system/user/:id` | 是 |
-| user | POST | `/v2/system/user` | 是 |
-| user | PUT | `/v2/system/user/profile` | 是 |
-| user | PUT | `/v2/system/user/password` | 是 |
-| user | DELETE | `/v2/system/user/:id` | 是 |
-| user | PUT | `/v2/system/user/reset-password` | 是 |
-| user | PUT | `/v2/system/user/set-authorities` | 是 |
-| role | GET | `/v2/system/role/tree` | 是 |
-| role | GET | `/v2/system/role/:id` | 是 |
-| role | GET | `/v2/system/role/data-authorities` | 是 |
-| role | POST | `/v2/system/role` | 是 |
-| role | PUT | `/v2/system/role/:id` | 是 |
-| role | DELETE | `/v2/system/role/:id` | 是 |
-| role | POST | `/v2/system/role/copy` | 是 |
-| role | PUT | `/v2/system/role/set-data-authority` | 是 |
-| menu | GET | `/v2/system/menu/tree` | 是 |
-| menu | GET | `/v2/system/menu/:id` | 是 |
-| menu | POST | `/v2/system/menu` | 是 |
-| menu | DELETE | `/v2/system/menu/:id` | 是 |
-| menu | PUT | `/v2/system/menu/assign-authority` | 是 |
-| api | GET | `/v2/system/api/list` | 是 |
-| api | GET | `/v2/system/api/all` | 是 |
-| api | GET | `/v2/system/api/groups` | 是 |
-| api | GET | `/v2/system/api/policies/:authorityId` | 是 |
-| api | PUT | `/v2/system/api/policies` | 是 |
-| api | GET | `/v2/system/api/:id` | 是 |
-| api | POST | `/v2/system/api` | 是 |
-| api | PUT | `/v2/system/api/:id` | 是 |
-| api | DELETE | `/v2/system/api/:id` | 是 |
-| api | POST | `/v2/system/api/batch-delete` | 是 |
-| api | POST | `/v2/system/api/fresh-casbin` | 是 |
-| api | GET | `/v2/system/api/sync` | 是 |
-| api | POST | `/v2/system/api/ignore` | 是 |
-| api | POST | `/v2/system/api/batch-sync` | 是 |
-| operation-record | GET | `/v2/system/operation-record/list` | 是 |
-| operation-record | GET | `/v2/system/operation-record/:id` | 是 |
-| operation-record | DELETE | `/v2/system/operation-record/:id` | 是 |
-| operation-record | POST | `/v2/system/operation-record/batch-delete` | 是 |
-| config | GET | `/v2/system/config/info` | 否 |
-| status | GET | `/v2/system/status/info` | 否 |
-| version | GET | `/v2/system/version/info` | 否 |
+| auth | POST | `/api/login` | 否 |
+| auth | GET | `/api/system/auth/me` | 是 |
+| user | GET | `/api/system/user/me` | 是 |
+| user | GET | `/api/system/user/list` | 是 |
+| user | GET | `/api/system/user/:id` | 是 |
+| user | POST | `/api/system/user` | 是 |
+| user | PUT | `/api/system/user/profile` | 是 |
+| user | PUT | `/api/system/user/password` | 是 |
+| user | DELETE | `/api/system/user/:id` | 是 |
+| user | PUT | `/api/system/user/reset-password` | 是 |
+| user | PUT | `/api/system/user/set-authorities` | 是 |
+| role | GET | `/api/system/role/tree` | 是 |
+| role | GET | `/api/system/role/:id` | 是 |
+| role | GET | `/api/system/role/data-authorities` | 是 |
+| role | POST | `/api/system/role` | 是 |
+| role | PUT | `/api/system/role/:id` | 是 |
+| role | DELETE | `/api/system/role/:id` | 是 |
+| role | POST | `/api/system/role/copy` | 是 |
+| role | PUT | `/api/system/role/set-data-authority` | 是 |
+| menu | GET | `/api/system/menu/tree` | 是 |
+| menu | GET | `/api/system/menu/:id` | 是 |
+| menu | POST | `/api/system/menu` | 是 |
+| menu | DELETE | `/api/system/menu/:id` | 是 |
+| menu | PUT | `/api/system/menu/assign-authority` | 是 |
+| api | GET | `/api/system/api/list` | 是 |
+| api | GET | `/api/system/api/all` | 是 |
+| api | GET | `/api/system/api/groups` | 是 |
+| api | GET | `/api/system/api/policies/:authorityId` | 是 |
+| api | PUT | `/api/system/api/policies` | 是 |
+| api | GET | `/api/system/api/:id` | 是 |
+| api | POST | `/api/system/api` | 是 |
+| api | PUT | `/api/system/api/:id` | 是 |
+| api | DELETE | `/api/system/api/:id` | 是 |
+| api | POST | `/api/system/api/batch-delete` | 是 |
+| api | POST | `/api/system/api/fresh-casbin` | 是 |
+| api | GET | `/api/system/api/sync` | 是 |
+| api | POST | `/api/system/api/ignore` | 是 |
+| api | POST | `/api/system/api/batch-sync` | 是 |
+| operation-record | GET | `/api/system/operation-record/list` | 是 |
+| operation-record | GET | `/api/system/operation-record/:id` | 是 |
+| operation-record | DELETE | `/api/system/operation-record/:id` | 是 |
+| operation-record | POST | `/api/system/operation-record/batch-delete` | 是 |
+| config | GET | `/api/system/config/info` | 否 |
+| status | GET | `/api/system/status/info` | 否 |
+| version | GET | `/api/system/version/info` | 否 |
 
 ### 业务模块
 
 | 模块 | 方法 | 路径 | 鉴权 |
 |------|------|------|------|
-| file | POST | `/v2/file/upload` | 是 |
-| file | GET | `/v2/file/list` | 是 |
-| file | PUT | `/v2/file/:id` | 是 |
-| file | DELETE | `/v2/file/:id` | 是 |
-| example | GET | `/v2/example/info` | 否 |
+| file | POST | `/api/file/upload` | 是 |
+| file | GET | `/api/file/list` | 是 |
+| file | PUT | `/api/file/:id` | 是 |
+| file | DELETE | `/api/file/:id` | 是 |
+| example | GET | `/api/example/info` | 否 |
 
 ## 中间件状态
 
