@@ -13,7 +13,6 @@
 
 <script setup>
 import { useRouter } from 'vue-router'
-import { emitter } from '@/utils/bus'
 import { useUserStore } from '@/pinia/modules/user'
 
 defineOptions({
@@ -23,18 +22,17 @@ defineOptions({
 const userStore = useUserStore()
 const router = useRouter()
 
+// 导航失败属于路由配置问题，不应误判为登录失效强制登出
 const toDashboard = () => {
-  try {
-    router.push({ name: userStore.userInfo.authority.defaultRouter })
-  } catch {
-    emitter.emit('show-error', {
-      code: '401',
-      message: '检测到当前登录状态已失效，请重新登录。',
-      fn: () => {
-        userStore.ClearStorage()
-        router.push({ name: 'Login', replace: true })
-      }
-    })
+  const defaultRouter = userStore.userInfo?.authority?.defaultRouter
+  if (defaultRouter && router.hasRoute(defaultRouter)) {
+    router.push({ name: defaultRouter }).catch(() => {})
+    return
   }
+  if (router.hasRoute('authority')) {
+    router.push({ name: 'authority' }).catch(() => {})
+    return
+  }
+  router.push({ path: '/layout' }).catch(() => {})
 }
 </script>

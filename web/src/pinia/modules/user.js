@@ -151,6 +151,9 @@ export const useUserStore = defineStore('user', () => {
     // 清理所有相关的localStorage项
     localStorage.removeItem('originSetting')
     localStorage.removeItem('token')
+    // 重置动态路由状态，避免下次登录残留上一个账号的菜单
+    const routerStore = useRouterStore()
+    routerStore.resetRouter()
   }
 
   return {

@@ -12,7 +12,7 @@
       @select="selectMenuItem"
       ref="menuRef"
     >
-      <template v-for="item in routerStore.asyncRouters[0].children">
+      <template v-for="item in (routerStore.asyncRouters[0]?.children || [])">
         <aside-component
           v-if="!item.hidden"
           :key="item.name"
@@ -26,7 +26,7 @@
 
 <script setup>
   import AsideComponent from '@/view/layout/aside/asideComponent/index.vue'
-  import { ref, provide, watchEffect, onMounted, nextTick } from 'vue'
+  import { ref, provide, watchEffect, onMounted, onUnmounted, nextTick } from 'vue'
   import { useRoute, useRouter } from 'vue-router'
   import { useRouterStore } from '@/pinia/modules/router'
   import { useAppStore } from '@/pinia'
@@ -63,10 +63,7 @@
   }
 
   watchEffect(() => {
-    if (route.name === 'gvaLayoutIframe') {
-      active.value = decodeURIComponent(route.query.url)
-      return
-    }
+    // iframe 页签高亮统一按路由名匹配，不再对已解码的 query.url 二次 decode
     active.value = route.meta.activeName || route.name
   })
 
@@ -94,6 +91,10 @@
     window.addEventListener('resize', calculateEllipsis)
   })
 
+  onUnmounted(() => {
+    window.removeEventListener('resize', calculateEllipsis)
+  })
+
   const selectMenuItem = (index) => {
     const query = {}
     const params = {}
@@ -109,9 +110,6 @@
     if (index.indexOf('http://') > -1 || index.indexOf('https://') > -1) {
         window.open(index, '_blank')
         return
-    }
-    if (index === 'gvaLayoutIframe') {
-      query.url = decodeURIComponent(index)
     }
     router.push({ name: index, query, params })
   }

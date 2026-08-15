@@ -126,6 +126,7 @@
       }
       return getFmtString(item) === rightActive.value
     })
+    if (rightIndex < 0) return
     const activeIndex = historys.value.findIndex(
       (item) => getFmtString(item) === activeValue.value
     )
@@ -143,6 +144,7 @@
       }
       return getFmtString(item) === rightActive.value
     })
+    if (leftIndex < 0) return
     const activeIndex = historys.value.findIndex(
       (item) => getFmtString(item) === activeValue.value
     )
@@ -212,6 +214,7 @@
   }
   const removeTab = (tab) => {
     const index = historys.value.findIndex((item) => getFmtString(item) === tab)
+    if (index < 0) return
     if (getFmtString(route) === tab) {
       if (historys.value.length === 1) {
         router.push({ name: defaultRouter.value })
@@ -234,17 +237,17 @@
     historys.value.splice(index, 1)
   }
 
+  const closeContextMenu = () => {
+    contextMenuVisible.value = false
+  }
+
   watch(
     () => contextMenuVisible.value,
     () => {
       if (contextMenuVisible.value) {
-        document.body.addEventListener('click', () => {
-          contextMenuVisible.value = false
-        })
+        document.body.addEventListener('click', closeContextMenu)
       } else {
-        document.body.removeEventListener('click', () => {
-          contextMenuVisible.value = false
-        })
+        document.body.removeEventListener('click', closeContextMenu)
       }
     }
   )
@@ -298,6 +301,7 @@
       const index = historys.value.findIndex(
         (item) => getFmtString(item) === activeValue.value
       )
+      if (index < 0) return
       historys.value[index].query = data
       activeValue.value = getFmtString(historys.value[index])
       const currentUrl = window.location.href.split('?')[0]
@@ -337,9 +341,15 @@
         params: {}
       }
     ]
+    // 先恢复历史页签，再 setTab，避免深链刷新时当前页被覆盖丢失
+    let restored = null
+    try {
+      restored = JSON.parse(sessionStorage.getItem('historys'))
+    } catch {
+      restored = null
+    }
+    historys.value = restored || initHistorys
     setTab(route)
-    historys.value =
-      JSON.parse(sessionStorage.getItem('historys')) || initHistorys
     if (!window.sessionStorage.getItem('activeValue')) {
       activeValue.value = getFmtString(route)
     } else {
@@ -355,6 +365,7 @@
   onUnmounted(() => {
     emitter.off('collapse')
     emitter.off('mobile')
+    document.body.removeEventListener('click', closeContextMenu)
   })
 
   const middleCloseTab = (e) => {

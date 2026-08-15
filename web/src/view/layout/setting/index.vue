@@ -85,15 +85,20 @@
   })
 
   const drawer = defineModel('drawer', {
-    default: true,
+    default: false,
     type: Boolean
   })
 
   const saveConfig = async () => {
-    const res = await setSelfSetting(config.value)
-    if (res.code === 0) {
-      localStorage.setItem('originSetting', JSON.stringify(config.value))
-      ElMessage.success('保存成功')
+    try {
+      const res = await setSelfSetting(config.value)
+      if (res.code === 0) {
+        localStorage.setItem('originSetting', JSON.stringify(config.value))
+        ElMessage.success('保存成功')
+      }
+    } catch {
+      // 保存失败不打断使用，仅在控制台提示
+      console.warn('save config failed')
     }
   }
 
@@ -101,9 +106,16 @@
     appStore.resetConfig()
   }
 
-  watch(config, async () => {
-    await saveConfig();
-  }, { deep: true });
+  let saveTimer = null
+  watch(config, () => {
+    // 防抖：连续调整（拖动/步进）只在停止 400ms 后保存一次
+    if (saveTimer) {
+      clearTimeout(saveTimer)
+    }
+    saveTimer = setTimeout(() => {
+      saveConfig()
+    }, 400)
+  }, { deep: true })
 </script>
 
 <style lang="scss">

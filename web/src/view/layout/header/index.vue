@@ -113,14 +113,18 @@
   const matched = computed(() => route.meta.matched)
 
   const changeUserAuth = async (id) => {
-    const res = await setUserAuthority({
-      id: userStore.userInfo.ID,
-      authorityId: id
-    })
-    if (res.code === 0) {
-      window.sessionStorage.setItem('needCloseAll', 'true')
-      window.sessionStorage.setItem('needToHome', 'true')
-      window.location.reload()
+    try {
+      const res = await setUserAuthority({
+        id: userStore.userInfo.ID,
+        authorityId: id
+      })
+      if (res.code === 0) {
+        window.sessionStorage.setItem('needCloseAll', 'true')
+        window.sessionStorage.setItem('needToHome', 'true')
+        window.location.reload()
+      }
+    } catch (error) {
+      console.error('changeUserAuth error:', error)
     }
   }
 </script>

@@ -13,21 +13,6 @@
     name: 'Screenfull'
   })
 
-  defineProps({
-    width: {
-      type: Number,
-      default: 22
-    },
-    height: {
-      type: Number,
-      default: 22
-    },
-    fill: {
-      type: String,
-      default: '#48576a'
-    }
-  })
-
   onMounted(() => {
     if (screenfull.isEnabled) {
       screenfull.on('change', changeFullShow)
@@ -35,7 +20,9 @@
   })
 
   onUnmounted(() => {
-    screenfull.off('change')
+    if (screenfull.isEnabled) {
+      screenfull.off('change', changeFullShow)
+    }
   })
 
   const clickFull = () => {

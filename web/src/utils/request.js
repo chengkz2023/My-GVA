@@ -129,6 +129,15 @@ function getErrorMessage(error) {
   return error.response?.data?.msg || error.response?.statusText || '请求失败'
 }
 
+function decodeMsg(raw) {
+  if (!raw) return ''
+  try {
+    return decodeURI(raw)
+  } catch {
+    return raw
+  }
+}
+
 // http response 拦截器
 service.interceptors.response.use(
   (response) => {
@@ -139,21 +148,23 @@ service.interceptors.response.use(
     if (response.headers['new-token']) {
       userStore.setToken(response.headers['new-token'])
     }
-    if (typeof response.data.code === 'undefined') {
+    if (typeof response.data?.code === 'undefined') {
       return response
     }
     if (response.data.code === 0 || response.headers.success === 'true') {
       if (response.headers.msg) {
-        response.data.msg = decodeURI(response.headers.msg)
+        response.data.msg = decodeMsg(response.headers.msg)
       }
       return response.data
     } else {
+      const message = response.data.msg || decodeMsg(response.headers.msg) || '请求失败'
       ElMessage({
         showClose: true,
-        message: response.data.msg || decodeURI(response.headers.msg),
+        message,
         type: 'error'
       })
-      return response.data.msg ? response.data : response
+      // 统一返回响应体，保证调用方 res.code/res.msg 可用
+      return response.data ?? response
     }
   },
   (error) => {

@@ -136,6 +136,10 @@
         return;
       }
       const firstMenu = leftMenu.find((item) => !item.hidden && item.path.indexOf("http://") === -1 && item.path.indexOf("https://") === -1)
+      if (!firstMenu) {
+        router.push({ name: index, query, params })
+        return
+      }
       router.push({ name: firstMenu.name, query, params })
 
   }

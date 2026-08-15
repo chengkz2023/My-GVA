@@ -52,13 +52,11 @@
 
   const avatar = computed(() => {
     if (props.picSrc === '') {
-      if (
-        userStore.userInfo.headerImg !== '' &&
-        userStore.userInfo.headerImg.slice(0, 4) === 'http'
-      ) {
-        return userStore.userInfo.headerImg
+      const headerImg = userStore.userInfo.headerImg || ''
+      if (headerImg && headerImg.slice(0, 4) === 'http') {
+        return headerImg
       }
-      return path.value + userStore.userInfo.headerImg
+      return path.value + headerImg
     } else {
       if (props.picSrc !== '' && props.picSrc.slice(0, 4) === 'http') {
         return props.picSrc

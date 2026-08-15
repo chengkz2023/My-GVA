@@ -156,9 +156,29 @@ export const useRouterStore = defineStore('router', () => {
 
   const routeMap = {}
 
+  const clearModuleAccumulators = () => {
+    notLayoutRouterArr.length = 0
+    keepAliveRoutersArr.length = 0
+    for (const key in nameMap) delete nameMap[key]
+    for (const key in routeMap) delete routeMap[key]
+    for (const key in menuMap) delete menuMap[key]
+  }
+
+  // 登出/切换账号时重置动态路由状态，避免跨登录残留
+  const resetRouter = () => {
+    asyncRouterFlag.value = 0
+    asyncRouters.value = []
+    keepAliveRouters.value = []
+    topMenu.value = []
+    leftMenu.value = []
+    topActive.value = ''
+    clearModuleAccumulators()
+  }
+
   // 从静态配置或后台获取路由
   const SetAsyncRouter = async () => {
     asyncRouterFlag.value++
+    clearModuleAccumulators()
     if (config.useStaticMenu) {
       const baseRouter = getStaticRouter()
       const asyncRouter = baseRouter[0].children || []
@@ -215,6 +235,7 @@ export const useRouterStore = defineStore('router', () => {
     asyncRouterFlag,
     SetAsyncRouter,
     routeMap,
-    handleKeepAlive
+    handleKeepAlive,
+    resetRouter
   }
 })

@@ -41,7 +41,7 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, onUnmounted } from 'vue'
 import { emitter } from '@/utils/bus.js'
 import { useAppStore } from '@/pinia'
 import GvaSetting from '@/view/layout/setting/index.vue'
@@ -68,15 +68,20 @@ const handleCommand = () => {
   command.value.open()
 }
 
-const initPage = () => {
-  const handleKeyDown = (e) => {
-    if (e.ctrlKey && e.key === 'k') {
-      e.preventDefault()
-      handleCommand()
-    }
+const handleKeyDown = (e) => {
+  // 输入框聚焦时忽略 Ctrl+K，避免与打字冲突
+  const target = e.target
+  if (target && (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.isContentEditable)) {
+    return
   }
-  window.addEventListener('keydown', handleKeyDown)
+  if (e.ctrlKey && e.key === 'k') {
+    e.preventDefault()
+    handleCommand()
+  }
 }
 
-initPage()
+window.addEventListener('keydown', handleKeyDown)
+onUnmounted(() => {
+  window.removeEventListener('keydown', handleKeyDown)
+})
 </script>
