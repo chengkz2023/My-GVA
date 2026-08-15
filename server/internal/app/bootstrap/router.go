@@ -38,21 +38,9 @@ func Routers(c *container.Container) *gin.Engine {
 	engine.StaticFS(c.Config.Local.StorePath, justFilesFilesystem{http.Dir(c.Config.Local.StorePath)})
 
 	publicGroup := engine.Group(c.Config.System.RouterPrefix)
-	privateGroup := engine.Group(c.Config.System.RouterPrefix)
-	privateGroup.Use(middleware.JWTAuthWithConfig(middleware.JWTConfig{
-		ExpiresTime: c.Config.JWT.ExpiresTime,
-		BufferTime:  c.Config.JWT.BufferTime,
-		SigningKey:  c.Config.JWT.SigningKey,
-		BlacklistCheck: func(token string) bool {
-				_, ok := c.BlackCache.Get(token)
-				return ok
-			},
-	})).Use(middleware.CasbinHandler())
-
 	publicGroup.GET("/health", func(c *gin.Context) {
 		c.JSON(http.StatusOK, "ok")
 	})
-
 
 	c.Logger.Info("router register success")
 	return engine

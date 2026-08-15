@@ -4,19 +4,17 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/casbin/casbin/v2"
 	platformauth "github.com/chengkz2023/My-GVA/server/internal/platform/auth"
-	casbinauthz "github.com/chengkz2023/My-GVA/server/internal/platform/authz/casbin"
 	"github.com/chengkz2023/My-GVA/server/internal/platform/response"
 	"github.com/gin-gonic/gin"
 )
 
-func CasbinHandler() gin.HandlerFunc {
-	return CasbinHandlerWithPrefix("")
-}
-
 const superAdminAuthorityID = 888
 
-func CasbinHandlerWithPrefix(routerPrefix string) gin.HandlerFunc {
+// CasbinHandlerWithPrefix 基于注入的 enforcer 做 RBAC 鉴权。
+// routerPrefix 用于从请求路径中剥离前缀（如 "/api"），使其与策略中的 path 口径一致。
+func CasbinHandlerWithPrefix(enforcer *casbin.SyncedCachedEnforcer, routerPrefix string) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		claims, ok := platformauth.GetClaimsFromContext(c)
 		if !ok {
@@ -28,18 +26,15 @@ func CasbinHandlerWithPrefix(routerPrefix string) gin.HandlerFunc {
 			c.Next()
 			return
 		}
-		path := c.Request.URL.Path
-		obj := strings.TrimPrefix(path, routerPrefix)
-		act := c.Request.Method
-		sub := strconv.Itoa(int(claims.AuthorityId))
-		e := casbinauthz.GetEnforcer(nil)
-		if e == nil {
+		if enforcer == nil {
 			response.Fail(c, 403, 7, "permission denied")
 			c.Abort()
 			return
 		}
-		success, _ := e.Enforce(sub, obj, act)
-		if !success {
+		obj := strings.TrimPrefix(c.Request.URL.Path, routerPrefix)
+		sub := strconv.Itoa(int(claims.AuthorityId))
+		success, err := enforcer.Enforce(sub, obj, c.Request.Method)
+		if err != nil || !success {
 			response.Fail(c, 403, 7, "permission denied")
 			c.Abort()
 			return

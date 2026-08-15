@@ -3,8 +3,8 @@ package bootstrap
 import (
 	"fmt"
 
-	"github.com/chengkz2023/My-GVA/server/task"
-	"github.com/chengkz2023/My-GVA/server/utils/timer"
+	"github.com/chengkz2023/My-GVA/server/internal/app/task"
+	"github.com/chengkz2023/My-GVA/server/internal/platform/timer"
 
 	"github.com/robfig/cron/v3"
 	"gorm.io/gorm"

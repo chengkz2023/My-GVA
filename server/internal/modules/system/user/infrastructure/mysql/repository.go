@@ -179,9 +179,6 @@ func (r *Repository) Create(ctx context.Context, input domain.CreateUserInput) (
 	if input.Enable == 0 {
 		user.Enable = 1
 	}
-	if input.AuthorityID == 0 {
-		user.AuthorityId = 888
-	}
 
 	if err := r.db.WithContext(ctx).Create(&user).Error; err != nil {
 		return domain.User{}, err

@@ -1,6 +1,8 @@
 package auth
 
 import (
+	"time"
+
 	"github.com/chengkz2023/My-GVA/server/config"
 	platformauth "github.com/chengkz2023/My-GVA/server/internal/platform/auth"
 	"github.com/chengkz2023/My-GVA/server/internal/platform/response"
@@ -20,6 +22,7 @@ func NewHandler(service *Service, captchaCfg config.Captcha, log *zap.Logger) *H
 
 func (h *Handler) Register(authenticated *gin.RouterGroup, public *gin.RouterGroup) {
 	authenticated.Group("/system/auth").GET("/me", h.Me)
+	authenticated.Group("/system/auth").POST("/logout", h.Logout)
 	public.POST("/login", h.Login)
 	public.POST("/base/captcha", h.Captcha)
 }
@@ -55,4 +58,18 @@ func (h *Handler) Login(c *gin.Context) {
 func (h *Handler) Captcha(c *gin.Context) {
 	result := GenerateCaptcha(h.captchaCfg, h.log)
 	response.OK(c, result)
+}
+
+func (h *Handler) Logout(c *gin.Context) {
+	token := platformauth.GetToken(c)
+	claims, _ := platformauth.GetClaimsFromContext(c)
+	var expiresAt time.Time
+	if claims != nil && claims.ExpiresAt != nil {
+		expiresAt = claims.ExpiresAt.Time
+	}
+	if err := h.service.Logout(c.Request.Context(), token, expiresAt); err != nil {
+		h.log.Error("logout failed", zap.Error(err))
+	}
+	platformauth.ClearToken(c)
+	response.OK(c, gin.H{"logout": true})
 }

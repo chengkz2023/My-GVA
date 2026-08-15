@@ -2,6 +2,7 @@ package http
 
 import (
 	"io"
+	"net/http"
 	"strconv"
 
 	"github.com/chengkz2023/My-GVA/server/internal/modules/business/file/application"
@@ -28,6 +29,7 @@ func (h *Handler) Register(group *gin.RouterGroup) {
 }
 
 func (h *Handler) Upload(c *gin.Context) {
+	c.Request.Body = http.MaxBytesReader(c.Writer, c.Request.Body, application.MaxUploadBytes)
 	file, header, err := c.Request.FormFile("file")
 	if err != nil {
 		response.Error(c, err)
@@ -35,9 +37,18 @@ func (h *Handler) Upload(c *gin.Context) {
 	}
 	defer file.Close()
 
+	if header.Size > application.MaxUploadBytes {
+		response.Fail(c, http.StatusRequestEntityTooLarge, response.Failure, "file too large")
+		return
+	}
+
 	data, err := io.ReadAll(file)
 	if err != nil {
 		response.Error(c, err)
+		return
+	}
+	if len(data) > application.MaxUploadBytes {
+		response.Fail(c, http.StatusRequestEntityTooLarge, response.Failure, "file too large")
 		return
 	}
 

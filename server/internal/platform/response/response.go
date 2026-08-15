@@ -6,6 +6,7 @@ import (
 
 	apperrors "github.com/chengkz2023/My-GVA/server/internal/platform/errors"
 	"github.com/gin-gonic/gin"
+	"go.uber.org/zap"
 )
 
 const (
@@ -52,5 +53,6 @@ func Error(c *gin.Context, err error) {
 		return
 	}
 
+	zap.L().Error("unhandled error", zap.Error(err))
 	Fail(c, http.StatusInternalServerError, Failure, "internal error")
 }

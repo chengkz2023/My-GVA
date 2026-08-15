@@ -26,7 +26,8 @@ func TestModuleInfoRedactsSecrets(t *testing.T) {
 	cfg.Redis.Password = "redis-secret"
 
 	engine := gin.New()
-	apphttp.RegisterRoutes(engine, apphttp.Config{}, NewModule(&container.Container{Config: cfg}))
+	group := engine.Group("/api")
+	NewModule(&container.Container{Config: cfg}).RegisterHTTP(apphttp.Routes{Public: group, Authenticated: group})
 
 	req := httptest.NewRequest(http.MethodGet, "/api/system/config/info", nil)
 	rec := httptest.NewRecorder()

@@ -2,10 +2,11 @@ package auth
 
 import (
 	"context"
+	"time"
 
 	platformauth "github.com/chengkz2023/My-GVA/server/internal/platform/auth"
-	apperrors "github.com/chengkz2023/My-GVA/server/internal/platform/errors"
 	platformdb "github.com/chengkz2023/My-GVA/server/internal/platform/database"
+	apperrors "github.com/chengkz2023/My-GVA/server/internal/platform/errors"
 	"gorm.io/gorm"
 )
 
@@ -56,6 +57,10 @@ func (s *Service) Me(ctx context.Context) (MeResponse, error) {
 		}
 	}
 	return MeResponse{UserInfo: ui}, nil
+}
+
+func (s *Service) Logout(ctx context.Context, token string, expiresAt time.Time) error {
+	return platformdb.AddToJwtBlacklist(s.db, token, expiresAt)
 }
 
 func (s *Service) Login(ctx context.Context, username, password string) (LoginResponse, error) {

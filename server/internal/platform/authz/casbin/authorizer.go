@@ -2,6 +2,7 @@ package casbin
 
 import (
 	"context"
+	"errors"
 	"strconv"
 
 	"github.com/casbin/casbin/v2"
@@ -16,14 +17,19 @@ var (
 	_ authz.PolicySyncer   = (*Authorizer)(nil)
 )
 
-type Authorizer struct{}
-
-func NewAuthorizer() *Authorizer {
-	return &Authorizer{}
+type Authorizer struct {
+	enforcer *casbin.SyncedCachedEnforcer
 }
 
-func getEnforcer() *casbin.SyncedCachedEnforcer {
-	return GetEnforcer(nil)
+func NewAuthorizer(enforcer *casbin.SyncedCachedEnforcer) *Authorizer {
+	return &Authorizer{enforcer: enforcer}
+}
+
+func (a *Authorizer) Enforce(sub, obj, act string) (bool, error) {
+	if a.enforcer == nil {
+		return false, errors.New("casbin unavailable")
+	}
+	return a.enforcer.Enforce(sub, obj, act)
 }
 
 func (a *Authorizer) Can(ctx context.Context, actor auth.Actor, action string, resource any) error {
@@ -31,12 +37,11 @@ func (a *Authorizer) Can(ctx context.Context, actor auth.Actor, action string, r
 	if !ok {
 		return apperrors.WithMessage(apperrors.Forbidden, "invalid resource")
 	}
-	enforcer := getEnforcer()
-	if enforcer == nil {
+	if a.enforcer == nil {
 		return apperrors.WithMessage(apperrors.Forbidden, "casbin unavailable")
 	}
 	sub := strconv.FormatUint(uint64(actor.AuthorityID), 10)
-	allowed, err := enforcer.Enforce(sub, path, action)
+	allowed, err := a.enforcer.Enforce(sub, path, action)
 	if err != nil {
 		return apperrors.New(apperrors.Internal, 0, "casbin enforce failed", err)
 	}
@@ -47,11 +52,10 @@ func (a *Authorizer) Can(ctx context.Context, actor auth.Actor, action string, r
 }
 
 func (a *Authorizer) Policies(authorityID uint) ([]authz.Policy, error) {
-	enforcer := getEnforcer()
-	if enforcer == nil {
+	if a.enforcer == nil {
 		return nil, nil
 	}
-	rules, _ := enforcer.GetFilteredPolicy(0, strconv.FormatUint(uint64(authorityID), 10))
+	rules, _ := a.enforcer.GetFilteredPolicy(0, strconv.FormatUint(uint64(authorityID), 10))
 	policies := make([]authz.Policy, 0, len(rules))
 	for _, rule := range rules {
 		if len(rule) >= 3 {
@@ -62,42 +66,39 @@ func (a *Authorizer) Policies(authorityID uint) ([]authz.Policy, error) {
 }
 
 func (a *Authorizer) SyncPolicies(authorityID uint, policies []authz.Policy) error {
-	enforcer := getEnforcer()
-	if enforcer == nil {
+	if a.enforcer == nil {
 		return nil
 	}
 	authStr := strconv.FormatUint(uint64(authorityID), 10)
-	_, _ = enforcer.RemoveFilteredPolicy(0, authStr)
+	_, _ = a.enforcer.RemoveFilteredPolicy(0, authStr)
 	if len(policies) == 0 {
 		return nil
 	}
 	seen := make(map[string]bool, len(policies))
 	rules := make([][]string, 0, len(policies))
 	for _, p := range policies {
-		key := authStr + p.Path + p.Method
+		key := authStr + "\x00" + p.Path + "\x00" + p.Method
 		if seen[key] {
 			continue
 		}
 		seen[key] = true
 		rules = append(rules, []string{authStr, p.Path, p.Method})
 	}
-	_, _ = enforcer.AddPolicies(rules)
+	_, _ = a.enforcer.AddPolicies(rules)
 	return nil
 }
 
 func (a *Authorizer) RemovePolicies(path, method string) error {
-	enforcer := getEnforcer()
-	if enforcer == nil {
+	if a.enforcer == nil {
 		return nil
 	}
-	_, _ = enforcer.RemoveFilteredPolicy(1, path, method)
+	_, _ = a.enforcer.RemoveFilteredPolicy(1, path, method)
 	return nil
 }
 
 func (a *Authorizer) RefreshPolicies() error {
-	enforcer := getEnforcer()
-	if enforcer == nil {
+	if a.enforcer == nil {
 		return nil
 	}
-	return enforcer.LoadPolicy()
+	return a.enforcer.LoadPolicy()
 }

@@ -10,18 +10,6 @@ import (
 	apperrors "github.com/chengkz2023/My-GVA/server/internal/platform/errors"
 )
 
-var defaultCasbinPolicies = []authz.Policy{
-	{Path: "/menu/getMenu", Method: "POST"},
-	{Path: "/jwt/jsonInBlacklist", Method: "POST"},
-	{Path: "/base/login", Method: "POST"},
-	{Path: "/user/changePassword", Method: "POST"},
-	{Path: "/user/setUserAuthority", Method: "POST"},
-	{Path: "/user/getUserInfo", Method: "GET"},
-	{Path: "/user/setSelfInfo", Method: "PUT"},
-	{Path: "/fileUploadAndDownload/upload", Method: "POST"},
-	{Path: "/sysDictionary/findSysDictionary", Method: "GET"},
-}
-
 type Service struct {
 	repo           domain.Repository
 	policyProvider authz.PolicyProvider
@@ -31,6 +19,17 @@ type Service struct {
 
 func NewService(repo domain.Repository, policyProvider authz.PolicyProvider, policySyncer authz.PolicySyncer, strictAuth bool) *Service {
 	return &Service{repo: repo, policyProvider: policyProvider, policySyncer: policySyncer, strictAuth: strictAuth}
+}
+
+// checkScope 在 strictAuth 模式下校验 targetID 是否在 actorID 的层级作用域内。
+func (s *Service) checkScope(ctx context.Context, actorID, targetID uint) error {
+	if !s.strictAuth || s.repo == nil {
+		return nil
+	}
+	if err := s.repo.CheckAuthorityAuth(ctx, actorID, targetID); err != nil {
+		return apperrors.WithMessage(apperrors.Forbidden, "role out of scope")
+	}
+	return nil
 }
 
 func (s *Service) FindByID(ctx context.Context, authorityID uint) (RoleResponse, error) {
@@ -74,10 +73,14 @@ func (s *Service) Create(ctx context.Context, input domain.SaveRoleInput) (RoleR
 		return RoleResponse{}, apperrors.WithMessage(apperrors.Internal, "role repository unavailable")
 	}
 
-	if s.strictAuth && (input.ParentID == nil || *input.ParentID == 0) {
+	if s.strictAuth {
 		actor, _ := platformauth.ActorFromContext(ctx)
-		actorID := actor.AuthorityID
-		input.ParentID = &actorID
+		if input.ParentID == nil || *input.ParentID == 0 {
+			actorID := actor.AuthorityID
+			input.ParentID = &actorID
+		} else if err := s.repo.CheckAuthorityAuth(ctx, actor.AuthorityID, *input.ParentID); err != nil {
+			return RoleResponse{}, apperrors.WithMessage(apperrors.Forbidden, "parent role out of scope")
+		}
 	}
 
 	if err := s.repo.Save(ctx, input); errors.Is(err, domain.ErrRoleIDExists) {
@@ -86,18 +89,19 @@ func (s *Service) Create(ctx context.Context, input domain.SaveRoleInput) (RoleR
 		return RoleResponse{}, apperrors.New(apperrors.Internal, 0, "create role failed", err)
 	}
 
-	if s.policySyncer != nil {
-		_ = s.policySyncer.SyncPolicies(input.AuthorityID, defaultCasbinPolicies)
-	}
 	return RoleResponse{AuthorityID: input.AuthorityID, AuthorityName: input.AuthorityName, ParentID: input.ParentID, DefaultRouter: input.DefaultRouter}, nil
 }
 
 func (s *Service) Update(ctx context.Context, input domain.SaveRoleInput) (RoleResponse, error) {
-	if _, ok := platformauth.ActorFromContext(ctx); !ok {
+	actor, ok := platformauth.ActorFromContext(ctx)
+	if !ok {
 		return RoleResponse{}, apperrors.WithMessage(apperrors.Unauthorized, "missing actor")
 	}
 	if s.repo == nil {
 		return RoleResponse{}, apperrors.WithMessage(apperrors.Internal, "role repository unavailable")
+	}
+	if err := s.checkScope(ctx, actor.AuthorityID, input.AuthorityID); err != nil {
+		return RoleResponse{}, err
 	}
 	if err := s.repo.Save(ctx, input); errors.Is(err, domain.ErrRoleNotFound) {
 		return RoleResponse{}, apperrors.WithMessage(apperrors.NotFound, "角色不存在")
@@ -108,11 +112,15 @@ func (s *Service) Update(ctx context.Context, input domain.SaveRoleInput) (RoleR
 }
 
 func (s *Service) Delete(ctx context.Context, authorityID uint) error {
-	if _, ok := platformauth.ActorFromContext(ctx); !ok {
+	actor, ok := platformauth.ActorFromContext(ctx)
+	if !ok {
 		return apperrors.WithMessage(apperrors.Unauthorized, "missing actor")
 	}
 	if s.repo == nil {
 		return apperrors.WithMessage(apperrors.Internal, "role repository unavailable")
+	}
+	if err := s.checkScope(ctx, actor.AuthorityID, authorityID); err != nil {
+		return err
 	}
 	_, err := s.repo.Delete(ctx, authorityID)
 	if errors.Is(err, domain.ErrRoleNotFound) {
@@ -134,11 +142,15 @@ func (s *Service) Delete(ctx context.Context, authorityID uint) error {
 }
 
 func (s *Service) Copy(ctx context.Context, oldAuthorityID uint, newRole domain.SaveRoleInput) (RoleResponse, error) {
-	if _, ok := platformauth.ActorFromContext(ctx); !ok {
+	actor, ok := platformauth.ActorFromContext(ctx)
+	if !ok {
 		return RoleResponse{}, apperrors.WithMessage(apperrors.Unauthorized, "missing actor")
 	}
 	if s.repo == nil {
 		return RoleResponse{}, apperrors.WithMessage(apperrors.Internal, "role repository unavailable")
+	}
+	if err := s.checkScope(ctx, actor.AuthorityID, oldAuthorityID); err != nil {
+		return RoleResponse{}, err
 	}
 
 	if err := s.repo.Save(ctx, newRole); errors.Is(err, domain.ErrRoleIDExists) {

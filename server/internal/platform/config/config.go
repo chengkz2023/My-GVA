@@ -7,7 +7,6 @@ import (
 	"path/filepath"
 
 	legacyconfig "github.com/chengkz2023/My-GVA/server/config"
-	"github.com/fsnotify/fsnotify"
 	"github.com/gin-gonic/gin"
 	"github.com/spf13/viper"
 )
@@ -32,11 +31,6 @@ func Load() (*viper.Viper, Config) {
 	if err := v.ReadInConfig(); err != nil {
 		panic(fmt.Errorf("fatal error config file: %w", err))
 	}
-	v.WatchConfig()
-	v.OnConfigChange(func(e fsnotify.Event) {
-		fmt.Println("config file changed:", e.Name)
-		_ = v.Unmarshal(&cfg)
-	})
 	if err := v.Unmarshal(&cfg); err != nil {
 		panic(fmt.Errorf("fatal error unmarshal config: %w", err))
 	}
@@ -45,9 +39,11 @@ func Load() (*viper.Viper, Config) {
 }
 
 func getConfigPath() string {
-	var config string
-	flag.StringVar(&config, "c", "", "choose config file.")
-	flag.Parse()
+	// 读取 -c 标志（由 cmd 入口注册并解析），不再在库内 flag.Parse 以免二次解析 panic
+	config := ""
+	if f := flag.Lookup("c"); f != nil {
+		config = f.Value.String()
+	}
 	if config != "" {
 		fmt.Printf("using command-line config: %s\n", config)
 		return config

@@ -2,16 +2,16 @@ package bootstrap
 
 import (
 	"github.com/chengkz2023/My-GVA/server/config"
-	"github.com/chengkz2023/My-GVA/server/utils"
+	platformauth "github.com/chengkz2023/My-GVA/server/internal/platform/auth"
 	"github.com/songzhibin97/gkit/cache/local_cache"
 )
 
 func InitBlackCache(jwt config.JWT) local_cache.Cache {
-	dr, err := utils.ParseDuration(jwt.ExpiresTime)
+	dr, err := platformauth.ParseDuration(jwt.ExpiresTime)
 	if err != nil {
 		panic(err)
 	}
-	_, err = utils.ParseDuration(jwt.BufferTime)
+	_, err = platformauth.ParseDuration(jwt.BufferTime)
 	if err != nil {
 		panic(err)
 	}

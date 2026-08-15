@@ -1,8 +1,6 @@
 package auth
 
 import (
-	"net"
-
 	"github.com/gin-gonic/gin"
 )
 
@@ -18,30 +16,16 @@ func SetToken(c *gin.Context, token string, maxAge int) {
 	if c == nil {
 		return
 	}
-	host, _, err := net.SplitHostPort(c.Request.Host)
-	if err != nil {
-		host = c.Request.Host
-	}
-	if net.ParseIP(host) != nil {
-		c.SetCookie("x-token", token, maxAge, "/", "", false, false)
-	} else {
-		c.SetCookie("x-token", token, maxAge, "/", host, false, false)
-	}
+	// httpOnly=true：前端通过 x-token 请求头携带令牌，cookie 仅供同源自动携带，
+	// 不让 JS 读取，降低 XSS 窃取面。domain 留空以保持 host-only，避免 Domain=localhost 被浏览器拒绝。
+	c.SetCookie("x-token", token, maxAge, "/", "", false, true)
 }
 
 func ClearToken(c *gin.Context) {
 	if c == nil {
 		return
 	}
-	host, _, err := net.SplitHostPort(c.Request.Host)
-	if err != nil {
-		host = c.Request.Host
-	}
-	if net.ParseIP(host) != nil {
-		c.SetCookie("x-token", "", -1, "/", "", false, false)
-	} else {
-		c.SetCookie("x-token", "", -1, "/", host, false, false)
-	}
+	c.SetCookie("x-token", "", -1, "/", "", false, true)
 }
 
 func GetClaimsFromContext(c *gin.Context) (*CustomClaims, bool) {

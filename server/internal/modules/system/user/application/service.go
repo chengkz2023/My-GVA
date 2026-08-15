@@ -25,6 +25,18 @@ func NewService(repo domain.Repository, hasher platformauth.PasswordHasher, chec
 	return &Service{repo: repo, hasher: hasher, authorityChecker: checker}
 }
 
+// checkAuthorityScope 校验 targetID（角色 ID）是否在 adminID（调用者角色 ID）的层级作用域内。
+// checker 为 nil 时跳过（此时仓储通常也不可用，后续写入会失败）。
+func (s *Service) checkAuthorityScope(ctx context.Context, adminID, targetID uint) error {
+	if s.authorityChecker == nil {
+		return nil
+	}
+	if err := s.authorityChecker(ctx, adminID, targetID); err != nil {
+		return apperrors.WithMessage(apperrors.Forbidden, "authority out of scope")
+	}
+	return nil
+}
+
 func (s *Service) Current(ctx context.Context) (CurrentUserResponse, error) {
 	actor, ok := platformauth.ActorFromContext(ctx)
 	if !ok {
@@ -159,14 +171,26 @@ func emptyList(page pagination.Page) ListUsersResponse {
 }
 
 func (s *Service) Create(ctx context.Context, cmd CreateUserCommand) (CreateUserResponse, error) {
-	if _, ok := platformauth.ActorFromContext(ctx); !ok {
+	actor, ok := platformauth.ActorFromContext(ctx)
+	if !ok {
 		return CreateUserResponse{}, apperrors.WithMessage(apperrors.Unauthorized, "missing actor")
 	}
 	if cmd.Username == "" || cmd.Password == "" {
 		return CreateUserResponse{}, apperrors.WithMessage(apperrors.Validation, "username and password are required")
 	}
+	if cmd.AuthorityID == 0 {
+		return CreateUserResponse{}, apperrors.WithMessage(apperrors.Validation, "authority is required")
+	}
 	if s.repo == nil {
 		return CreateUserResponse{}, apperrors.WithMessage(apperrors.Internal, "user repository unavailable")
+	}
+	if err := s.checkAuthorityScope(ctx, actor.AuthorityID, cmd.AuthorityID); err != nil {
+		return CreateUserResponse{}, err
+	}
+	for _, id := range cmd.AuthorityIDs {
+		if err := s.checkAuthorityScope(ctx, actor.AuthorityID, id); err != nil {
+			return CreateUserResponse{}, err
+		}
 	}
 
 	passwordHash, err := s.hasher.Hash(cmd.Password)
@@ -206,6 +230,20 @@ func (s *Service) Delete(ctx context.Context, userID uint) (DeleteUserResponse, 
 		return DeleteUserResponse{}, apperrors.WithMessage(apperrors.Internal, "user repository unavailable")
 	}
 
+	target, err := s.repo.FindByID(ctx, userID)
+	if errors.Is(err, domain.ErrUserNotFound) {
+		return DeleteUserResponse{}, apperrors.WithMessage(apperrors.NotFound, "user not found")
+	}
+	if errors.Is(err, domain.ErrRepositoryUnavailable) {
+		return DeleteUserResponse{}, apperrors.WithMessage(apperrors.Internal, "user repository unavailable")
+	}
+	if err != nil {
+		return DeleteUserResponse{}, apperrors.New(apperrors.Internal, 0, "load target user failed", err)
+	}
+	if err := s.checkAuthorityScope(ctx, actor.AuthorityID, target.AuthorityID); err != nil {
+		return DeleteUserResponse{}, err
+	}
+
 	if err := s.repo.Delete(ctx, userID); err == domain.ErrRepositoryUnavailable {
 		return DeleteUserResponse{}, apperrors.WithMessage(apperrors.Internal, "user repository unavailable")
 	} else if err != nil {
@@ -215,7 +253,8 @@ func (s *Service) Delete(ctx context.Context, userID uint) (DeleteUserResponse, 
 }
 
 func (s *Service) ResetPassword(ctx context.Context, cmd ResetPasswordCommand) (ResetPasswordResponse, error) {
-	if _, ok := platformauth.ActorFromContext(ctx); !ok {
+	actor, ok := platformauth.ActorFromContext(ctx)
+	if !ok {
 		return ResetPasswordResponse{}, apperrors.WithMessage(apperrors.Unauthorized, "missing actor")
 	}
 	if cmd.UserID == 0 || cmd.Password == "" {
@@ -223,6 +262,20 @@ func (s *Service) ResetPassword(ctx context.Context, cmd ResetPasswordCommand) (
 	}
 	if s.repo == nil {
 		return ResetPasswordResponse{}, apperrors.WithMessage(apperrors.Internal, "user repository unavailable")
+	}
+
+	target, err := s.repo.FindByID(ctx, cmd.UserID)
+	if errors.Is(err, domain.ErrUserNotFound) {
+		return ResetPasswordResponse{}, apperrors.WithMessage(apperrors.NotFound, "user not found")
+	}
+	if errors.Is(err, domain.ErrRepositoryUnavailable) {
+		return ResetPasswordResponse{}, apperrors.WithMessage(apperrors.Internal, "user repository unavailable")
+	}
+	if err != nil {
+		return ResetPasswordResponse{}, apperrors.New(apperrors.Internal, 0, "load target user failed", err)
+	}
+	if err := s.checkAuthorityScope(ctx, actor.AuthorityID, target.AuthorityID); err != nil {
+		return ResetPasswordResponse{}, err
 	}
 
 	passwordHash, err := s.hasher.Hash(cmd.Password)
@@ -238,7 +291,8 @@ func (s *Service) ResetPassword(ctx context.Context, cmd ResetPasswordCommand) (
 }
 
 func (s *Service) SetAuthorities(ctx context.Context, cmd SetAuthoritiesCommand) (SetAuthoritiesResponse, error) {
-	if _, ok := platformauth.ActorFromContext(ctx); !ok {
+	actor, ok := platformauth.ActorFromContext(ctx)
+	if !ok {
 		return SetAuthoritiesResponse{}, apperrors.WithMessage(apperrors.Unauthorized, "missing actor")
 	}
 	if len(cmd.AuthorityIDs) == 0 {
@@ -247,7 +301,25 @@ func (s *Service) SetAuthorities(ctx context.Context, cmd SetAuthoritiesCommand)
 	if s.repo == nil {
 		return SetAuthoritiesResponse{}, apperrors.WithMessage(apperrors.Internal, "user repository unavailable")
 	}
-	// TODO: Add hierarchical auth check (CheckAuthorityIDAuth) when role write operations are migrated
+
+	target, err := s.repo.FindByID(ctx, cmd.UserID)
+	if errors.Is(err, domain.ErrUserNotFound) {
+		return SetAuthoritiesResponse{}, apperrors.WithMessage(apperrors.NotFound, "user not found")
+	}
+	if errors.Is(err, domain.ErrRepositoryUnavailable) {
+		return SetAuthoritiesResponse{}, apperrors.WithMessage(apperrors.Internal, "user repository unavailable")
+	}
+	if err != nil {
+		return SetAuthoritiesResponse{}, apperrors.New(apperrors.Internal, 0, "load target user failed", err)
+	}
+	if err := s.checkAuthorityScope(ctx, actor.AuthorityID, target.AuthorityID); err != nil {
+		return SetAuthoritiesResponse{}, err
+	}
+	for _, id := range cmd.AuthorityIDs {
+		if err := s.checkAuthorityScope(ctx, actor.AuthorityID, id); err != nil {
+			return SetAuthoritiesResponse{}, err
+		}
+	}
 
 	if err := s.repo.SetAuthorities(ctx, domain.SetAuthoritiesInput{
 		UserID:       cmd.UserID,

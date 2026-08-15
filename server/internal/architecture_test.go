@@ -38,6 +38,7 @@ func TestArchitectureBoundaries(t *testing.T) {
 		}
 
 		assertPlatformDoesNotImportModules(t, rel, imports)
+		assertPlatformDoesNotImportLegacyRootPackages(t, rel, imports)
 		assertDomainIsFrameworkFree(t, rel, imports)
 		assertHandlersDoNotUsePersistence(t, rel, imports)
 		assertServicesStayTransportFree(t, rel, imports)
@@ -74,6 +75,24 @@ func assertPlatformDoesNotImportModules(t *testing.T, rel string, imports []stri
 		if strings.Contains(imp, "/internal/modules") {
 			t.Fatalf("%s: platform package must not import module package %q", rel, imp)
 		}
+	}
+}
+
+// assertPlatformDoesNotImportLegacyRootPackages 防止 platform 依赖顶层遗留包
+// （如已被移除的 utils/、task/）。platform 只允许依赖自身内部包与 server/config。
+func assertPlatformDoesNotImportLegacyRootPackages(t *testing.T, rel string, imports []string) {
+	t.Helper()
+	if !strings.HasPrefix(rel, "platform/") {
+		return
+	}
+	for _, imp := range imports {
+		if !strings.Contains(imp, "/server/") {
+			continue
+		}
+		if strings.Contains(imp, "/server/config") || strings.Contains(imp, "/server/internal/") {
+			continue
+		}
+		t.Fatalf("%s: platform package must not import legacy top-level package %q", rel, imp)
 	}
 }
 

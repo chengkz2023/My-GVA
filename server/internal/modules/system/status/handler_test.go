@@ -15,7 +15,8 @@ import (
 func TestModuleInfoWithoutDatabase(t *testing.T) {
 	gin.SetMode(gin.TestMode)
 	engine := gin.New()
-	apphttp.RegisterRoutes(engine, apphttp.Config{}, NewModule(&container.Container{}))
+	group := engine.Group("/api")
+	NewModule(&container.Container{}).RegisterHTTP(apphttp.Routes{Public: group, Authenticated: group})
 
 	req := httptest.NewRequest(http.MethodGet, "/api/system/status/info", nil)
 	rec := httptest.NewRecorder()

@@ -6,7 +6,6 @@ import (
 	"testing"
 
 	platformauth "github.com/chengkz2023/My-GVA/server/internal/platform/auth"
-	"github.com/chengkz2023/My-GVA/server/utils"
 	"github.com/gin-gonic/gin"
 	"github.com/songzhibin97/gkit/cache/local_cache"
 )
@@ -21,8 +20,7 @@ func TestJWTAuthInjectsActor(t *testing.T) {
 		BufferTime:  "30m",
 		Issuer:      "boyking-admin",
 	})
-	j := &utils.JWT{JWT: pjwt}
-	token, err := j.CreateToken(j.CreateClaims(platformauth.BaseClaims{
+	token, err := pjwt.CreateToken(pjwt.CreateClaims(platformauth.BaseClaims{
 		ID:          1,
 		Username:    "admin",
 		NickName:    "Admin",

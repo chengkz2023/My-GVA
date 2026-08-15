@@ -3,8 +3,6 @@ package internal
 import (
 	"fmt"
 	"github.com/chengkz2023/My-GVA/server/config"
-	astutil "github.com/chengkz2023/My-GVA/server/utils/ast"
-	"github.com/chengkz2023/My-GVA/server/utils/stacktrace"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 	"os"
@@ -103,8 +101,8 @@ func (z *ZapCore) Write(entry zapcore.Entry, fields []zapcore.Field) error {
 		if stack != "" {
 			info = fmt.Sprintf("%s \n 调用栈：%s", info, stack)
 			// 解析最终业务调用方，并提取其方法源码
-			if frame, ok := stacktrace.FindFinalCaller(stack); ok {
-				fnName, fnSrc, sLine, eLine, exErr := astutil.ExtractFuncSourceByPosition(frame.File, frame.Line)
+			if frame, ok := FindFinalCaller(stack); ok {
+				fnName, fnSrc, sLine, eLine, exErr := ExtractFuncSourceByPosition(frame.File, frame.Line)
 				if exErr == nil {
 					info = fmt.Sprintf("%s \n 最终调用方法:%s:%d (%s lines %d-%d)\n----- 产生日志的方法代码如下 -----\n%s", info, frame.File, frame.Line, fnName, sLine, eLine, fnSrc)
 				} else {

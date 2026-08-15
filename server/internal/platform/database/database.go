@@ -12,7 +12,7 @@ import (
 	"gorm.io/gorm"
 )
 
-func Open(cfg config.Mysql, log *zap.Logger) *gorm.DB {
+func Open(cfg config.Mysql, log *zap.Logger) (*gorm.DB, error) {
 	return openMySQL(cfg, log)
 }
 
@@ -27,9 +27,9 @@ func Ping(ctx context.Context, db *gorm.DB) error {
 	return sqlDB.PingContext(ctx)
 }
 
-func openMySQL(m config.Mysql, log *zap.Logger) *gorm.DB {
+func openMySQL(m config.Mysql, log *zap.Logger) (*gorm.DB, error) {
 	if m.Dbname == "" {
-		return nil
+		return nil, nil
 	}
 	dsn := m.Dsn()
 	if m.Config == "" || !strings.Contains(m.Config, "timeout=") {
@@ -43,11 +43,16 @@ func openMySQL(m config.Mysql, log *zap.Logger) *gorm.DB {
 	general := m.GeneralDB
 	db, err := gorm.Open(mysql.New(mysqlConfig), internal.Gorm.Config(general, log))
 	if err != nil {
-		panic(err)
+		return nil, err
 	}
-	db.InstanceSet("gorm:table_options", "ENGINE="+m.Engine)
-	sqlDB, _ := db.DB()
+	if m.Engine != "" {
+		db.InstanceSet("gorm:table_options", "ENGINE="+m.Engine)
+	}
+	sqlDB, err := db.DB()
+	if err != nil {
+		return nil, err
+	}
 	sqlDB.SetMaxIdleConns(m.MaxIdleConns)
 	sqlDB.SetMaxOpenConns(m.MaxOpenConns)
-	return db
+	return db, nil
 }

@@ -1,11 +1,12 @@
 package bootstrap
 
 import (
+	"os"
 	"strconv"
 
 	apimysql "github.com/chengkz2023/My-GVA/server/internal/modules/system/api/infrastructure/mysql"
+	platformauth "github.com/chengkz2023/My-GVA/server/internal/platform/auth"
 	platformdb "github.com/chengkz2023/My-GVA/server/internal/platform/database"
-	"github.com/chengkz2023/My-GVA/server/utils"
 	"github.com/google/uuid"
 	"go.uber.org/zap"
 	"gorm.io/gorm"
@@ -49,10 +50,20 @@ func seedAdminUser(db *gorm.DB, log *zap.Logger) {
 	if count > 0 {
 		return
 	}
+	initialPassword := os.Getenv("ADMIN_INITIAL_PASSWORD")
+	if initialPassword == "" {
+		initialPassword = "123456"
+		log.Warn("ADMIN_INITIAL_PASSWORD not set, using default admin password '123456' — change it immediately")
+	}
+	hashedPwd, err := platformauth.NewBcryptPasswordHasher().Hash(initialPassword)
+	if err != nil {
+		log.Error("seed admin password hash failed", zap.Error(err))
+		return
+	}
 	user := platformdb.SysUser{
 		UUID:        uuid.New(),
 		Username:    adminUsername,
-		Password:    utils.BcryptHash("123456"),
+		Password:    hashedPwd,
 		NickName:    "管理员",
 		HeaderImg:   "https://qmplusimg.henrongyi.top/gva_header.jpg",
 		AuthorityId: adminAuthorityID,

@@ -14,6 +14,7 @@ import (
 	"github.com/chengkz2023/My-GVA/server/internal/interfaces/http/middleware"
 	"github.com/chengkz2023/My-GVA/server/internal/modules"
 	"github.com/chengkz2023/My-GVA/server/internal/platform/buildinfo"
+	platformdb "github.com/chengkz2023/My-GVA/server/internal/platform/database"
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
 )
@@ -43,13 +44,15 @@ func Router(c *container.Container) *gin.Engine {
 
 func apiConfig(c *container.Container) apphttp.Config {
 	return apphttp.Config{
+		DB:       c.DB,
+		Logger:   c.Logger,
+		Enforcer: c.Enforcer,
 		JWT: middleware.JWTConfig{
 			ExpiresTime: c.Config.JWT.ExpiresTime,
 			BufferTime:  c.Config.JWT.BufferTime,
 			SigningKey:  c.Config.JWT.SigningKey,
 			BlacklistCheck: func(token string) bool {
-				_, ok := c.BlackCache.Get(token)
-				return ok
+				return platformdb.IsJwtBlacklisted(c.DB, token)
 			},
 		},
 	}

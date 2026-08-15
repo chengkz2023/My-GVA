@@ -1,55 +1,53 @@
 package casbin
 
 import (
-	"sync"
+	"errors"
 
 	"github.com/casbin/casbin/v2"
 	"github.com/casbin/casbin/v2/model"
 	gormadapter "github.com/casbin/gorm-adapter/v3"
-	"go.uber.org/zap"
 	"gorm.io/gorm"
 )
 
-var (
-	enforcer *casbin.SyncedCachedEnforcer
-	once     sync.Once
-)
+const casbinModelText = `
+[request_definition]
+r = sub, obj, act
 
-func GetEnforcer(db *gorm.DB) *casbin.SyncedCachedEnforcer {
-	once.Do(func() {
-		if db == nil {
-			zap.L().Error("casbin adapter: db is nil")
-			return
-		}
-		a, err := gormadapter.NewAdapterByDB(db)
-		if err != nil {
-			zap.L().Error("casbin adapter: failed to create adapter", zap.Error(err))
-			return
-		}
-		text := `
-		[request_definition]
-		r = sub, obj, act
+[policy_definition]
+p = sub, obj, act
 
-		[policy_definition]
-		p = sub, obj, act
+[role_definition]
+g = _, _
 
-		[role_definition]
-		g = _, _
+[policy_effect]
+e = some(where (p.eft == allow))
 
-		[policy_effect]
-		e = some(where (p.eft == allow))
+[matchers]
+m = r.sub == p.sub && keyMatch2(r.obj,p.obj) && r.act == p.act
+`
 
-		[matchers]
-		m = r.sub == p.sub && keyMatch2(r.obj,p.obj) && r.act == p.act
-		`
-		m, err := model.NewModelFromString(text)
-		if err != nil {
-			zap.L().Error("casbin model: failed to load model", zap.Error(err))
-			return
-		}
-		enforcer, _ = casbin.NewSyncedCachedEnforcer(m, a)
-		enforcer.SetExpireTime(60 * 60)
-		_ = enforcer.LoadPolicy()
-	})
-	return enforcer
+// NewEnforcer 构造一个基于 DB adapter 的 casbin enforcer。
+// 失败时返回错误，由调用方决定如何处理（不再使用包级全局单例）。
+func NewEnforcer(db *gorm.DB) (*casbin.SyncedCachedEnforcer, error) {
+	if db == nil {
+		return nil, errors.New("casbin adapter: db is nil")
+	}
+
+	a, err := gormadapter.NewAdapterByDB(db)
+	if err != nil {
+		return nil, err
+	}
+	m, err := model.NewModelFromString(casbinModelText)
+	if err != nil {
+		return nil, err
+	}
+	e, err := casbin.NewSyncedCachedEnforcer(m, a)
+	if err != nil {
+		return nil, err
+	}
+	e.SetExpireTime(60 * 60)
+	if err := e.LoadPolicy(); err != nil {
+		return nil, err
+	}
+	return e, nil
 }

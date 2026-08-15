@@ -23,5 +23,5 @@ func NewModule(c *container.Container) *Module {
 }
 
 func (m *Module) RegisterHTTP(routes apphttp.Routes) {
-	m.handler.Register(routes.Public)
+	m.handler.Register(routes.Authenticated)
 }

@@ -2,7 +2,6 @@ package mysql
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/chengkz2023/My-GVA/server/internal/modules/system/api/domain"
 	"github.com/chengkz2023/My-GVA/server/internal/platform/pagination"
@@ -42,14 +41,7 @@ func (r *Repository) List(ctx context.Context, query domain.ListQuery) (paginati
 	}
 
 	page := pagination.Normalize(query.Page)
-	orderKey := "id"
-	if query.OrderKey != "" {
-		orderKey = query.OrderKey
-	}
-	order := fmt.Sprintf("%s asc", orderKey)
-	if query.Desc {
-		order = fmt.Sprintf("%s desc", orderKey)
-	}
+	order := orderClause(query.OrderKey, query.Desc)
 
 	var entities []SysApi
 	if err := db.Order(order).Offset(page.Offset()).Limit(page.Limit()).Find(&entities).Error; err != nil {
@@ -252,4 +244,26 @@ func mapSysApi(entity SysApi) domain.Api {
 		ApiGroup:    entity.ApiGroup,
 		Method:      entity.Method,
 	}
+}
+
+// sysApiOrderColumns 允许排序的列名白名单，防止 orderKey 拼入 SQL 造成注入。
+var sysApiOrderColumns = map[string]string{
+	"id":          "id",
+	"path":        "path",
+	"description": "description",
+	"api_group":   "api_group",
+	"method":      "method",
+	"created_at":  "created_at",
+	"updated_at":  "updated_at",
+}
+
+func orderClause(orderKey string, desc bool) string {
+	col := sysApiOrderColumns[orderKey]
+	if col == "" {
+		col = "id"
+	}
+	if desc {
+		return col + " desc"
+	}
+	return col + " asc"
 }

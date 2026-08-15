@@ -32,27 +32,30 @@ type JWT struct {
 	Buffer     time.Duration
 }
 
-func parseDuration(s string) time.Duration {
-	d, err := time.ParseDuration(s)
+// ParseDuration 解析时间字符串，支持 Go 原生格式以及 "Nd" 天语法（例如 "1d5h20m"）。
+func ParseDuration(d string) (time.Duration, error) {
+	d = strings.TrimSpace(d)
+	dr, err := time.ParseDuration(d)
 	if err == nil {
-		return d
+		return dr, nil
 	}
-	if idx := strings.Index(s, "d"); idx >= 0 {
-		days, _ := strconv.Atoi(s[:idx])
-		d = time.Hour * 24 * time.Duration(days)
-		rest, err := time.ParseDuration(s[idx+1:])
-		if err == nil {
-			d += rest
+	if strings.Contains(d, "d") {
+		index := strings.Index(d, "d")
+		hour, _ := strconv.Atoi(d[:index])
+		dr = time.Hour * 24 * time.Duration(hour)
+		ndr, err := time.ParseDuration(d[index+1:])
+		if err != nil {
+			return dr, nil
 		}
-		return d
+		return dr + ndr, nil
 	}
-	v, _ := strconv.ParseInt(s, 10, 64)
-	return time.Duration(v)
+	dv, err := strconv.ParseInt(d, 10, 64)
+	return time.Duration(dv), err
 }
 
 func NewJWT(cfg JWTConfig) *JWT {
-	expires := parseDuration(cfg.ExpiresTime)
-	buffer := parseDuration(cfg.BufferTime)
+	expires, _ := ParseDuration(cfg.ExpiresTime)
+	buffer, _ := ParseDuration(cfg.BufferTime)
 	return &JWT{
 		SigningKey: []byte(cfg.SigningKey),
 		Issuer:     cfg.Issuer,
@@ -81,8 +84,11 @@ func (j *JWT) CreateToken(claims CustomClaims) (string, error) {
 
 func (j *JWT) ParseToken(tokenString string) (*CustomClaims, error) {
 	token, err := jwt.ParseWithClaims(tokenString, &CustomClaims{}, func(token *jwt.Token) (interface{}, error) {
+		if token.Method != jwt.SigningMethodHS256 {
+			return nil, TokenSignatureInvalid
+		}
 		return j.SigningKey, nil
-	})
+	}, jwt.WithValidMethods([]string{jwt.SigningMethodHS256.Alg()}))
 	if err != nil {
 		switch {
 		case errors.Is(err, jwt.ErrTokenExpired):

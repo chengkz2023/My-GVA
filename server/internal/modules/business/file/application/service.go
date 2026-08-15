@@ -3,12 +3,34 @@ package application
 import (
 	"context"
 	"errors"
+	"net/http"
+	"os"
 	"path/filepath"
 	"strings"
 
 	"github.com/chengkz2023/My-GVA/server/internal/modules/business/file/domain"
 	apperrors "github.com/chengkz2023/My-GVA/server/internal/platform/errors"
 )
+
+// MaxUploadBytes 单个文件上传大小上限（10 MB）。
+const MaxUploadBytes = 10 << 20
+
+// blockedUploadExts 拒绝可被同源直接执行/渲染的危险扩展名，防止存储型 XSS。
+var blockedUploadExts = map[string]bool{
+	".html": true, ".htm": true, ".svg": true, ".js": true, ".mjs": true,
+	".php": true, ".jsp": true, ".asp": true, ".aspx": true,
+}
+
+func validateUploadType(filename string, data []byte) error {
+	ext := strings.ToLower(filepath.Ext(filename))
+	if blockedUploadExts[ext] {
+		return apperrors.WithMessage(apperrors.Validation, "file type not allowed")
+	}
+	if ct := http.DetectContentType(data); strings.HasPrefix(ct, "text/html") {
+		return apperrors.WithMessage(apperrors.Validation, "file type not allowed")
+	}
+	return nil
+}
 
 type Service struct {
 	repo      domain.Repository
@@ -23,6 +45,15 @@ func NewService(repo domain.Repository, storePath string) *Service {
 func (s *Service) Upload(ctx context.Context, header FileHeader, classID int) (UploadResponse, error) {
 	if s.repo == nil {
 		return UploadResponse{}, apperrors.WithMessage(apperrors.Internal, "file repository unavailable")
+	}
+	if len(header.Data) == 0 {
+		return UploadResponse{}, apperrors.WithMessage(apperrors.Validation, "file is empty")
+	}
+	if len(header.Data) > MaxUploadBytes {
+		return UploadResponse{}, apperrors.WithMessage(apperrors.Validation, "file too large")
+	}
+	if err := validateUploadType(header.Filename, header.Data); err != nil {
+		return UploadResponse{}, err
 	}
 
 	filename := s.safeFilename(header.Filename)
@@ -43,6 +74,8 @@ func (s *Service) Upload(ctx context.Context, header FileHeader, classID int) (U
 		Key:     filename,
 	})
 	if err != nil {
+		// 落盘成功但入库失败：回滚已写入的文件，避免产生孤儿文件
+		_ = removeFile(storePath)
 		return UploadResponse{}, apperrors.New(apperrors.Internal, 0, "save file record failed", err)
 	}
 	return UploadResponse{File: fromDomain(record)}, nil
@@ -76,8 +109,18 @@ func (s *Service) Delete(ctx context.Context, id uint) error {
 	if err != nil {
 		return apperrors.New(apperrors.Internal, 0, "delete file record failed", err)
 	}
-	if file.Key != "" {
-		_ = removeFile(filepath.Join(s.storePath, file.Key))
+	if file.Key == "" {
+		return nil
+	}
+	// 校验 key 为纯文件名，拒绝含路径分隔符或 .. 的脏数据，避免越界删除
+	if filepath.Base(file.Key) != file.Key || strings.Contains(file.Key, "..") {
+		return nil
+	}
+	if err := removeFile(filepath.Join(s.storePath, file.Key)); err != nil {
+		// 文件本就不存在视为删除成功；真正失败（权限等）才返回错误
+		if !os.IsNotExist(err) {
+			return apperrors.New(apperrors.Internal, 0, "delete file failed", err)
+		}
 	}
 	return nil
 }

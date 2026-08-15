@@ -1,24 +1,9 @@
 package mysql
 
 import (
-	"time"
-
-	"github.com/chengkz2023/My-GVA/server/internal/platform/database"
+	platformdb "github.com/chengkz2023/My-GVA/server/internal/platform/database"
 )
 
-type SysOperationRecord struct {
-	database.GVA_MODEL
-	Ip           string        `json:"ip" form:"ip" gorm:"column:ip;comment:请求ip"`
-	Method       string        `json:"method" form:"method" gorm:"column:method;comment:请求方法"`
-	Path         string        `json:"path" form:"path" gorm:"column:path;comment:请求路径"`
-	Status       int           `json:"status" form:"status" gorm:"column:status;comment:请求状态"`
-	Latency      time.Duration `json:"latency" form:"latency" gorm:"column:latency;comment:延迟" swaggertype:"string"`
-	Agent        string        `json:"agent" form:"agent" gorm:"type:text;column:agent;comment:代理"`
-	ErrorMessage string        `json:"error_message" form:"error_message" gorm:"column:error_message;comment:错误信息"`
-	Body         string        `json:"body" form:"body" gorm:"type:text;column:body;comment:请求Body"`
-	Resp         string        `json:"resp" form:"resp" gorm:"type:text;column:resp;comment:响应Body"`
-	UserID       int           `json:"user_id" form:"user_id" gorm:"column:user_id;comment:用户id"`
-	User         database.SysUser `json:"user"`
-}
-
-func (SysOperationRecord) TableName() string { return "sys_operation_records" }
+// SysOperationRecord 是共享实体，定义在 platform/database 中，
+// 这里保留别名以维持模块内部引用不变。
+type SysOperationRecord = platformdb.SysOperationRecord
