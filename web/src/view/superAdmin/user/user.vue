@@ -243,7 +243,7 @@
           />
         </el-form-item>
         <el-form-item label="头像" label-width="80px">
-          <SelectImage v-model="userInfo.headerImg" />
+          <el-input v-model="userInfo.headerImg" placeholder="头像 URL" />
         </el-form-item>
       </el-form>
     </el-drawer>
@@ -265,7 +265,6 @@
 
   import { nextTick, ref, watch } from 'vue'
   import { ElMessage, ElMessageBox } from 'element-plus'
-  import SelectImage from '@/components/selectImage/selectImage.vue'
   import { useAppStore } from "@/pinia";
 
   defineOptions({
