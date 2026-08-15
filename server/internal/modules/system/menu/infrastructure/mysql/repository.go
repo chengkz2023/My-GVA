@@ -71,7 +71,7 @@ func (r *Repository) All(ctx context.Context) ([]domain.Menu, error) {
 		treeMap[bm.ParentId] = append(treeMap[bm.ParentId], bm)
 	}
 	domainMenus := buildTree(treeMap, 0)
-	return keepScaffoldMenus(domainMenus), nil
+	return domainMenus, nil
 }
 
 func buildTree(treeMap map[uint][]platformdb.SysBaseMenu, parentID uint) []domain.Menu {

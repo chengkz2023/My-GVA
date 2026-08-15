@@ -2,6 +2,7 @@ package mysql
 
 import (
 	"context"
+	"errors"
 	"strconv"
 
 	"github.com/chengkz2023/My-GVA/server/internal/modules/system/role/domain"
@@ -77,7 +78,10 @@ func (r *Repository) Save(ctx context.Context, input domain.SaveRoleInput) error
 			DefaultRouter: input.DefaultRouter,
 		}
 		if err := r.db.WithContext(ctx).Create(&auth).Error; err != nil {
-			return domain.ErrRoleIDExists
+			if errors.Is(err, gorm.ErrDuplicatedKey) {
+				return domain.ErrRoleIDExists
+			}
+			return err
 		}
 		// Assign default dashboard menu
 		r.assignMenu(ctx, input.AuthorityID, 1)

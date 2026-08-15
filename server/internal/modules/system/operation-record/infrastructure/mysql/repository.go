@@ -2,6 +2,7 @@ package mysql
 
 import (
 	"context"
+	"errors"
 
 	"github.com/chengkz2023/My-GVA/server/internal/modules/system/operation-record/domain"
 	"github.com/chengkz2023/My-GVA/server/internal/platform/pagination"
@@ -54,6 +55,9 @@ func (r *Repository) FindByID(ctx context.Context, id uint) (domain.Record, erro
 	}
 	var record SysOperationRecord
 	if err := r.db.WithContext(ctx).Preload("User").Where("id = ?", id).First(&record).Error; err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return domain.Record{}, domain.ErrRecordNotFound
+		}
 		return domain.Record{}, err
 	}
 	return mapRecord(record), nil

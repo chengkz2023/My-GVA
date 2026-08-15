@@ -58,22 +58,24 @@ func (s *Service) GetAll(ctx context.Context) (AllResponse, error) {
 
 	if s.useStrictAuth && s.policyProvider != nil {
 		policies, _ := s.policyProvider.Policies(actor.AuthorityID)
-		if len(policies) > 0 {
-			policySet := make(map[string]map[string]bool, len(policies))
-			for _, p := range policies {
-				if policySet[p.Path] == nil {
-					policySet[p.Path] = make(map[string]bool)
-				}
-				policySet[p.Path][p.Method] = true
-			}
-			filtered := make([]domain.Api, 0, len(apis))
-			for _, api := range apis {
-				if policySet[api.Path] != nil && policySet[api.Path][api.Method] {
-					filtered = append(filtered, api)
-				}
-			}
-			apis = filtered
+		if len(policies) == 0 {
+			// 严格模式下无策略的角色不应看到全部 API
+			return AllResponse{List: []ApiResponse{}}, nil
 		}
+		policySet := make(map[string]map[string]bool, len(policies))
+		for _, p := range policies {
+			if policySet[p.Path] == nil {
+				policySet[p.Path] = make(map[string]bool)
+			}
+			policySet[p.Path][p.Method] = true
+		}
+		filtered := make([]domain.Api, 0, len(apis))
+		for _, api := range apis {
+			if policySet[api.Path] != nil && policySet[api.Path][api.Method] {
+				filtered = append(filtered, api)
+			}
+		}
+		apis = filtered
 	}
 	return AllResponse{List: mapApis(apis)}, nil
 }

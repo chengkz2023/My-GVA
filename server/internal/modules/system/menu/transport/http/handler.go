@@ -66,7 +66,7 @@ type assignAuthorityRequest struct {
 func (h *Handler) AssignAuthority(c *gin.Context) {
 	var req assignAuthorityRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
-		response.OK(c, nil)
+		response.Error(c, apperrors.WithMessage(apperrors.Validation, "invalid request body"))
 		return
 	}
 	if err := h.service.AssignAuthority(c.Request.Context(), req.AuthorityID, req.MenuIDs); err != nil {

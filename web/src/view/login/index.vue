@@ -115,7 +115,7 @@
   const loading = ref(false)
 
   const loginFormData = reactive({
-    username: 'admin',
+    username: '',
     password: '',
     captcha: '',
     captchaId: '',

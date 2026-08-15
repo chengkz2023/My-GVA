@@ -5,6 +5,7 @@ import (
 
 	"github.com/chengkz2023/My-GVA/server/internal/modules/system/api/application"
 	"github.com/chengkz2023/My-GVA/server/internal/modules/system/api/domain"
+	apperrors "github.com/chengkz2023/My-GVA/server/internal/platform/errors"
 	"github.com/chengkz2023/My-GVA/server/internal/platform/pagination"
 	"github.com/chengkz2023/My-GVA/server/internal/platform/response"
 	"github.com/gin-gonic/gin"
@@ -107,7 +108,7 @@ type updatePoliciesRequest struct {
 func (h *Handler) UpdatePolicies(c *gin.Context) {
 	var req updatePoliciesRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
-		response.OK(c, nil)
+		response.Error(c, apperrors.WithMessage(apperrors.Validation, "invalid request body"))
 		return
 	}
 	if err := h.service.UpdatePolicies(c.Request.Context(), req.AuthorityID, req.Policies); err != nil {

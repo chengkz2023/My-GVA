@@ -6,7 +6,6 @@ import (
 
 	"github.com/chengkz2023/My-GVA/server/internal/modules/system/operation-record/domain"
 	apperrors "github.com/chengkz2023/My-GVA/server/internal/platform/errors"
-	"github.com/chengkz2023/My-GVA/server/internal/platform/pagination"
 )
 
 type Service struct {
@@ -42,6 +41,9 @@ func (s *Service) FindByID(ctx context.Context, id uint) (RecordResponse, error)
 		return RecordResponse{}, apperrors.WithMessage(apperrors.Internal, "repository unavailable")
 	}
 	record, err := s.repo.FindByID(ctx, id)
+	if errors.Is(err, domain.ErrRecordNotFound) {
+		return RecordResponse{}, apperrors.WithMessage(apperrors.NotFound, "record not found")
+	}
 	if err != nil {
 		return RecordResponse{}, apperrors.New(apperrors.Internal, 0, "find record failed", err)
 	}
@@ -71,7 +73,3 @@ func fromDomain(r domain.Record) RecordResponse {
 		User: UserInRecord{ID: uint(r.UserID), UserName: r.Username, NickName: r.NickName},
 	}
 }
-
-var _ pagination.Page = pagination.Page{}
-
-func init() { _ = pagination.Page{Page: 1, PageSize: 10} }
