@@ -14,10 +14,11 @@ type AuthorityChecker = func(ctx context.Context, adminID, targetID uint) error
 type Service struct {
 	repo             domain.Repository
 	authorityChecker AuthorityChecker
+	strictAuth       bool
 }
 
-func NewService(repo domain.Repository, checker AuthorityChecker) *Service {
-	return &Service{repo: repo, authorityChecker: checker}
+func NewService(repo domain.Repository, checker AuthorityChecker, strictAuth bool) *Service {
+	return &Service{repo: repo, authorityChecker: checker, strictAuth: strictAuth}
 }
 
 func (s *Service) All(ctx context.Context) (TreeResponse, error) {
@@ -75,7 +76,7 @@ func (s *Service) AssignAuthority(ctx context.Context, authorityID uint, menuIDs
 	if s.repo == nil {
 		return apperrors.WithMessage(apperrors.Internal, "menu repository unavailable")
 	}
-	if s.authorityChecker != nil {
+	if s.strictAuth && s.authorityChecker != nil {
 		actor, _ := platformauth.ActorFromContext(ctx)
 		if err := s.authorityChecker(ctx, actor.AuthorityID, authorityID); err != nil {
 			return apperrors.WithMessage(apperrors.Forbidden, "role out of scope")

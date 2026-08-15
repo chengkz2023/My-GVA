@@ -28,7 +28,7 @@ func TestMe(t *testing.T) {
 		}))
 	})
 	group := engine.Group("/api")
-	NewHandler(application.NewService(nil, platformauth.NewBcryptPasswordHasher(), nil)).Register(group)
+	NewHandler(application.NewService(nil, platformauth.NewBcryptPasswordHasher(), nil, false)).Register(group)
 
 	req := httptest.NewRequest(http.MethodGet, "/api/system/user/me", nil)
 	rec := httptest.NewRecorder()
@@ -66,7 +66,7 @@ func TestList(t *testing.T) {
 		}))
 	})
 	group := engine.Group("/api")
-	NewHandler(application.NewService(nil, platformauth.NewBcryptPasswordHasher(), nil)).Register(group)
+	NewHandler(application.NewService(nil, platformauth.NewBcryptPasswordHasher(), nil, false)).Register(group)
 
 	req := httptest.NewRequest(http.MethodGet, "/api/system/user/list?page=0&pageSize=200&username=admin", nil)
 	rec := httptest.NewRecorder()
@@ -101,7 +101,7 @@ func TestChangePassword(t *testing.T) {
 		}))
 	})
 	group := engine.Group("/api")
-	NewHandler(application.NewService(repo, fakeHasher{}, nil)).Register(group)
+	NewHandler(application.NewService(repo, fakeHasher{}, nil, false)).Register(group)
 
 	req := httptest.NewRequest(http.MethodPost, "/api/system/user/password", bytes.NewBufferString(`{"oldPassword":"old-password","newPassword":"new-password"}`))
 	req.Header.Set("Content-Type", "application/json")
@@ -137,7 +137,7 @@ func TestUpdateProfile(t *testing.T) {
 		}))
 	})
 	group := engine.Group("/api")
-	NewHandler(application.NewService(repo, fakeHasher{}, nil)).Register(group)
+	NewHandler(application.NewService(repo, fakeHasher{}, nil, false)).Register(group)
 
 	req := httptest.NewRequest(http.MethodPut, "/api/system/user/profile", bytes.NewBufferString(`{"nickName":"New Admin","headerImg":"avatar.png","phone":"10086","email":"admin@example.com","enable":2}`))
 	req.Header.Set("Content-Type", "application/json")

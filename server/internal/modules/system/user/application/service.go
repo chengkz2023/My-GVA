@@ -16,19 +16,21 @@ type Service struct {
 	repo             domain.Repository
 	hasher           platformauth.PasswordHasher
 	authorityChecker AuthorityChecker
+	strictAuth       bool
 }
 
-func NewService(repo domain.Repository, hasher platformauth.PasswordHasher, checker AuthorityChecker) *Service {
+func NewService(repo domain.Repository, hasher platformauth.PasswordHasher, checker AuthorityChecker, strictAuth bool) *Service {
 	if hasher == nil {
 		hasher = platformauth.NewBcryptPasswordHasher()
 	}
-	return &Service{repo: repo, hasher: hasher, authorityChecker: checker}
+	return &Service{repo: repo, hasher: hasher, authorityChecker: checker, strictAuth: strictAuth}
 }
 
 // checkAuthorityScope 校验 targetID（角色 ID）是否在 adminID（调用者角色 ID）的层级作用域内。
+// 与 role 模块约定一致：仅在 strictAuth 开启时强制执行层级校验；关闭时任意角色均可分配。
 // checker 为 nil 时跳过（此时仓储通常也不可用，后续写入会失败）。
 func (s *Service) checkAuthorityScope(ctx context.Context, adminID, targetID uint) error {
-	if s.authorityChecker == nil {
+	if !s.strictAuth || s.authorityChecker == nil {
 		return nil
 	}
 	if err := s.authorityChecker(ctx, adminID, targetID); err != nil {

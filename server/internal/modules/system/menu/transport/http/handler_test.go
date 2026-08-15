@@ -26,7 +26,7 @@ func TestTree(t *testing.T) {
 		}))
 	})
 	group := engine.Group("/api")
-	NewHandler(application.NewService(fakeRepository{}, nil)).Register(group)
+	NewHandler(application.NewService(fakeRepository{}, nil, false)).Register(group)
 
 	req := httptest.NewRequest(http.MethodGet, "/api/system/menu/tree", nil)
 	rec := httptest.NewRecorder()

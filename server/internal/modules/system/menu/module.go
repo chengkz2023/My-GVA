@@ -14,15 +14,19 @@ type Module struct {
 }
 
 func NewModule(c *container.Container) *Module {
-	var repo domain.Repository
-	var checker application.AuthorityChecker
+	var (
+		repo    domain.Repository
+		checker application.AuthorityChecker
+		strict  bool
+	)
 	if c != nil {
 		repo = menumysql.NewRepository(c.DB)
+		strict = c.Config.System.UseStrictAuth
 		if c.AuthorityChecker != nil {
 			checker = c.AuthorityChecker.CheckAuthorityAuth
 		}
 	}
-	service := application.NewService(repo, checker)
+	service := application.NewService(repo, checker, strict)
 	return &Module{
 		handler: menuhttp.NewHandler(service),
 	}

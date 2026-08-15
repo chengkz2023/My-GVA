@@ -30,7 +30,7 @@ func TestTree(t *testing.T) {
 			Title:     "角色管理",
 		}},
 	}}}
-	service := NewService(repo, nil)
+	service := NewService(repo, nil, false)
 
 	got, err := service.Tree(actorContext())
 	if err != nil {
@@ -48,7 +48,7 @@ func TestTree(t *testing.T) {
 }
 
 func TestTreeMissingActor(t *testing.T) {
-	_, err := NewService(&fakeRepository{}, nil).Tree(context.Background())
+	_, err := NewService(&fakeRepository{}, nil, false).Tree(context.Background())
 	var appErr *apperrors.Error
 	if !errors.As(err, &appErr) || appErr.Kind != apperrors.Unauthorized {
 		t.Fatalf("error = %v, want unauthorized app error", err)
@@ -56,12 +56,36 @@ func TestTreeMissingActor(t *testing.T) {
 }
 
 func TestTreeRepositoryUnavailable(t *testing.T) {
-	got, err := NewService(&fakeRepository{err: domain.ErrRepositoryUnavailable}, nil).Tree(actorContext())
+	got, err := NewService(&fakeRepository{err: domain.ErrRepositoryUnavailable}, nil, false).Tree(actorContext())
 	if err != nil {
 		t.Fatalf("Tree() error = %v", err)
 	}
 	if len(got.Menus) != 0 {
 		t.Fatalf("list = %+v, want empty list", got.Menus)
+	}
+}
+
+func TestAssignAuthorityNonStrictSkipsScopeCheck(t *testing.T) {
+	deny := AuthorityChecker(func(ctx context.Context, adminID, targetID uint) error {
+		return errors.New("denied")
+	})
+	service := NewService(&fakeRepository{}, deny, false)
+
+	if err := service.AssignAuthority(actorContext(), 999, []uint{1, 2}); err != nil {
+		t.Fatalf("AssignAuthority() error = %v, want success in non-strict mode", err)
+	}
+}
+
+func TestAssignAuthorityStrictBlocksOutOfScope(t *testing.T) {
+	deny := AuthorityChecker(func(ctx context.Context, adminID, targetID uint) error {
+		return errors.New("denied")
+	})
+	service := NewService(&fakeRepository{}, deny, true)
+
+	err := service.AssignAuthority(actorContext(), 999, []uint{1, 2})
+	var appErr *apperrors.Error
+	if !errors.As(err, &appErr) || appErr.Kind != apperrors.Forbidden {
+		t.Fatalf("error = %v, want forbidden app error", err)
 	}
 }
 

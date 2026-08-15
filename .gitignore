@@ -32,6 +32,9 @@ rm_file/
 /server/configs/config.debug.yaml
 /server/configs/*.local.yaml
 /server/.gocache/
+/server/.gotmp/
+/.gocache/
+/.gotmp/
 server/uploads/
 
 *.iml
