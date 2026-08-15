@@ -18,6 +18,7 @@ type Repository interface {
 	FindPasswordHashByID(ctx context.Context, id uint) (string, error)
 	UpdatePasswordHash(ctx context.Context, id uint, passwordHash string) error
 	UpdateProfile(ctx context.Context, id uint, profile ProfilePatch) (User, error)
+	UpdateByAdmin(ctx context.Context, id uint, patch AdminUpdateInput) error
 	Create(ctx context.Context, input CreateUserInput) (User, error)
 	Delete(ctx context.Context, id uint) error
 	SetAuthorities(ctx context.Context, input SetAuthoritiesInput) error

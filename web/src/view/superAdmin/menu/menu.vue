@@ -681,11 +681,30 @@
   const enterDialog = async () => {
     menuForm.value.validate(async (valid) => {
       if (valid) {
+        // 后端 SaveMenuRequest 为扁平字段（id/title/icon/...），这里把嵌套的 meta 展开后再提交
+        const submitData = {
+          id: form.value.ID,
+          parentId: form.value.parentId,
+          path: form.value.path,
+          name: form.value.name,
+          hidden: form.value.hidden,
+          component: form.value.component,
+          sort: form.value.sort,
+          title: form.value.meta?.title || '',
+          icon: form.value.meta?.icon || '',
+          activeName: form.value.meta?.activeName || '',
+          keepAlive: !!form.value.meta?.keepAlive,
+          defaultMenu: !!form.value.meta?.defaultMenu,
+          closeTab: !!form.value.meta?.closeTab,
+          transitionType: form.value.meta?.transitionType || '',
+          parameters: form.value.parameters || [],
+          menuBtn: form.value.menuBtn || []
+        }
         let res
         if (isEdit.value) {
-          res = await updateBaseMenu(form.value)
+          res = await updateBaseMenu(submitData)
         } else {
-          res = await addBaseMenu(form.value)
+          res = await addBaseMenu(submitData)
         }
         if (res.code === 0) {
           ElMessage({
@@ -756,7 +775,31 @@
   const editMenu = async (id) => {
     dialogTitle.value = '编辑菜单'
     const res = await getBaseMenuById({ id })
-    form.value = res.data.menu
+    if (res.code !== 0) return
+    // 后端 MenuDetailResponse = { menu, meta, parameters, menuBtn }，需合并回显，
+    // 否则编辑保存会丢失 transitionType/参数/按钮
+    const detail = res.data
+    const menu = detail.menu || {}
+    form.value = {
+      ID: menu.ID || 0,
+      path: menu.path || '',
+      name: menu.name || '',
+      hidden: menu.hidden ?? false,
+      parentId: menu.parentId || 0,
+      component: menu.component || '',
+      sort: menu.sort || 0,
+      meta: {
+        title: menu.meta?.title || '',
+        icon: menu.meta?.icon || '',
+        activeName: detail.meta?.activeName || menu.meta?.activeName || '',
+        keepAlive: detail.meta?.keepAlive ?? menu.meta?.keepAlive ?? false,
+        defaultMenu: detail.meta?.defaultMenu ?? menu.meta?.defaultMenu ?? false,
+        closeTab: detail.meta?.closeTab ?? menu.meta?.closeTab ?? false,
+        transitionType: detail.meta?.transitionType || ''
+      },
+      parameters: detail.parameters || [],
+      menuBtn: detail.menuBtn || []
+    }
     isEdit.value = true
     setOptions()
     dialogFormVisible.value = true

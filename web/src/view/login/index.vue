@@ -74,6 +74,7 @@
                   class="h-11 w-full shadow shadow-active"
                   type="primary"
                   size="large"
+                  :loading="loading"
                   @click="submitForm"
                 >
                   登录
@@ -111,6 +112,7 @@
   const captchaRequiredLength = ref(6)
   const loginForm = ref(null)
   const picPath = ref('')
+  const loading = ref(false)
 
   const loginFormData = reactive({
     username: 'admin',
@@ -165,14 +167,25 @@
   }
 
   const submitForm = () => {
+    if (loading.value) return
     loginForm.value.validate(async (valid) => {
       if (!valid) {
         ElMessage.error('请正确填写登录信息')
         return
       }
-      const ok = await userStore.LoginIn(loginFormData)
-      if (!ok && !useMockLogin) {
-        await loginVerify()
+      loading.value = true
+      try {
+        const ok = await userStore.LoginIn({
+          username: loginFormData.username,
+          password: loginFormData.password,
+          captcha: loginFormData.captcha,
+          captchaId: loginFormData.captchaId
+        })
+        if (!ok && !useMockLogin) {
+          await loginVerify()
+        }
+      } finally {
+        loading.value = false
       }
     })
   }

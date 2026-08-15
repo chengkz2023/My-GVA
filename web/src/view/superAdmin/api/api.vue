@@ -49,7 +49,7 @@
         @selection-change="handleSelectionChange"
       >
         <el-table-column type="selection" width="55" />
-        <el-table-column align="left" label="ID" min-width="80" prop="ID" sortable="custom" />
+        <el-table-column align="left" label="ID" min-width="80" prop="id" sortable="custom" />
         <el-table-column align="left" label="路径" min-width="180" prop="path" sortable="custom" />
         <el-table-column align="left" label="分组" min-width="140" prop="apiGroup" sortable="custom" />
         <el-table-column align="left" label="描述" min-width="180" prop="description" sortable="custom" />
@@ -379,7 +379,7 @@ const closeDialog = () => {
 }
 
 const editApiFunc = async (row) => {
-  const res = await getApiById(row.ID)
+  const res = await getApiById(row.id)
   if (res.code === 0) {
     form.value = { ...res.data }
     openDialog('edit')
@@ -406,7 +406,7 @@ const deleteApiFunc = async (row) => {
     cancelButtonText: '取消',
     type: 'warning'
   }).then(async () => {
-    const res = await deleteApi(row.ID)
+    const res = await deleteApi(row.id)
     if (res.code === 0) {
       ElMessage.success('删除成功')
       if (tableData.value.length === 1 && page.value > 1) {
@@ -424,7 +424,7 @@ const onDelete = async () => {
     cancelButtonText: '取消',
     type: 'warning'
   }).then(async () => {
-    const ids = apis.value.map((item) => item.ID)
+    const ids = apis.value.map((item) => item.id)
     const res = await deleteApisByIds({ ids })
     if (res.code === 0) {
       ElMessage.success(res.msg)
@@ -513,13 +513,16 @@ const enterSyncDialog = async () => {
     return
   }
   syncing.value = true
-  const res = await enterSyncApi(syncApiData.value)
-  syncing.value = false
-  if (res.code === 0) {
-    ElMessage.success(res.msg)
-    syncApiFlag.value = false
-    await getTableData()
-    await getGroup()
+  try {
+    const res = await enterSyncApi(syncApiData.value)
+    if (res.code === 0) {
+      ElMessage.success(res.msg)
+      syncApiFlag.value = false
+      await getTableData()
+      await getGroup()
+    }
+  } finally {
+    syncing.value = false
   }
 }
 

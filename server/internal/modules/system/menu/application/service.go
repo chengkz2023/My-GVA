@@ -53,6 +53,21 @@ func (s *Service) Tree(ctx context.Context) (TreeResponse, error) {
 	return TreeResponse{Menus: mapMenus(menus)}, nil
 }
 
+// TreeForAuthority 返回指定角色的已分配菜单树（角色菜单分配页回显用）。
+func (s *Service) TreeForAuthority(ctx context.Context, authorityID uint) (TreeResponse, error) {
+	if s.repo == nil {
+		return TreeResponse{Menus: []MenuResponse{}}, nil
+	}
+	menus, err := s.repo.TreeByAuthority(ctx, authorityID)
+	if errors.Is(err, domain.ErrRepositoryUnavailable) {
+		return TreeResponse{Menus: []MenuResponse{}}, nil
+	}
+	if err != nil {
+		return TreeResponse{}, apperrors.New(apperrors.Internal, 0, "list menus failed", err)
+	}
+	return TreeResponse{Menus: mapMenus(menus)}, nil
+}
+
 func (s *Service) AssignAuthority(ctx context.Context, authorityID uint, menuIDs []uint) error {
 	if _, ok := platformauth.ActorFromContext(ctx); !ok {
 		return apperrors.WithMessage(apperrors.Unauthorized, "missing actor")

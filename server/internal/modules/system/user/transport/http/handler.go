@@ -50,6 +50,15 @@ type SetAuthoritiesRequest struct {
 	AuthorityIDs []uint `json:"authorityIds"`
 }
 
+type UpdateUserByAdminRequest struct {
+	NickName     string `json:"nickName"`
+	HeaderImg    string `json:"headerImg"`
+	Phone        string `json:"phone"`
+	Email        string `json:"email"`
+	Enable       int    `json:"enable"`
+	AuthorityIDs []uint `json:"authorityIds"`
+}
+
 type Handler struct {
 	service *application.Service
 }
@@ -65,6 +74,7 @@ func (h *Handler) Register(group *gin.RouterGroup) {
 	userGroup.POST("/password", h.ChangePassword)
 	userGroup.PUT("/profile", h.UpdateProfile)
 	userGroup.POST("", h.Create)
+	userGroup.PUT("/:id", h.UpdateByAdmin)
 	userGroup.DELETE("/:id", h.Delete)
 	userGroup.POST("/:id/reset-password", h.ResetPassword)
 	userGroup.PUT("/:id/authorities", h.SetAuthorities)
@@ -127,6 +137,32 @@ func (h *Handler) UpdateProfile(c *gin.Context) {
 		HeaderImg: req.HeaderImg,
 		Phone:     req.Phone,
 		Email:     req.Email,
+	})
+	if err != nil {
+		response.Error(c, err)
+		return
+	}
+	response.OK(c, result)
+}
+
+func (h *Handler) UpdateByAdmin(c *gin.Context) {
+	id, err := strconv.ParseUint(c.Param("id"), 10, 64)
+	if err != nil {
+		response.Error(c, apperrors.WithMessage(apperrors.Validation, "invalid id"))
+		return
+	}
+	var req UpdateUserByAdminRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		response.Error(c, apperrors.WithMessage(apperrors.Validation, "invalid request body"))
+		return
+	}
+	result, err := h.service.UpdateByAdmin(c.Request.Context(), uint(id), application.AdminUpdateUserCommand{
+		NickName:     req.NickName,
+		HeaderImg:    req.HeaderImg,
+		Phone:        req.Phone,
+		Email:        req.Email,
+		Enable:       req.Enable,
+		AuthorityIDs: req.AuthorityIDs,
 	})
 	if err != nil {
 		response.Error(c, err)

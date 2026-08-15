@@ -7,6 +7,7 @@ export const setUserInfo = (data) => service({ url: '/system/user/profile', meth
 export const setSelfInfo = (data) => service({ url: '/system/user/profile', method: 'put', data })
 export const register = (data) => service({ url: '/system/user', method: 'post', data })
 export const deleteUser = (data) => service({ url: `/system/user/${data.id||data.ID}`, method: 'delete' })
+export const updateUserById = (id, data) => service({ url: `/system/user/${id}`, method: 'put', data })
 export const setUserAuthorities = (data) => service({ url: `/system/user/${data.ID||data.id}/authorities`, method: 'put', data: {authorityIds: data.authorityIds} })
 export const resetPassword = (data) => service({ url: `/system/user/${data.ID||data.id}/reset-password`, method: 'post', data: {password: data.password||data.Password} })
 export const setUserAuthority = (data) => service({ url: `/system/user/${data.id||data.ID}/authorities`, method: 'put', data: {authorityIds: [data.authorityId]} })

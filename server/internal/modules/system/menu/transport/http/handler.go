@@ -4,6 +4,7 @@ import (
 	"strconv"
 
 	"github.com/chengkz2023/My-GVA/server/internal/modules/system/menu/application"
+	apperrors "github.com/chengkz2023/My-GVA/server/internal/platform/errors"
 	"github.com/chengkz2023/My-GVA/server/internal/platform/response"
 	"github.com/gin-gonic/gin"
 )
@@ -28,6 +29,20 @@ func (h *Handler) Register(group *gin.RouterGroup) {
 func (h *Handler) Tree(c *gin.Context) {
 	if c.Query("all") == "true" {
 		tree, err := h.service.All(c.Request.Context())
+		if err != nil {
+			response.Error(c, err)
+			return
+		}
+		response.OK(c, tree)
+		return
+	}
+	if authorityIDStr := c.Query("authorityId"); authorityIDStr != "" {
+		id, err := strconv.ParseUint(authorityIDStr, 10, 64)
+		if err != nil {
+			response.Error(c, apperrors.WithMessage(apperrors.Validation, "invalid authorityId"))
+			return
+		}
+		tree, err := h.service.TreeForAuthority(c.Request.Context(), uint(id))
 		if err != nil {
 			response.Error(c, err)
 			return

@@ -161,6 +161,77 @@ func (s *Service) UpdateProfile(ctx context.Context, cmd UpdateProfileCommand) (
 	return UpdateProfileResponse{User: userFromDomain(user)}, nil
 }
 
+// UpdateByAdmin 管理员更新目标用户的资料/状态/角色（与 profile 自改不同，作用于指定用户）。
+func (s *Service) UpdateByAdmin(ctx context.Context, userID uint, cmd AdminUpdateUserCommand) (UpdateProfileResponse, error) {
+	actor, ok := platformauth.ActorFromContext(ctx)
+	if !ok {
+		return UpdateProfileResponse{}, apperrors.WithMessage(apperrors.Unauthorized, "missing actor")
+	}
+	if userID == 0 {
+		return UpdateProfileResponse{}, apperrors.WithMessage(apperrors.Validation, "user id is required")
+	}
+	if s.repo == nil {
+		return UpdateProfileResponse{}, apperrors.WithMessage(apperrors.Internal, "user repository unavailable")
+	}
+
+	target, err := s.repo.FindByID(ctx, userID)
+	if errors.Is(err, domain.ErrUserNotFound) {
+		return UpdateProfileResponse{}, apperrors.WithMessage(apperrors.NotFound, "user not found")
+	}
+	if errors.Is(err, domain.ErrRepositoryUnavailable) {
+		return UpdateProfileResponse{}, apperrors.WithMessage(apperrors.Internal, "user repository unavailable")
+	}
+	if err != nil {
+		return UpdateProfileResponse{}, apperrors.New(apperrors.Internal, 0, "load target user failed", err)
+	}
+	if err := s.checkAuthorityScope(ctx, actor.AuthorityID, target.AuthorityID); err != nil {
+		return UpdateProfileResponse{}, err
+	}
+
+	enable := cmd.Enable
+	if enable == 0 {
+		enable = target.Enable
+	}
+	if err := s.repo.UpdateByAdmin(ctx, userID, domain.AdminUpdateInput{
+		NickName:  cmd.NickName,
+		HeaderImg: cmd.HeaderImg,
+		Phone:     cmd.Phone,
+		Email:     cmd.Email,
+		Enable:    enable,
+	}); err != nil {
+		if errors.Is(err, domain.ErrRepositoryUnavailable) {
+			return UpdateProfileResponse{}, apperrors.WithMessage(apperrors.Internal, "user repository unavailable")
+		}
+		if errors.Is(err, domain.ErrUserNotFound) {
+			return UpdateProfileResponse{}, apperrors.WithMessage(apperrors.NotFound, "user not found")
+		}
+		return UpdateProfileResponse{}, apperrors.New(apperrors.Internal, 0, "update user failed", err)
+	}
+
+	if len(cmd.AuthorityIDs) > 0 {
+		for _, id := range cmd.AuthorityIDs {
+			if err := s.checkAuthorityScope(ctx, actor.AuthorityID, id); err != nil {
+				return UpdateProfileResponse{}, err
+			}
+		}
+		if err := s.repo.SetAuthorities(ctx, domain.SetAuthoritiesInput{UserID: userID, AuthorityIDs: cmd.AuthorityIDs}); err != nil {
+			if errors.Is(err, domain.ErrRepositoryUnavailable) {
+				return UpdateProfileResponse{}, apperrors.WithMessage(apperrors.Internal, "user repository unavailable")
+			}
+			if errors.Is(err, domain.ErrUserNotFound) {
+				return UpdateProfileResponse{}, apperrors.WithMessage(apperrors.NotFound, "user not found")
+			}
+			return UpdateProfileResponse{}, apperrors.New(apperrors.Internal, 0, "set user authorities failed", err)
+		}
+	}
+
+	user, err := s.repo.FindByID(ctx, userID)
+	if err != nil {
+		return UpdateProfileResponse{}, apperrors.New(apperrors.Internal, 0, "refresh user after update failed", err)
+	}
+	return UpdateProfileResponse{User: userFromDomain(user)}, nil
+}
+
 func emptyList(page pagination.Page) ListUsersResponse {
 	return ListUsersResponse{
 		List:     []SourceUser{},

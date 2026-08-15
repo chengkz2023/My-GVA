@@ -255,13 +255,14 @@
     getUserList,
     setUserAuthorities,
     register,
-    deleteUser
+    deleteUser,
+    updateUserById,
+    resetPassword
   } from '@/api/user'
 
   import { getAuthorityList } from '@/api/authority'
   import CustomPic from '@/components/customPic/index.vue'
   import WarningBar from '@/components/warningBar/warningBar.vue'
-  import { setUserInfo, resetPassword } from '@/api/user.js'
 
   import { nextTick, ref, watch } from 'vue'
   import { ElMessage, ElMessageBox } from 'element-plus'
@@ -523,7 +524,15 @@
           }
         }
         if (dialogFlag.value === 'edit') {
-          const res = await setUserInfo(req)
+          // 管理员编辑目标用户：走 PUT /system/user/:id（profile 接口改的是当前登录者自己）
+          const res = await updateUserById(userInfo.value.ID, {
+            nickName: userInfo.value.nickName,
+            headerImg: userInfo.value.headerImg,
+            phone: userInfo.value.phone,
+            email: userInfo.value.email,
+            enable: userInfo.value.enable,
+            authorityIds: userInfo.value.authorityIds
+          })
           if (res.code === 0) {
             ElMessage({ type: 'success', message: '编辑成功' })
             await getTableData()
@@ -581,20 +590,23 @@
   }
 
   const switchEnable = async (row) => {
-    userInfo.value = JSON.parse(JSON.stringify(row))
-    await nextTick()
-    const req = {
-      ...userInfo.value
-    }
-    const res = await setUserInfo(req)
+    const res = await updateUserById(row.ID, {
+      nickName: row.nickName,
+      headerImg: row.headerImg,
+      phone: row.phone,
+      email: row.email,
+      enable: row.enable,
+      authorityIds: row.authorityIds
+    })
     if (res.code === 0) {
       ElMessage({
         type: 'success',
-        message: `${req.enable === 2 ? '禁用' : '启用'}成功`
+        message: `${row.enable === 2 ? '禁用' : '启用'}成功`
       })
       await getTableData()
-      userInfo.value.headerImg = ''
-      userInfo.value.authorityIds = []
+    } else {
+      // 失败回滚开关状态
+      row.enable = row.enable === 1 ? 2 : 1
     }
   }
 </script>

@@ -32,6 +32,15 @@ type UpdateProfileCommand struct {
 	Email     string
 }
 
+type AdminUpdateUserCommand struct {
+	NickName     string
+	HeaderImg    string
+	Phone        string
+	Email        string
+	Enable       int
+	AuthorityIDs []uint
+}
+
 type UpdateProfileResponse struct {
 	User SourceUser `json:"user"`
 }

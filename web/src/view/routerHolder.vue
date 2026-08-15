@@ -4,9 +4,7 @@
     <router-view v-slot="{ Component }">
       <transition mode="out-in" name="el-fade-in-linear">
         <keep-alive :include="routerStore.keepAliveRouters">
-          <div>
-            <component :is="Component" />
-          </div>
+          <component :is="Component" />
         </keep-alive>
       </transition>
     </router-view>

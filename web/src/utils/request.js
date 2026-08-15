@@ -12,6 +12,7 @@ let timer
 let loadingInstance
 let isLoadingVisible = false
 let forceCloseTimer
+let redirectingToLogin = false
 
 const showLoading = (
   option = {
@@ -172,15 +173,20 @@ service.interceptors.response.use(
 
     // HTTP 状态码错误
     if (error.response.status === 401) {
-      emitter.emit('show-error', {
-        code: '401',
-        message: getErrorMessage(error),
-        fn: () => {
-          const userStore = useUserStore()
-          userStore.ClearStorage()
-          router.push({ name: 'Login', replace: true })
-        }
+      const userStore = useUserStore()
+      userStore.ClearStorage()
+      ElMessage({
+        showClose: true,
+        message: getErrorMessage(error) || '登录已过期，请重新登录',
+        type: 'error'
       })
+      // 直接跳登录，不再依赖错误弹窗的“确认”回调；用标志去重，避免并发 401 重复跳转
+      if (!redirectingToLogin && router.currentRoute.value.name !== 'Login') {
+        redirectingToLogin = true
+        router.push({ name: 'Login', replace: true }).finally(() => {
+          redirectingToLogin = false
+        })
+      }
       return Promise.reject(error)
     }
 

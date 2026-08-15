@@ -1,7 +1,6 @@
 <template>
   <div class="h-screen w-screen bg-gray-50 text-slate-700 dark:bg-slate-800 dark:text-slate-500">
     <iframe
-      v-if="reloadFlag"
       id="gva-base-load-dom"
       class="gva-body-h w-full border-t border-gray-200 bg-gray-50 dark:border-slate-700 dark:bg-slate-800"
       :src="url"
@@ -10,13 +9,10 @@
 </template>
 
 <script setup>
-import { ref, onMounted, nextTick, reactive, watchEffect } from 'vue'
-import { useRouter, useRoute } from 'vue-router'
-import { storeToRefs } from 'pinia'
-import { emitter } from '@/utils/bus.js'
+import { onMounted } from 'vue'
+import { useRoute } from 'vue-router'
 import useResponsive from '@/hooks/responsive'
 import { useUserStore } from '@/pinia/modules/user'
-import { useAppStore } from '@/pinia'
 
 defineOptions({
   name: 'GvaLayoutIframe'
@@ -24,45 +20,23 @@ defineOptions({
 
 useResponsive(true)
 
-const appStore = useAppStore()
-const { isDark } = storeToRefs(appStore)
 const userStore = useUserStore()
-const router = useRouter()
 const route = useRoute()
 
-const font = reactive({
-  color: 'rgba(0, 0, 0, .15)'
-})
+// 只允许 http(s) 绝对地址，防止菜单数据注入 javascript:/data: 协议在 iframe 内执行脚本
+function safeIframeUrl(raw) {
+  const val = String(raw || '')
+  if (/^https?:\/\//i.test(val)) {
+    return val
+  }
+  return 'about:blank'
+}
 
-watchEffect(() => {
-  font.color = isDark.value ? 'rgba(255,255,255, .15)' : 'rgba(0, 0, 0, .15)'
-})
-
-const url = route.query.url || 'about:blank'
+const url = safeIframeUrl(route.query.url)
 
 onMounted(() => {
-  emitter.on('reload', reload)
   if (userStore.loadingInstance) {
     userStore.loadingInstance.close()
   }
 })
-
-const reloadFlag = ref(true)
-let reloadTimer = null
-
-const reload = async () => {
-  if (reloadTimer) {
-    window.clearTimeout(reloadTimer)
-  }
-  reloadTimer = window.setTimeout(async () => {
-    if (route.meta.keepAlive) {
-      reloadFlag.value = false
-      await nextTick()
-      reloadFlag.value = true
-    } else {
-      const title = route.meta.title
-      router.push({ name: 'Reload', params: { title } })
-    }
-  }, 400)
-}
 </script>

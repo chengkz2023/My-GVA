@@ -31,7 +31,7 @@
 <script setup>
   import { ref } from 'vue'
   import { ElMessage } from 'element-plus'
-  import { setDataAuthority } from '@/api/authority'
+  import { setDataAuthority, getAuthorityInfo } from '@/api/authority'
   import WarningBar from '@/components/warningBar/warningBar.vue'
 
   defineOptions({
@@ -67,11 +67,12 @@
     })
   }
 
-  const init = () => {
+  const init = async () => {
     roundAuthority(props.authority)
-    const authIds = props.row.dataAuthorityIds || props.row.dataAuthorityId || []
-    authIds.forEach((item) => {
-      const authId = typeof item === 'object' ? item.authorityId : item
+    // 回显：GET /system/role/:id 返回 dataAuthorityIds（[]uint）
+    const res = await getAuthorityInfo({ authorityId: props.row.authorityId })
+    const authIds = res.code === 0 ? res.data.dataAuthorityIds || [] : []
+    authIds.forEach((authId) => {
       const target = authoritys.value.find(
         (authority) => authority.authorityId === authId
       )
@@ -119,9 +120,16 @@
   }
 
   const authDataEnter = async () => {
-    const res = await setDataAuthority(props.row)
+    // 后端期望 { authorityId, dataAuthorityIds: []uint }
+    const res = await setDataAuthority({
+      authorityId: props.row.authorityId,
+      dataAuthorityIds: dataAuthorityId.value
+        .filter(Boolean)
+        .map((item) => item.authorityId)
+    })
     if (res.code === 0) {
       ElMessage({ type: 'success', message: '数据权限设置成功' })
+      needConfirm.value = false
     }
   }
 

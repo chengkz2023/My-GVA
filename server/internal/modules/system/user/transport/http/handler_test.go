@@ -201,6 +201,10 @@ func (r *fakeRepository) UpdateProfile(ctx context.Context, id uint, profile dom
 	}, nil
 }
 
+func (r *fakeRepository) UpdateByAdmin(ctx context.Context, id uint, patch domain.AdminUpdateInput) error {
+	return nil
+}
+
 func (r *fakeRepository) Create(ctx context.Context, input domain.CreateUserInput) (domain.User, error) {
 	return domain.User{ID: 2, UUID: "new", Username: input.Username, Enable: 1}, nil
 }

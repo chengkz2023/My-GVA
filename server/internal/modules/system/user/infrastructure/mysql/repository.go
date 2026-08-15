@@ -147,6 +147,27 @@ func (r *Repository) UpdateProfile(ctx context.Context, id uint, profile domain.
 	return r.FindByID(ctx, id)
 }
 
+func (r *Repository) UpdateByAdmin(ctx context.Context, id uint, patch domain.AdminUpdateInput) error {
+	if r == nil || r.db == nil {
+		return domain.ErrRepositoryUnavailable
+	}
+	result := r.db.WithContext(ctx).Model(&platformdb.SysUser{}).Where("id = ?", id).Updates(map[string]any{
+		"updated_at": time.Now(),
+		"nick_name":  patch.NickName,
+		"header_img": patch.HeaderImg,
+		"phone":      patch.Phone,
+		"email":      patch.Email,
+		"enable":     patch.Enable,
+	})
+	if result.Error != nil {
+		return result.Error
+	}
+	if result.RowsAffected == 0 {
+		return domain.ErrUserNotFound
+	}
+	return nil
+}
+
 func (r *Repository) Create(ctx context.Context, input domain.CreateUserInput) (domain.User, error) {
 	if r == nil || r.db == nil {
 		return domain.User{}, domain.ErrRepositoryUnavailable
