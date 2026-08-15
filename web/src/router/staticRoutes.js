@@ -15,9 +15,7 @@ const staticMenus = [
       { path: 'menu', name: 'menu', meta: { title: '菜单管理', icon: 'tickets', keepAlive: true }, component: 'view/superAdmin/menu/menu.vue' },
       { path: 'api', name: 'api', meta: { title: 'API管理', icon: 'platform', keepAlive: true }, component: 'view/superAdmin/api/api.vue' },
       { path: 'user', name: 'user', meta: { title: '用户管理', icon: 'coordinate' }, component: 'view/superAdmin/user/user.vue' },
-      { path: 'dictionary', name: 'dictionary', meta: { title: '字典管理', icon: 'notebook' }, component: 'view/superAdmin/dictionary/sysDictionary.vue' },
-      { path: 'operation', name: 'operation', meta: { title: '操作历史', icon: 'pie-chart' }, component: 'view/superAdmin/operation/sysOperationRecord.vue' },
-      { path: 'sysParams', name: 'sysParams', meta: { title: '参数管理', icon: 'compass' }, component: 'view/superAdmin/params/sysParams.vue' }
+      { path: 'operation', name: 'operation', meta: { title: '操作历史', icon: 'pie-chart' }, component: 'view/superAdmin/operation/sysOperationRecord.vue' }
     ]
   }
 ]

@@ -1,5 +1,4 @@
-import { login, getUserInfo } from '@/api/user'
-import { jsonInBlacklist } from '@/api/jwt'
+import { login, getUserInfo, logout } from '@/api/user'
 import router from '@/router/index'
 import { ElLoading, ElMessage } from 'element-plus'
 import { defineStore } from 'pinia'
@@ -133,8 +132,11 @@ export const useUserStore = defineStore('user', () => {
   /* 登出 */
   const LoginOut = async () => {
     if (!config.useMockLogin) {
-      const res = await jsonInBlacklist()
-      if (res.code !== 0) return
+      try {
+        await logout()
+      } catch (error) {
+        console.error('logout error:', error)
+      }
     }
     await ClearStorage()
     router.push({ name: 'Login', replace: true })

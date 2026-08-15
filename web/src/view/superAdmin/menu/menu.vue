@@ -521,7 +521,6 @@
   } from '@/api/menu'
   import icon from '@/view/superAdmin/menu/icon.vue'
   import WarningBar from '@/components/warningBar/warningBar.vue'
-  import { canRemoveAuthorityBtnApi } from '@/api/authorityBtn'
   import { reactive, ref } from 'vue'
   import { ElMessage, ElMessageBox } from 'element-plus'
   import { QuestionFilled, InfoFilled, Delete } from '@element-plus/icons-vue'
@@ -589,17 +588,9 @@
       desc: ''
     })
   }
-  // 删除可控按钮
+  // 删除可控按钮（后端无按钮级授权接口，仅从表单中移除）
   const deleteBtn = async (btns, index) => {
-    const btn = btns[index]
-    if (btn.ID === 0) {
-      btns.splice(index, 1)
-      return
-    }
-    const res = await canRemoveAuthorityBtnApi({ id: btn.ID })
-    if (res.code === 0) {
-      btns.splice(index, 1)
-    }
+    btns.splice(index, 1)
   }
 
   const form = ref({

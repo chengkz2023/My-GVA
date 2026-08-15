@@ -1,5 +1,4 @@
 import { formatTimeToStr } from '@/utils/date'
-import { getDict } from '@/utils/dictionary'
 import { ref } from 'vue'
 
 export const formatBoolean = (bool) => {
@@ -71,11 +70,6 @@ export const filterDataSource = (dataSource, value) => {
   
   const rowLabel = findInDataSource(dataSource, value)
   return rowLabel?.label
-}
-
-export const getDictFunc = async (type) => {
-  const dicts = await getDict(type)
-  return dicts
 }
 
 const path =

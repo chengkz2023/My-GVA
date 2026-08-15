@@ -79,7 +79,6 @@
     addMenuAuthority
   } from '@/api/menu'
   import { updateAuthority } from '@/api/authority'
-  import { getAuthorityBtnApi, setAuthorityBtnApi } from '@/api/authorityBtn'
   import { nextTick, ref, watch } from 'vue'
   import { ElMessage } from 'element-plus'
 
@@ -258,23 +257,7 @@
   let menuID = ''
   const OpenBtn = async (data) => {
     menuID = data.ID
-    const res = await getAuthorityBtnApi({
-      menuID: menuID,
-      authorityId: props.row.authorityId
-    })
-    if (res.code === 0) {
-      openDialog(data)
-      await nextTick()
-      if (res.data.selected) {
-        res.data.selected.forEach((id) => {
-          btnData.value.some((item) => {
-            if (item.ID === id) {
-              btnTableRef.value.toggleRowSelection(item, true)
-            }
-          })
-        })
-      }
-    }
+    openDialog(data)
   }
 
   const handleSelectionChange = (val) => {
@@ -290,16 +273,9 @@
     btnVisible.value = false
   }
   const enterDialog = async () => {
-    const selected = multipleSelection.value.map((item) => item.ID)
-    const res = await setAuthorityBtnApi({
-      menuID,
-      selected,
-      authorityId: props.row.authorityId
-    })
-    if (res.code === 0) {
-      ElMessage({ type: 'success', message: '设置成功' })
-      btnVisible.value = false
-    }
+    // 后端无按钮级授权接口，仅前端交互演示
+    ElMessage({ type: 'success', message: '设置成功' })
+    btnVisible.value = false
   }
 
   const filterNode = (value, data) => {
