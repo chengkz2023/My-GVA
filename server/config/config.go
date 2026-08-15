@@ -7,6 +7,5 @@ type Server struct {
 	System  System  `mapstructure:"system" json:"system" yaml:"system"`
 	Captcha Captcha `mapstructure:"captcha" json:"captcha" yaml:"captcha"`
 	Mysql   Mysql   `mapstructure:"mysql" json:"mysql" yaml:"mysql"`
-	Local   Local   `mapstructure:"local" json:"local" yaml:"local"`
 	Cors    CORS    `mapstructure:"cors" json:"cors" yaml:"cors"`
 }

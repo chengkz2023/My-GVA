@@ -34,11 +34,11 @@ server/
 │   │   └── middleware/              # jwt, casbin_rbac, error
 │   ├── modules/
 │   │   ├── system/                  # auth, user, role, menu, api, operation-record, config, status, version
-│   │   └── business/                # file, example
+│   │   └── business/                # example（开发示例模块，非真实业务）
 │   ├── platform/                    # 共享包（不导入 modules）
 │   │   ├── auth/                    # Actor, Claims, JWT, Token, Password（零全局依赖）
 │   │   ├── authz/                   # Authorizer + PolicyProvider + PolicySyncer + AuthorityChecker 接口
-│   │   ├── authz/casbin/            # Casbin 实现
+│   │   ├── authz/casbin/            # Casbin 实现（构造注入）
 │   │   ├── buildinfo/               # 构建元信息
 │   │   ├── config/                  # 基于 Viper 的配置加载
 │   │   ├── database/                # GORM 数据库连接
@@ -46,10 +46,9 @@ server/
 │   │   ├── logger/                  # Zap 日志器
 │   │   ├── pagination/              # 泛型分页
 │   │   ├── response/                # 统一响应（code/msg/message/data）
-│   │   ├── timer/                   # 定时任务调度（cron）
-│   │   └── transaction/             # 事务管理器
+│   │   └── timer/                   # 定时任务调度（cron）
 │   └── architecture_test.go         # 6 条架构边界规则
-├── config/                          # 配置结构体定义（system, jwt, redis, gorm-mysql, zap, cors, captcha, oss-local）
+├── config/                          # 配置结构体定义（system, jwt, redis, gorm-mysql, zap, cors, captcha）
 ├── configs/                         # YAML 配置文件（config.debug.yaml, config.example.yaml）
 ├── migrations/mysql/                # SQL 迁移文件（含 README）
 ├── Dockerfile
@@ -63,7 +62,7 @@ server/
 - `POST /api/login` — 登录认证
 - `POST /api/base/captcha` — 图形验证码
 - 其余端点均在 `/api/` 路径下，由 JWT + Casbin 中间件保护
-- 无需鉴权的公开端点：`health`、`login`、`captcha`、`config/info`、`status/info`、`version/info`、`example/info`
+- 无需鉴权的公开端点：`health`、`login`、`captcha`、`version/info`、`example/greetings`
 
 ### 模块结构
 
@@ -78,7 +77,7 @@ module/
 ├── transport/http/      # Gin handler + 测试
 └── module.go            # 组装（NewModule → repo → service → handler）
 ```
-适用模块：`business/file`、`system/user`、`system/role`、`system/menu`、`system/api`、`system/operation-record`
+适用模块：`business/example`（内存仓储，开发示例）、`system/user`、`system/role`、`system/menu`、`system/api`、`system/operation-record`
 
 **轻量级**（扁平结构）：
 ```
@@ -86,9 +85,9 @@ module/
 ├── handler.go / service.go / repository.go / model.go / dto.go / module.go
 └── handler_test.go
 ```
-适用模块：`business/example`、`system/auth`、`system/config`、`system/status`、`system/version`
+适用模块：`system/auth`、`system/config`、`system/status`、`system/version`
 
-## 全部端点（52 个）
+## 全部端点（50 个）
 
 ### 公开端点
 
@@ -97,17 +96,17 @@ module/
 | — | GET | `/api/health` | 否 |
 | auth | POST | `/api/login` | 否 |
 | auth | POST | `/api/base/captcha` | 否 |
-| config | GET | `/api/system/config/info` | 否 |
-| status | GET | `/api/system/status/info` | 否 |
 | version | GET | `/api/system/version/info` | 否 |
-| example | GET | `/api/example/info` | 否 |
-| example | GET | `/api/example/missing` | 否 |
+| example | GET | `/api/example/greetings` | 否 |
+| example | GET | `/api/example/greetings/:id` | 否 |
+| example | POST | `/api/example/greetings` | 否 |
 
 ### 系统模块（需鉴权）
 
 | 模块 | 方法 | 路径 | 鉴权 |
 |------|------|------|------|
 | auth | GET | `/api/system/auth/me` | 是 |
+| auth | POST | `/api/system/auth/logout` | 是 |
 | user | GET | `/api/system/user/me` | 是 |
 | user | GET | `/api/system/user/list` | 是 |
 | user | POST | `/api/system/user/password` | 是 |
@@ -147,29 +146,27 @@ module/
 | operation-record | GET | `/api/system/operation-record/:id` | 是 |
 | operation-record | DELETE | `/api/system/operation-record/:id` | 是 |
 | operation-record | POST | `/api/system/operation-record/batch-delete` | 是 |
+| config | GET | `/api/system/config/info` | 是 |
+| status | GET | `/api/system/status/info` | 是 |
 
 ### 业务模块
 
-| 模块 | 方法 | 路径 | 鉴权 |
-|------|------|------|------|
-| file | POST | `/api/file/upload` | 是 |
-| file | GET | `/api/file/list` | 是 |
-| file | PUT | `/api/file/:id` | 是 |
-| file | DELETE | `/api/file/:id` | 是 |
+`business/example` 为开发示例模块（非真实业务，见 `server/internal/modules/business/example/README.md`），其端点为公开端点：`/api/example/greetings`（GET/POST）与 `/api/example/greetings/:id`（GET）。
 
 ## 中间件状态
 
-现有 3 个中间件，全部参数化、零 `global` 依赖：
+现有 4 个中间件，全部参数化、零 `global` 依赖：
 
 - `jwt.go` — `JWTAuthWithConfig(JWTConfig{ExpiresTime, BufferTime, SigningKey, BlacklistCheck})`
-- `casbin_rbac.go` — `CasbinHandler()` / `CasbinHandlerWithPrefix(prefix)`
+- `casbin_rbac.go` — `CasbinHandlerWithPrefix(enforcer, prefix)`（enforcer 由构造注入）
 - `error.go` — `GinRecovery(log, stack)`
+- `operation.go` — `OperationRecord(db, log)`（写操作审计入库）
 
-已移除的旧中间件：`cors.go`、`operation.go`、`limit_ip.go`（对应能力已由 platform 层或启动编排接管）。
+已移除的旧中间件：`cors.go`、`limit_ip.go`（对应能力已由 platform 层或启动编排接管）。
 
 ## 已删除
 
-旧架构目录已全部移除：`api/`、`router/`、`service/`、`source/`、`core/`、`initialize/`、`model/`、`global/`、`cmd/migrate`、`internal/app/migration/`、`utils/`、`internal/platform/validator/`、`task/`
+旧架构目录已全部移除：`api/`、`router/`、`service/`、`source/`、`core/`、`initialize/`、`model/`、`global/`、`cmd/migrate`、`internal/app/migration/`、`utils/`、`internal/platform/validator/`、`task/`、`internal/platform/transaction/`、`internal/modules/business/file/`、`config/oss_local.go`（Local 文件存储配置）
 
 ## 剩余工作（低优先级）
 

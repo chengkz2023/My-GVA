@@ -96,7 +96,7 @@ internal/modules/{domain}/{module}/
 | Repository | 接口在 domain，实现在 infrastructure | 接口 + 实现在同一文件 |
 | 数据库访问 | GORM，通过 infra/mysql | 通常无 DB，或直接拿 `*gorm.DB` |
 | 适用场景 | CRUD 业务模块 | 公开接口、状态查询 |
-| 示例 | user, menu, role, api, file | auth, config, status, version |
+| 示例 | user, menu, role, api, business/example | auth, config, status, version |
 
 **选择建议：** 新业务模块默认选择完整 DDD 风格。只在确实不需要持久化、逻辑少于 3 个方法时考虑轻量风格。
 

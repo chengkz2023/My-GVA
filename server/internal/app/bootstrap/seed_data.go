@@ -167,8 +167,6 @@ func seedAPIs(db *gorm.DB, log *zap.Logger) {
 		{Path: "/system/api/batch-sync", Description: "批量同步API", ApiGroup: "api", Method: "POST"},
 		{Path: "/system/operation-record/list", Description: "操作记录列表", ApiGroup: "operation-record", Method: "GET"},
 		{Path: "/system/operation-record/batch-delete", Description: "批量删除", ApiGroup: "operation-record", Method: "POST"},
-		{Path: "/file/upload", Description: "文件上传", ApiGroup: "file", Method: "POST"},
-		{Path: "/file/list", Description: "文件列表", ApiGroup: "file", Method: "GET"},
 		{Path: "/system/config/info", Description: "系统配置", ApiGroup: "config", Method: "GET"},
 		{Path: "/system/status/info", Description: "服务状态", ApiGroup: "status", Method: "GET"},
 		{Path: "/system/version/info", Description: "版本信息", ApiGroup: "version", Method: "GET"},

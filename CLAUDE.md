@@ -15,11 +15,11 @@ server/                          # Go 1.24+ 后端
 │   │   ├── bootstrap/           # 启动编排 (app, db, http, router, seed, timer)
 │   │   ├── container/           # DI 容器
 │   │   └── scaffold/            # 模块生成器引擎
-│   ├── interfaces/http/         # HTTP 路由 + 中间件 (jwt, casbin_rbac, error)
+│   ├── interfaces/http/         # HTTP 路由 + 中间件 (jwt, casbin_rbac, error, operation)
 │   ├── modules/
 │   │   ├── system/              # 系统模块 (api, auth, config, menu, operation-record, role, status, user, version)
-│   │   └── business/            # 业务模块 (example, file)
-│   └── platform/                # 平台共享层 (auth, authz/casbin, buildinfo, config, database, errors, logger, pagination, response, timer, transaction)
+│   │   └── business/            # 业务模块 (example — 开发示例，非真实业务)
+│   └── platform/                # 平台共享层 (auth, authz/casbin, buildinfo, config, database, errors, logger, pagination, response, timer)
 └── migrations/mysql/            # SQL 迁移文件
 
 web/                             # Vue3 + Element-Plus 前端

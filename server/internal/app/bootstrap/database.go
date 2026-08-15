@@ -3,7 +3,6 @@ package bootstrap
 import (
 	adapter "github.com/casbin/gorm-adapter/v3"
 	apimysql "github.com/chengkz2023/My-GVA/server/internal/modules/system/api/infrastructure/mysql"
-	filemysql "github.com/chengkz2023/My-GVA/server/internal/modules/business/file/infrastructure/mysql"
 	platformdb "github.com/chengkz2023/My-GVA/server/internal/platform/database"
 	"go.uber.org/zap"
 	"gorm.io/gorm"
@@ -26,8 +25,6 @@ func RegisterTables(db *gorm.DB, log *zap.Logger, disableAutoMigrate bool) {
 		platformdb.SysAuthorityBtn{},
 		adapter.CasbinRule{},
 		platformdb.JwtBlacklist{},
-
-		filemysql.ExaFileUploadAndDownload{},
 	}
 	for _, t := range tables {
 		if err := db.AutoMigrate(t); err != nil {

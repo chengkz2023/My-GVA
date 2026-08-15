@@ -3,7 +3,6 @@
 # 1. Basic runtime
 # 2. Security
 # 3. Data storage
-# 4. File storage
 # -----------------------------------------------------------------------------
 
 system:
@@ -65,10 +64,6 @@ redis:
   db: 0
   useCluster: false
   clusterAddrs: []
-
-local:
-  path: uploads/file
-  store-path: uploads/file
 
 # clickhouse:
 #   addr: 127.0.0.1:9000

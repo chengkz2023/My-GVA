@@ -7,7 +7,6 @@ type Snapshot struct {
 	Redis   RedisSnapshot   `json:"redis"`
 	Zap     ZapSnapshot     `json:"zap"`
 	CORS    CORSSnapshot    `json:"cors"`
-	Local   LocalSnapshot   `json:"local"`
 	Captcha CaptchaSnapshot `json:"captcha"`
 }
 
@@ -68,11 +67,6 @@ type ZapSnapshot struct {
 type CORSSnapshot struct {
 	Mode           string `json:"mode"`
 	WhitelistCount int    `json:"whitelistCount"`
-}
-
-type LocalSnapshot struct {
-	Path      string `json:"path"`
-	StorePath string `json:"storePath"`
 }
 
 type CaptchaSnapshot struct {
@@ -137,10 +131,6 @@ func SafeSnapshot(cfg Config) Snapshot {
 		CORS: CORSSnapshot{
 			Mode:           cfg.Cors.Mode,
 			WhitelistCount: len(cfg.Cors.Whitelist),
-		},
-		Local: LocalSnapshot{
-			Path:      cfg.Local.Path,
-			StorePath: cfg.Local.StorePath,
 		},
 		Captcha: CaptchaSnapshot{
 			KeyLong:            cfg.Captcha.KeyLong,
