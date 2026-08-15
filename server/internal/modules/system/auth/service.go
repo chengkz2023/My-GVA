@@ -26,26 +26,39 @@ func (s *Service) Me(ctx context.Context) (MeResponse, error) {
 		return MeResponse{}, apperrors.WithMessage(apperrors.Unauthorized, "missing actor")
 	}
 	ui := UserInfoResponse{
-		ID:       actor.UserID,
-		NickName: actor.NickName,
+		ID:          actor.UserID,
+		NickName:    actor.NickName,
+		AuthorityId: actor.AuthorityID,
 		Authority: AuthorityInfo{
+			AuthorityId:   actor.AuthorityID,
 			DefaultRouter: "authority",
 		},
-		Authorities: []any{},
+		Authorities: []AuthorityInfo{},
 	}
 	if s.db != nil {
 		var user platformdb.SysUser
 		if err := s.db.WithContext(ctx).
 			Preload("Authority").
+			Preload("Authorities").
 			Where("id = ?", actor.UserID).
 			First(&user).Error; err == nil {
 			ui.ID = user.ID
 			ui.UUID = user.UUID.String()
 			ui.NickName = user.NickName
 			ui.HeaderImg = user.HeaderImg
+			ui.AuthorityId = user.AuthorityId
+			ui.Authority.AuthorityId = user.Authority.AuthorityId
+			ui.Authority.AuthorityName = user.Authority.AuthorityName
 			ui.Authority.DefaultRouter = user.Authority.DefaultRouter
 			if ui.Authority.DefaultRouter == "" {
 				ui.Authority.DefaultRouter = "authority"
+			}
+			for _, a := range user.Authorities {
+				ui.Authorities = append(ui.Authorities, AuthorityInfo{
+					AuthorityId:   a.AuthorityId,
+					AuthorityName: a.AuthorityName,
+					DefaultRouter: a.DefaultRouter,
+				})
 			}
 			if user.OriginSetting != nil {
 				originSetting := map[string]any{}

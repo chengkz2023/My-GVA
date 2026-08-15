@@ -5,16 +5,19 @@ type MeResponse struct {
 }
 
 type UserInfoResponse struct {
-	ID            uint           `json:"ID"`
-	UUID          string         `json:"uuid"`
-	NickName      string         `json:"nickName"`
-	HeaderImg     string         `json:"headerImg"`
-	Authority     AuthorityInfo  `json:"authority"`
-	Authorities   []any          `json:"authorities"`
-	OriginSetting map[string]any `json:"originSetting,omitempty"`
+	ID            uint            `json:"ID"`
+	UUID          string          `json:"uuid"`
+	NickName      string          `json:"nickName"`
+	HeaderImg     string          `json:"headerImg"`
+	AuthorityId   uint            `json:"authorityId"`
+	Authority     AuthorityInfo   `json:"authority"`
+	Authorities   []AuthorityInfo `json:"authorities"`
+	OriginSetting map[string]any  `json:"originSetting,omitempty"`
 }
 
 type AuthorityInfo struct {
+	AuthorityId   uint   `json:"authorityId"`
+	AuthorityName string `json:"authorityName"`
 	DefaultRouter string `json:"defaultRouter"`
 }
 
