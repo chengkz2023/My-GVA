@@ -35,7 +35,8 @@ func (r *Repository) Tree(ctx context.Context, authorityID uint, strict bool) ([
 			query = query.Where("parent_id = ?", authorityID)
 		}
 	} else {
-		query = query.Where("parent_id = ?", 0)
+		// 根角色的 parent_id 可能是 NULL（种子数据），也可能显式为 0，两者都要算作根
+		query = query.Where("parent_id = ? OR parent_id IS NULL", 0)
 	}
 
 	var authorities []platformdb.SysAuthority

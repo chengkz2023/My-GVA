@@ -363,7 +363,7 @@
   const initPage = async () => {
     getTableData()
     const res = await getAuthorityList()
-    setOptions(res.data)
+    setOptions(res.data?.list || [])
   }
 
   initPage()

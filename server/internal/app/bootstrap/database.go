@@ -16,6 +16,7 @@ func RegisterTables(db *gorm.DB, log *zap.Logger, disableAutoMigrate bool) {
 
 	tables := []interface{}{
 		apimysql.SysApi{},
+		apimysql.SysIgnoreApi{},
 		platformdb.SysUser{},
 		platformdb.SysBaseMenu{},
 		platformdb.SysAuthority{},
