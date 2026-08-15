@@ -36,7 +36,7 @@ func (r *Repository) FindByID(ctx context.Context, id uint) (domain.User, error)
 		"phone",
 		"email",
 		"enable",
-	).First(&user, id).Error
+	).Preload("Authorities").First(&user, id).Error
 	if errors.Is(err, gorm.ErrRecordNotFound) {
 		return domain.User{}, domain.ErrUserNotFound
 	}
@@ -86,7 +86,7 @@ func (r *Repository) List(ctx context.Context, query domain.ListQuery) (paginati
 		"phone",
 		"email",
 		"enable",
-	).Limit(page.Limit()).Offset(page.Offset()).Order("id desc").Find(&users).Error
+	).Preload("Authorities").Limit(page.Limit()).Offset(page.Offset()).Order("id desc").Find(&users).Error
 	if err != nil {
 		return pagination.Result[domain.User]{}, err
 	}
@@ -236,15 +236,20 @@ func (r *Repository) SetAuthorities(ctx context.Context, input domain.SetAuthori
 }
 
 func mapUser(user platformdb.SysUser) domain.User {
+	authorityIDs := make([]uint, 0, len(user.Authorities))
+	for _, a := range user.Authorities {
+		authorityIDs = append(authorityIDs, a.AuthorityId)
+	}
 	return domain.User{
-		ID:          user.ID,
-		UUID:        user.UUID.String(),
-		Username:    user.Username,
-		NickName:    user.NickName,
-		HeaderImg:   user.HeaderImg,
-		AuthorityID: user.AuthorityId,
-		Phone:       user.Phone,
-		Email:       user.Email,
-		Enable:      user.Enable,
+		ID:           user.ID,
+		UUID:         user.UUID.String(),
+		Username:     user.Username,
+		NickName:     user.NickName,
+		HeaderImg:    user.HeaderImg,
+		AuthorityID:  user.AuthorityId,
+		AuthorityIDs: authorityIDs,
+		Phone:        user.Phone,
+		Email:        user.Email,
+		Enable:       user.Enable,
 	}
 }

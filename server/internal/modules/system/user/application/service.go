@@ -341,15 +341,25 @@ func (s *Service) SetAuthorities(ctx context.Context, cmd SetAuthoritiesCommand)
 
 func userFromActor(actor platformauth.Actor) SourceUser {
 	return SourceUser{
-		ID:          actor.UserID,
-		Username:    actor.Username,
-		NickName:    actor.NickName,
-		AuthorityID: actor.AuthorityID,
-		Source:      "token",
+		ID:           actor.UserID,
+		Username:     actor.Username,
+		NickName:     actor.NickName,
+		AuthorityID:  actor.AuthorityID,
+		Authorities:  []AuthorityRef{{AuthorityId: actor.AuthorityID}},
+		AuthorityIds: []uint{actor.AuthorityID},
+		Source:       "token",
 	}
 }
 
 func userFromDomain(user domain.User) SourceUser {
+	authorityIDs := user.AuthorityIDs
+	if len(authorityIDs) == 0 && user.AuthorityID != 0 {
+		authorityIDs = []uint{user.AuthorityID}
+	}
+	authorities := make([]AuthorityRef, 0, len(authorityIDs))
+	for _, id := range authorityIDs {
+		authorities = append(authorities, AuthorityRef{AuthorityId: id})
+	}
 	return SourceUser{
 		ID:           user.ID,
 		UUID:         user.UUID,
@@ -358,11 +368,11 @@ func userFromDomain(user domain.User) SourceUser {
 		NickName:     user.NickName,
 		HeaderImg:    user.HeaderImg,
 		AuthorityID:  user.AuthorityID,
-		Authorities:  []any{},
-		AuthorityIds: []uint{user.AuthorityID},
+		Authorities:  authorities,
+		AuthorityIds: authorityIDs,
 		Phone:        user.Phone,
 		Email:        user.Email,
-		Enable:      user.Enable,
-		Source:      "database",
+		Enable:       user.Enable,
+		Source:       "database",
 	}
 }
