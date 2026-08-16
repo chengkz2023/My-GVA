@@ -1,6 +1,7 @@
 # v1 → v2 差异文档
 
-面向用过原版 gin-vue-admin（v1）的开发者。目标是避免按 v1 的肌肉记忆写出破坏 v2 架构或约定的代码。架构细节见 `server/docs/how-to-add-module.md` 与 `docs/backend-handoff.md`。
+面向用过原版 gin-vue-admin（v1 时代的写法与习惯）的开发者；v2 即本脚手架 **v2.0.0**（DDD 模块化重构版）。
+目标是避免按 v1 的肌肉记忆写出破坏 v2 架构或约定的代码。架构细节见 `server/docs/how-to-add-module.md` 与 `docs/backend-handoff.md`。
 
 ## 后端差异
 

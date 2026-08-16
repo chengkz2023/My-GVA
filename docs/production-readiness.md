@@ -1,4 +1,4 @@
-# 生产成熟度验收清单（脚手架 v1.0）
+# 生产成熟度验收清单（脚手架 v2.0.0）
 
 来源：`/grill-with-docs` 会话结论（Q1–Q22）。P0 = 脚手架 v1.0 必须达成；P1 = 后续或随客户项目。
 
@@ -40,4 +40,4 @@
 
 每批改动：后端 `go build ./...` + `go test ./internal/...`，前端 `npm run build`，通过后立即提交（conventional commits）。
 
-P0 全部完成于 v1.0.0 之后的 hardening 批次，详见 `CHANGELOG.md` 的 Unreleased。
+P0 全部完成并随 **v2.0.0** 发布，详见 `CHANGELOG.md` 的 `[v2.0.0]`。

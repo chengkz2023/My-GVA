@@ -1,7 +1,7 @@
 package buildinfo
 
 const (
-	Version     = "v1.0.0"
+	Version     = "v2.0.0"
 	AppName     = "BoyKing Admin"
 	Description = "模块化后台管理脚手架"
 )
