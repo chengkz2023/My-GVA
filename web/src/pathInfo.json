@@ -31,6 +31,7 @@
   "/src/view/superAdmin/authority/components/apis.vue": "Apis",
   "/src/view/superAdmin/authority/components/datas.vue": "Datas",
   "/src/view/superAdmin/authority/components/menus.vue": "Menus",
+  "/src/view/superAdmin/dictionary/dictionary.vue": "Dictionary",
   "/src/view/superAdmin/index.vue": "SuperAdmin",
   "/src/view/superAdmin/menu/components/components-cascader.vue": "ComponentsCascader",
   "/src/view/superAdmin/menu/icon.vue": "Icon",
