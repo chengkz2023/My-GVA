@@ -13,6 +13,7 @@ import (
 	apphttp "github.com/chengkz2023/My-GVA/server/internal/interfaces/http"
 	"github.com/chengkz2023/My-GVA/server/internal/interfaces/http/middleware"
 	"github.com/chengkz2023/My-GVA/server/internal/modules"
+	"github.com/chengkz2023/My-GVA/server/internal/platform/audit"
 	"github.com/chengkz2023/My-GVA/server/internal/platform/buildinfo"
 	platformdb "github.com/chengkz2023/My-GVA/server/internal/platform/database"
 	"github.com/gin-gonic/gin"
@@ -44,15 +45,15 @@ func Router(c *container.Container) *gin.Engine {
 
 func apiConfig(c *container.Container) apphttp.Config {
 	return apphttp.Config{
-		DB:       c.DB,
-		Logger:   c.Logger,
-		Enforcer: c.Enforcer,
+		AuditSink: audit.NewMySQLSink(c.DB),
+		Logger:    c.Logger,
+		Enforcer:  c.Enforcer,
 		JWT: middleware.JWTConfig{
 			ExpiresTime: c.Config.JWT.ExpiresTime,
 			BufferTime:  c.Config.JWT.BufferTime,
 			SigningKey:  c.Config.JWT.SigningKey,
 			BlacklistCheck: func(token string) bool {
-				return platformdb.IsJwtBlacklisted(c.DB, token)
+				return platformdb.IsJwtBlacklistedCached(c.DB, c.BlackCache, token)
 			},
 		},
 	}

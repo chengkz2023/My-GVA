@@ -7,6 +7,7 @@ import (
 	apimysql "github.com/chengkz2023/My-GVA/server/internal/modules/system/api/infrastructure/mysql"
 	platformauth "github.com/chengkz2023/My-GVA/server/internal/platform/auth"
 	platformdb "github.com/chengkz2023/My-GVA/server/internal/platform/database"
+	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 	"go.uber.org/zap"
 	"gorm.io/gorm"
@@ -51,7 +52,15 @@ func seedAdminUser(db *gorm.DB, log *zap.Logger) {
 		return
 	}
 	initialPassword := os.Getenv("ADMIN_INITIAL_PASSWORD")
-	if initialPassword == "" {
+	switch {
+	case initialPassword != "":
+		policyErr := platformauth.DefaultPasswordPolicy{}.Validate(initialPassword)
+		if policyErr != nil {
+			log.Fatal("ADMIN_INITIAL_PASSWORD does not satisfy the password policy", zap.Error(policyErr))
+		}
+	case gin.Mode() == gin.ReleaseMode:
+		log.Fatal("ADMIN_INITIAL_PASSWORD is required in release mode — refusing to seed admin with a default password")
+	default:
 		initialPassword = "123456"
 		log.Warn("ADMIN_INITIAL_PASSWORD not set, using default admin password '123456' — change it immediately")
 	}

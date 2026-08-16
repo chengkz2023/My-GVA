@@ -27,7 +27,7 @@ func NewModule(c *container.Container) *Module {
 			checker = c.AuthorityChecker.CheckAuthorityAuth
 		}
 	}
-	service := application.NewService(repo, platformauth.NewBcryptPasswordHasher(), checker, strict)
+	service := application.NewService(repo, platformauth.NewBcryptPasswordHasher(), checker, strict, platformauth.DefaultPasswordPolicy{})
 	return &Module{
 		handler: userhttp.NewHandler(service),
 	}

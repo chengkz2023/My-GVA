@@ -5,6 +5,7 @@ import (
 	"encoding/hex"
 	"time"
 
+	"github.com/songzhibin97/gkit/cache/local_cache"
 	"gorm.io/gorm"
 )
 
@@ -42,4 +43,26 @@ func IsJwtBlacklisted(db *gorm.DB, token string) bool {
 		return false
 	}
 	return count > 0
+}
+
+// IsJwtBlacklistedCached 同 IsJwtBlacklisted，但命中黑名单后写入本地缓存，避免每个请求都查库。
+// cache 为 gkit local_cache.Cache；零值（未初始化）时退化为直接查库。
+// 只缓存「已吊销」的肯定结果——一旦入黑名单即永久失效，缓存不会造成放行窗口。
+func IsJwtBlacklistedCached(db *gorm.DB, cache local_cache.Cache, token string) bool {
+	if db == nil || token == "" {
+		return false
+	}
+	hash := jwtHash(token)
+	if cache != (local_cache.Cache{}) {
+		if v, ok := cache.Get(hash); ok {
+			if b, ok := v.(bool); ok && b {
+				return true
+			}
+		}
+	}
+	blacklisted := IsJwtBlacklisted(db, token)
+	if blacklisted && cache != (local_cache.Cache{}) {
+		cache.SetDefault(hash, true)
+	}
+	return blacklisted
 }

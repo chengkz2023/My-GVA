@@ -5,19 +5,22 @@ import (
 
 	"github.com/chengkz2023/My-GVA/server/config"
 	platformauth "github.com/chengkz2023/My-GVA/server/internal/platform/auth"
+	"github.com/chengkz2023/My-GVA/server/internal/platform/ratelimit"
 	"github.com/chengkz2023/My-GVA/server/internal/platform/response"
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
 )
 
 type Handler struct {
-	service    *Service
-	captchaCfg config.Captcha
-	log        *zap.Logger
+	service      *Service
+	captchaCfg   config.Captcha
+	log          *zap.Logger
+	loginLimiter *ratelimit.Limiter
+	tokenMaxAge  int // 登录 cookie 有效期（秒），读自 jwt.expires-time
 }
 
-func NewHandler(service *Service, captchaCfg config.Captcha, log *zap.Logger) *Handler {
-	return &Handler{service: service, captchaCfg: captchaCfg, log: log}
+func NewHandler(service *Service, captchaCfg config.Captcha, log *zap.Logger, limiter *ratelimit.Limiter, tokenMaxAge int) *Handler {
+	return &Handler{service: service, captchaCfg: captchaCfg, log: log, loginLimiter: limiter, tokenMaxAge: tokenMaxAge}
 }
 
 func (h *Handler) Register(authenticated *gin.RouterGroup, public *gin.RouterGroup) {
@@ -42,16 +45,33 @@ func (h *Handler) Login(c *gin.Context) {
 		response.Error(c, err)
 		return
 	}
+	ipKey := "ip:" + c.ClientIP()
+	userKey := "user:" + req.Username
+	if h.loginLimiter != nil && (!h.loginLimiter.Allow(ipKey) || !h.loginLimiter.Allow(userKey)) {
+		response.Fail(c, 429, 7, "请求过于频繁，请稍后再试")
+		return
+	}
 	if !VerifyCaptcha(req.CaptchaId, req.Captcha, h.captchaCfg.OpenCaptcha) {
+		if h.loginLimiter != nil {
+			h.loginLimiter.Take(ipKey)
+			h.loginLimiter.Take(userKey)
+		}
 		response.Fail(c, 400, 7, "验证码错误")
 		return
 	}
 	result, err := h.service.Login(c.Request.Context(), req.Username, req.Password)
 	if err != nil {
+		if h.loginLimiter != nil {
+			h.loginLimiter.Take(ipKey)
+			h.loginLimiter.Take(userKey)
+		}
 		response.Error(c, err)
 		return
 	}
-	platformauth.SetToken(c, result.Token, 7*24*60*60)
+	if h.loginLimiter != nil {
+		h.loginLimiter.Reset(userKey)
+	}
+	platformauth.SetToken(c, result.Token, h.tokenMaxAge)
 	response.OK(c, result)
 }
 

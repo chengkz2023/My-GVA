@@ -17,13 +17,27 @@ type Service struct {
 	hasher           platformauth.PasswordHasher
 	authorityChecker AuthorityChecker
 	strictAuth       bool
+	passwordPolicy   platformauth.PasswordPolicy
 }
 
-func NewService(repo domain.Repository, hasher platformauth.PasswordHasher, checker AuthorityChecker, strictAuth bool) *Service {
+// NewService 组装用户服务。checker 为角色层级校验（strictAuth 门控），
+// policy 为密码策略接缝（nil 时跳过校验，由模块组装层注入默认实现）。
+func NewService(repo domain.Repository, hasher platformauth.PasswordHasher, checker AuthorityChecker, strictAuth bool, policy platformauth.PasswordPolicy) *Service {
 	if hasher == nil {
 		hasher = platformauth.NewBcryptPasswordHasher()
 	}
-	return &Service{repo: repo, hasher: hasher, authorityChecker: checker, strictAuth: strictAuth}
+	return &Service{repo: repo, hasher: hasher, authorityChecker: checker, strictAuth: strictAuth, passwordPolicy: policy}
+}
+
+// validatePassword 应用密码策略（策略未注入时跳过）。
+func (s *Service) validatePassword(password string) error {
+	if s.passwordPolicy == nil {
+		return nil
+	}
+	if err := s.passwordPolicy.Validate(password); err != nil {
+		return apperrors.WithMessage(apperrors.Validation, err.Error())
+	}
+	return nil
 }
 
 // checkAuthorityScope 校验 targetID（角色 ID）是否在 adminID（调用者角色 ID）的层级作用域内。
@@ -105,6 +119,9 @@ func (s *Service) ChangePassword(ctx context.Context, cmd ChangePasswordCommand)
 	}
 	if cmd.OldPassword == "" || cmd.NewPassword == "" {
 		return ChangePasswordResponse{}, apperrors.WithMessage(apperrors.Validation, "password is required")
+	}
+	if err := s.validatePassword(cmd.NewPassword); err != nil {
+		return ChangePasswordResponse{}, err
 	}
 	if s.repo == nil {
 		return ChangePasswordResponse{}, apperrors.WithMessage(apperrors.Internal, "user repository unavailable")
@@ -251,6 +268,9 @@ func (s *Service) Create(ctx context.Context, cmd CreateUserCommand) (CreateUser
 	if cmd.Username == "" || cmd.Password == "" {
 		return CreateUserResponse{}, apperrors.WithMessage(apperrors.Validation, "username and password are required")
 	}
+	if err := s.validatePassword(cmd.Password); err != nil {
+		return CreateUserResponse{}, err
+	}
 	if cmd.AuthorityID == 0 {
 		return CreateUserResponse{}, apperrors.WithMessage(apperrors.Validation, "authority is required")
 	}
@@ -332,6 +352,9 @@ func (s *Service) ResetPassword(ctx context.Context, cmd ResetPasswordCommand) (
 	}
 	if cmd.UserID == 0 || cmd.Password == "" {
 		return ResetPasswordResponse{}, apperrors.WithMessage(apperrors.Validation, "user id and password are required")
+	}
+	if err := s.validatePassword(cmd.Password); err != nil {
+		return ResetPasswordResponse{}, err
 	}
 	if s.repo == nil {
 		return ResetPasswordResponse{}, apperrors.WithMessage(apperrors.Internal, "user repository unavailable")

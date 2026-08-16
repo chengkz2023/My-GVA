@@ -12,7 +12,7 @@ import (
 )
 
 func TestCurrentFallsBackToActorWhenRepositoryUnavailable(t *testing.T) {
-	service := NewService(&fakeRepository{err: domain.ErrRepositoryUnavailable}, fakeHasher{}, nil, false)
+	service := NewService(&fakeRepository{err: domain.ErrRepositoryUnavailable}, fakeHasher{}, nil, false, nil)
 
 	got, err := service.Current(actorContext())
 	if err != nil {
@@ -34,7 +34,7 @@ func TestCurrentUsesRepositoryUser(t *testing.T) {
 		Phone:       "10086",
 		Email:       "admin@example.com",
 		Enable:      1,
-	}}, fakeHasher{}, nil, false)
+	}}, fakeHasher{}, nil, false, nil)
 
 	got, err := service.Current(actorContext())
 	if err != nil {
@@ -46,7 +46,7 @@ func TestCurrentUsesRepositoryUser(t *testing.T) {
 }
 
 func TestCurrentMissingActor(t *testing.T) {
-	_, err := NewService(nil, fakeHasher{}, nil, false).Current(context.Background())
+	_, err := NewService(nil, fakeHasher{}, nil, false, nil).Current(context.Background())
 	var appErr *apperrors.Error
 	if !errors.As(err, &appErr) || appErr.Kind != apperrors.Unauthorized {
 		t.Fatalf("error = %v, want unauthorized app error", err)
@@ -54,7 +54,7 @@ func TestCurrentMissingActor(t *testing.T) {
 }
 
 func TestCurrentUserNotFound(t *testing.T) {
-	_, err := NewService(&fakeRepository{err: domain.ErrUserNotFound}, fakeHasher{}, nil, false).Current(actorContext())
+	_, err := NewService(&fakeRepository{err: domain.ErrUserNotFound}, fakeHasher{}, nil, false, nil).Current(actorContext())
 	var appErr *apperrors.Error
 	if !errors.As(err, &appErr) || appErr.Kind != apperrors.NotFound {
 		t.Fatalf("error = %v, want not found app error", err)
@@ -73,7 +73,7 @@ func TestListUsers(t *testing.T) {
 		Total:    1,
 		Page:     2,
 		PageSize: 20,
-	}}, fakeHasher{}, nil, false)
+	}}, fakeHasher{}, nil, false, nil)
 
 	got, err := service.List(actorContext(), ListUsersQuery{
 		Page:     pagination.Page{Page: 2, PageSize: 20},
@@ -91,7 +91,7 @@ func TestListUsers(t *testing.T) {
 }
 
 func TestListUsersRepositoryUnavailable(t *testing.T) {
-	service := NewService(&fakeRepository{err: domain.ErrRepositoryUnavailable}, fakeHasher{}, nil, false)
+	service := NewService(&fakeRepository{err: domain.ErrRepositoryUnavailable}, fakeHasher{}, nil, false, nil)
 
 	got, err := service.List(actorContext(), ListUsersQuery{})
 	if err != nil {
@@ -104,7 +104,7 @@ func TestListUsersRepositoryUnavailable(t *testing.T) {
 
 func TestChangePassword(t *testing.T) {
 	repo := &fakeRepository{passwordHash: "hash:old-password"}
-	service := NewService(repo, fakeHasher{}, nil, false)
+	service := NewService(repo, fakeHasher{}, nil, false, nil)
 
 	got, err := service.ChangePassword(actorContext(), ChangePasswordCommand{
 		OldPassword: "old-password",
@@ -122,7 +122,7 @@ func TestChangePassword(t *testing.T) {
 }
 
 func TestChangePasswordWrongOldPassword(t *testing.T) {
-	_, err := NewService(&fakeRepository{passwordHash: "hash:old-password"}, fakeHasher{}, nil, false).ChangePassword(actorContext(), ChangePasswordCommand{
+	_, err := NewService(&fakeRepository{passwordHash: "hash:old-password"}, fakeHasher{}, nil, false, nil).ChangePassword(actorContext(), ChangePasswordCommand{
 		OldPassword: "wrong-password",
 		NewPassword: "new-password",
 	})
@@ -133,7 +133,7 @@ func TestChangePasswordWrongOldPassword(t *testing.T) {
 }
 
 func TestChangePasswordRepositoryUnavailable(t *testing.T) {
-	_, err := NewService(nil, fakeHasher{}, nil, false).ChangePassword(actorContext(), ChangePasswordCommand{
+	_, err := NewService(nil, fakeHasher{}, nil, false, nil).ChangePassword(actorContext(), ChangePasswordCommand{
 		OldPassword: "old-password",
 		NewPassword: "new-password",
 	})
@@ -145,7 +145,7 @@ func TestChangePasswordRepositoryUnavailable(t *testing.T) {
 
 func TestUpdateProfile(t *testing.T) {
 	repo := &fakeRepository{}
-	service := NewService(repo, fakeHasher{}, nil, false)
+	service := NewService(repo, fakeHasher{}, nil, false, nil)
 
 	got, err := service.UpdateProfile(actorContext(), UpdateProfileCommand{
 		NickName:  "New Admin",
@@ -165,7 +165,7 @@ func TestUpdateProfile(t *testing.T) {
 }
 
 func TestUpdateProfileRepositoryUnavailable(t *testing.T) {
-	_, err := NewService(nil, fakeHasher{}, nil, false).UpdateProfile(actorContext(), UpdateProfileCommand{NickName: "New Admin"})
+	_, err := NewService(nil, fakeHasher{}, nil, false, nil).UpdateProfile(actorContext(), UpdateProfileCommand{NickName: "New Admin"})
 	var appErr *apperrors.Error
 	if !errors.As(err, &appErr) || appErr.Kind != apperrors.Internal {
 		t.Fatalf("error = %v, want internal app error", err)
@@ -173,7 +173,7 @@ func TestUpdateProfileRepositoryUnavailable(t *testing.T) {
 }
 
 func TestCreateUser(t *testing.T) {
-	service := NewService(&fakeRepository{user: domain.User{ID: 2, UUID: "new", Username: "newuser", Enable: 1}}, fakeHasher{}, nil, false)
+	service := NewService(&fakeRepository{user: domain.User{ID: 2, UUID: "new", Username: "newuser", Enable: 1}}, fakeHasher{}, nil, false, nil)
 
 	got, err := service.Create(actorContext(), CreateUserCommand{
 		Username:     "newuser",
@@ -192,7 +192,7 @@ func TestCreateUser(t *testing.T) {
 }
 
 func TestCreateUserMissingActor(t *testing.T) {
-	_, err := NewService(&fakeRepository{}, fakeHasher{}, nil, false).Create(context.Background(), CreateUserCommand{Username: "x", Password: "y"})
+	_, err := NewService(&fakeRepository{}, fakeHasher{}, nil, false, nil).Create(context.Background(), CreateUserCommand{Username: "x", Password: "y"})
 	var appErr *apperrors.Error
 	if !errors.As(err, &appErr) || appErr.Kind != apperrors.Unauthorized {
 		t.Fatalf("error = %v, want unauthorized", err)
@@ -200,7 +200,7 @@ func TestCreateUserMissingActor(t *testing.T) {
 }
 
 func TestDeleteUser(t *testing.T) {
-	got, err := NewService(&fakeRepository{}, fakeHasher{}, nil, false).Delete(actorContext(), 99)
+	got, err := NewService(&fakeRepository{}, fakeHasher{}, nil, false, nil).Delete(actorContext(), 99)
 	if err != nil {
 		t.Fatalf("Delete() error = %v", err)
 	}
@@ -210,7 +210,7 @@ func TestDeleteUser(t *testing.T) {
 }
 
 func TestDeleteSelf(t *testing.T) {
-	_, err := NewService(&fakeRepository{}, fakeHasher{}, nil, false).Delete(actorContext(), 1)
+	_, err := NewService(&fakeRepository{}, fakeHasher{}, nil, false, nil).Delete(actorContext(), 1)
 	var appErr *apperrors.Error
 	if !errors.As(err, &appErr) || appErr.Kind != apperrors.Validation {
 		t.Fatalf("error = %v, want validation error", err)
@@ -219,7 +219,7 @@ func TestDeleteSelf(t *testing.T) {
 
 func TestResetPassword(t *testing.T) {
 	repo := &fakeRepository{passwordHash: "old"}
-	got, err := NewService(repo, fakeHasher{}, nil, false).ResetPassword(actorContext(), ResetPasswordCommand{
+	got, err := NewService(repo, fakeHasher{}, nil, false, nil).ResetPassword(actorContext(), ResetPasswordCommand{
 		UserID:   2,
 		Password: "newpass",
 	})
@@ -238,7 +238,7 @@ func TestUpdateByAdminNonStrictSkipsScopeCheck(t *testing.T) {
 	deny := AuthorityChecker(func(ctx context.Context, adminID, targetID uint) error {
 		return errors.New("denied")
 	})
-	service := NewService(&fakeRepository{user: domain.User{ID: 2, Username: "target", AuthorityID: 888}}, fakeHasher{}, deny, false)
+	service := NewService(&fakeRepository{user: domain.User{ID: 2, Username: "target", AuthorityID: 888}}, fakeHasher{}, deny, false, nil)
 
 	got, err := service.UpdateByAdmin(actorContext(), 2, AdminUpdateUserCommand{
 		NickName:     "Updated",
@@ -260,7 +260,7 @@ func TestUpdateByAdminStrictBlocksOutOfScopeRole(t *testing.T) {
 		}
 		return errors.New("out of scope")
 	})
-	service := NewService(&fakeRepository{user: domain.User{ID: 2, Username: "target", AuthorityID: 888}}, fakeHasher{}, checker, true)
+	service := NewService(&fakeRepository{user: domain.User{ID: 2, Username: "target", AuthorityID: 888}}, fakeHasher{}, checker, true, nil)
 
 	_, err := service.UpdateByAdmin(actorContext(), 2, AdminUpdateUserCommand{
 		NickName:     "Updated",
@@ -270,6 +270,37 @@ func TestUpdateByAdminStrictBlocksOutOfScopeRole(t *testing.T) {
 	var appErr *apperrors.Error
 	if !errors.As(err, &appErr) || appErr.Kind != apperrors.Forbidden {
 		t.Fatalf("error = %v, want forbidden app error", err)
+	}
+}
+
+func TestPasswordPolicyRejectsWeakPassword(t *testing.T) {
+	service := NewService(&fakeRepository{}, fakeHasher{}, nil, false, platformauth.DefaultPasswordPolicy{})
+
+	_, err := service.Create(actorContext(), CreateUserCommand{
+		Username:     "newuser",
+		Password:     "short",
+		AuthorityID:  888,
+		AuthorityIDs: []uint{888},
+		Enable:       1,
+	})
+	var appErr *apperrors.Error
+	if !errors.As(err, &appErr) || appErr.Kind != apperrors.Validation {
+		t.Fatalf("error = %v, want validation app error", err)
+	}
+}
+
+func TestPasswordPolicyAllowsStrongPassword(t *testing.T) {
+	service := NewService(&fakeRepository{user: domain.User{ID: 2, Username: "newuser", Enable: 1}}, fakeHasher{}, nil, false, platformauth.DefaultPasswordPolicy{})
+
+	_, err := service.Create(actorContext(), CreateUserCommand{
+		Username:     "newuser",
+		Password:     "strongPass123",
+		AuthorityID:  888,
+		AuthorityIDs: []uint{888},
+		Enable:       1,
+	})
+	if err != nil {
+		t.Fatalf("Create() error = %v, want success", err)
 	}
 }
 
