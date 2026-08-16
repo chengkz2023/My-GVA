@@ -81,14 +81,19 @@ New modules should use platform packages for shared capabilities:
 
 ```
 internal/platform/
-  auth/        → Actor, PasswordHasher
-  authz/       → Authorizer, PolicyProvider, PolicySyncer, AuthorityChecker
-  config/      → Typed config reading
-  database/    → DB connection
-  errors/      → Unified error types (Validation, Unauthorized, Forbidden, NotFound, Conflict, Internal)
-  pagination/  → Page, Result[T]
-  response/    → OK(), Error(), Fail()
-  transaction/ → Manager interface
+  audit/      → 审计输出接缝（Sink 接口 + MySQL 默认实现）
+  auth/       → Actor, Claims, JWT, PasswordHasher, PasswordPolicy
+  authz/      → Authorizer, PolicyProvider, PolicySyncer, AuthorityChecker（Casbin 实现）
+  buildinfo/  → 构建元信息（版本）
+  config/     → Typed config reading + 安全快照（脱敏）
+  dataauth/   → 行级数据权限构造器（Scope）
+  database/   → DB connection + JWT 黑名单
+  errors/     → Unified error types (Validation, Unauthorized, Forbidden, NotFound, Conflict, Internal)
+  logger/     → Zap 日志器
+  pagination/ → Page, Result[T]
+  ratelimit/  → 内存限流器（登录防爆破）
+  response/   → OK(), Error(), Fail()
+  timer/      → 定时任务调度（cron）
 ```
 
 ## PR Checklist

@@ -23,7 +23,7 @@
 
 ## 前端差异
 
-- `view/superAdmin/*` 页面结构基本延续 v1，但**删除了一大批组件与依赖**：文件上传、`wangeditor`、`echarts`、`vue-office`、`vue-cropper`、二维码、拖拽排序、断点续传、`@form-create` 等（详见 CHANGELOG v1.0.0）。
+- `view/superAdmin/*` 页面结构基本延续 v1，但**删除了一大批组件与依赖**：文件上传、`wangeditor`、`echarts`、`vue-office`、`vue-cropper`、二维码、拖拽排序、断点续传、`@form-create` 等（详见 CHANGELOG [v2.0.0]）。
 - 字典管理页面：`view/superAdmin/dictionary/dictionary.vue`（v2 重做，接口与 v1 不同：`/dictionary/*`）。
 - 新增页面：需要菜单种子（name + component 路径约定 `view/...`）+ 角色分配菜单；API 权限在「API 管理 → 同步 API」自动发现。
 - **i18n 接缝**：vue-i18n v11 已接入，新增文案必须走 `t()`；存量硬编码中文不抽取（`docs/i18n.md`）。

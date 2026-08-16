@@ -90,7 +90,7 @@ module/
 ```
 适用模块：`system/auth`、`system/config`、`system/status`、`system/version`
 
-## 全部端点（60 个）
+## 全部端点（61 个）
 
 ### 公开端点
 

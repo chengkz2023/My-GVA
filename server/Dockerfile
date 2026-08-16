@@ -12,7 +12,7 @@ RUN go env -w GO111MODULE=on \
 
 FROM alpine:latest
 
-LABEL MAINTAINER="SliverHorn@sliver_horn@qq.com"
+LABEL MAINTAINER="boyking-admin"
 # 设置时区
 ENV TZ=Asia/Shanghai
 RUN apk update && apk add --no-cache tzdata openntpd \
@@ -23,8 +23,9 @@ WORKDIR /go/src/github.com/chengkz2023/My-GVA/server
 COPY --from=0 /go/src/github.com/chengkz2023/My-GVA/server/server ./
 COPY --from=0 /go/src/github.com/chengkz2023/My-GVA/server/config.yaml ./
 
-# 挂载目录：如果使用了sqlite数据库，容器命令示例：docker run -d -v /宿主机路径/gva.db:/go/src/github.com/chengkz2023/My-GVA/server/gva.db -p 8888:8888 --name gva-server-v1 gva-server:1.0
-# VOLUME ["/go/src/github.com/chengkz2023/My-GVA/server"]
+# 运行时挂载配置与日志目录，例如：
+# docker run -d -v /宿主机/config.yaml:/go/src/github.com/chengkz2023/My-GVA/server/config.yaml \
+#   -v /宿主机/log:/go/src/github.com/chengkz2023/My-GVA/server/log -p 8888:8888 boyking-admin/server:latest
 
 EXPOSE 8888
 ENTRYPOINT ./server -c config.yaml

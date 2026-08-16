@@ -20,10 +20,10 @@ go test ./...                  # all tests
 ├── internal/
 │   ├── app/                   # bootstrap, container, scaffold
 │   ├── interfaces/http/       # router + middleware
-│   ├── modules/               # system + business modules (11 modules, 50 endpoints)
-│   └── platform/              # shared infra (auth/JWT/claims, authz, casbin, config, db, ...)
+│   ├── modules/               # system + business modules (11 modules, 61 endpoints)
+│   └── platform/              # shared infra (audit, auth, authz, dataauth, ratelimit, config, db, ...)
 ├── config/                    # config struct definitions
-└── utils/                     # helpers (timer, token, hash, validator)
+└── configs/                   # config.yaml (safe defaults) + config.example.yaml
 ```
 
 ## Adding a Module

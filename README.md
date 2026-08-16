@@ -55,13 +55,22 @@ server/internal/
 
 ## 文档
 
-- 词汇表：`CONTEXT.md`
-- 决策记录：`docs/adr/`
+推荐阅读顺序（新人 / 团队）：
+
+1. `docs/forking.md` — 模板复制操作手册（fork 后改名与配置，客户项目第一步）
+2. `docs/v1-v2-diff.md` — v1 → v2 差异（老团队必读）
+3. `server/docs/how-to-add-module.md` — 新增模块指南
+4. `docs/frontend-guide.md` — 前端开发指南
+5. `docs/configuration.md` — 配置与环境变量参考
+6. `docs/security-baseline.md` — 安全基线与加固指南
+7. `docs/deployment.md` — 部署约定（同源代理）
+8. `docs/code-review-checklist.md` — 代码评审清单
+9. `docs/release-process.md` — 发布流程（维护者）
+
+参考：
+
+- 词汇表：`CONTEXT.md`；决策记录：`docs/adr/`
 - 生产成熟度验收清单：`docs/production-readiness.md`
-- v1 → v2 差异（老团队必读）：`docs/v1-v2-diff.md`
-- 代码评审清单：`docs/code-review-checklist.md`
 - i18n 接缝与错误码契约：`docs/i18n.md`
-- 部署约定：`docs/deployment.md`
-- 新增模块指南：`server/docs/how-to-add-module.md`
-- 详细 API 列表与架构说明：`docs/backend-handoff.md`
-- 架构蓝图：`docs/backend-architecture-blueprint.md`
+- 现状报告（端点/模块/中间件）：`docs/backend-handoff.md`
+- 架构蓝图（历史规划稿）：`docs/backend-architecture-blueprint.md`
