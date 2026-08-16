@@ -58,3 +58,13 @@ npm run dev                       # 启动 (默认 :8080)，API 代理到 :8888
 - **配置加载**: 命令行 `-c` > 环境变量 `GVA_CONFIG` > Gin 模式匹配 (`config.debug.yaml` > `config.yaml`)，`configs/` 子目录优先
 - **架构测试**: 6 条边界规则自动检查 domain/application/transport/platform 之间的依赖
 - 所有中间件已参数化，零全局依赖
+
+## Agent skills
+
+### Issue tracker
+
+Issue 存放在 GitHub Issues（repo: chengkz2023/My-GVA），统一通过 `gh` CLI 读写。见 `docs/agents/issue-tracker.md`。
+
+### Domain docs
+
+单上下文布局：根 `CONTEXT.md` 为词汇表、`docs/adr/` 为决策记录（文件由 /domain-modeling 按需惰性创建）。见 `docs/agents/domain.md`。
