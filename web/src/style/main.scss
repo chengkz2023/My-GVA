@@ -35,8 +35,24 @@
   @apply w-4 h-4;
 }
 
+/* 全局细滚动条：Chromium 与 Firefox 双兼容，保留可见滚动指示（a11y） */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--el-border-color) transparent;
+}
+
 ::-webkit-scrollbar {
-  @apply hidden;
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--el-border-color);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
 }
 
 .gva-search-box {
@@ -51,9 +67,10 @@
   background: var(--el-color-primary-bg) !important;
 }
 
+/* 不全局压制 outline，保留键盘导航焦点指示；对下拉触发器提供显式焦点样式 */
 .el-dropdown {
-  outline: none;
-  * {
-    outline: none;
+  &:focus-visible {
+    outline: 2px solid var(--el-color-primary);
+    outline-offset: 2px;
   }
 }

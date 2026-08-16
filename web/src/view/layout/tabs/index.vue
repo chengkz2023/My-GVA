@@ -90,10 +90,10 @@
       return false
     }
     let id = ''
-    if (e.srcElement.nodeName === 'SPAN') {
-      id = e.srcElement.offsetParent.id
+    if (e.target.nodeName === 'SPAN') {
+      id = e.target.offsetParent.id
     } else {
-      id = e.srcElement.id
+      id = e.target.id
     }
     if (id) {
       contextMenuVisible.value = true
@@ -373,10 +373,10 @@
       return false
     }
     let id = ''
-    if (e.srcElement.nodeName === 'SPAN') {
-      id = e.srcElement.offsetParent.id
+    if (e.target.nodeName === 'SPAN') {
+      id = e.target.offsetParent.id
     } else {
-      id = e.srcElement.id
+      id = e.target.id
     }
     if (id) {
       removeTab(id.substring(4))

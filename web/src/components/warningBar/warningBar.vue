@@ -25,9 +25,26 @@
     }
   })
 
+  const safeHref = () => {
+    const value = prop.href
+    if (!value) {
+      return ''
+    }
+    try {
+      const url = new URL(value, window.location.origin)
+      if (url.protocol === 'http:' || url.protocol === 'https:') {
+        return url.href
+      }
+    } catch {
+      return ''
+    }
+    return ''
+  }
+
   const open = () => {
-    if (prop.href) {
-      window.open(prop.href)
+    const target = safeHref()
+    if (target) {
+      window.open(target, '_blank', 'noopener,noreferrer')
     }
   }
 </script>
