@@ -5,6 +5,7 @@ import (
 	"strconv"
 
 	apimysql "github.com/chengkz2023/My-GVA/server/internal/modules/system/api/infrastructure/mysql"
+	dictionarymysql "github.com/chengkz2023/My-GVA/server/internal/modules/system/dictionary/infrastructure/mysql"
 	platformauth "github.com/chengkz2023/My-GVA/server/internal/platform/auth"
 	platformdb "github.com/chengkz2023/My-GVA/server/internal/platform/database"
 	"github.com/gin-gonic/gin"
@@ -26,6 +27,7 @@ func EnsureSystemSeedData(db *gorm.DB, log *zap.Logger) {
 	seedAdminUser(db, log)
 	seedMenus(db, log)
 	seedAPIs(db, log)
+	seedDictionaries(db, log)
 	log.Info("seed data complete")
 }
 
@@ -126,6 +128,11 @@ func seedMenus(db *gorm.DB, log *zap.Logger) {
 			Component: "view/superAdmin/operation/sysOperationRecord.vue", Sort: 5,
 			Meta: platformdb.Meta{Title: "操作历史", Icon: "pie-chart"},
 		},
+		{
+			ParentId: 1, Path: "dictionary", Name: "dictionary", Hidden: false,
+			Component: "view/superAdmin/dictionary/dictionary.vue", Sort: 6,
+			Meta: platformdb.Meta{Title: "字典管理", Icon: "notebook"},
+		},
 	}
 	for i := range menus {
 		if err := db.Create(&menus[i]).Error; err != nil {
@@ -176,11 +183,44 @@ func seedAPIs(db *gorm.DB, log *zap.Logger) {
 		{Path: "/system/api/batch-sync", Description: "批量同步API", ApiGroup: "api", Method: "POST"},
 		{Path: "/system/operation-record/list", Description: "操作记录列表", ApiGroup: "operation-record", Method: "GET"},
 		{Path: "/system/operation-record/batch-delete", Description: "批量删除", ApiGroup: "operation-record", Method: "POST"},
+		{Path: "/dictionary/list", Description: "字典列表", ApiGroup: "dictionary", Method: "GET"},
+		{Path: "/dictionary/types", Description: "字典引用数据", ApiGroup: "dictionary", Method: "GET"},
+		{Path: "/dictionary", Description: "创建字典", ApiGroup: "dictionary", Method: "POST"},
+		{Path: "/dictionary/:id", Description: "更新字典", ApiGroup: "dictionary", Method: "PUT"},
+		{Path: "/dictionary/:id", Description: "删除字典", ApiGroup: "dictionary", Method: "DELETE"},
+		{Path: "/dictionary/details", Description: "字典项列表", ApiGroup: "dictionary", Method: "GET"},
+		{Path: "/dictionary/details", Description: "创建字典项", ApiGroup: "dictionary", Method: "POST"},
+		{Path: "/dictionary/details/:id", Description: "更新字典项", ApiGroup: "dictionary", Method: "PUT"},
+		{Path: "/dictionary/details/:id", Description: "删除字典项", ApiGroup: "dictionary", Method: "DELETE"},
 		{Path: "/system/config/info", Description: "系统配置", ApiGroup: "config", Method: "GET"},
 		{Path: "/system/status/info", Description: "服务状态", ApiGroup: "status", Method: "GET"},
 		{Path: "/system/version/info", Description: "版本信息", ApiGroup: "version", Method: "GET"},
 	}
 	for _, api := range apis {
 		db.Where("path = ? AND method = ?", api.Path, api.Method).FirstOrCreate(&api)
+	}
+}
+
+// seedDictionaries 种一个示例字典（性别），展示字典管理的完整用法。
+func seedDictionaries(db *gorm.DB, log *zap.Logger) {
+	var count int64
+	db.Model(&dictionarymysql.SysDictionary{}).Where("type = ?", "gender").Count(&count)
+	if count > 0 {
+		return
+	}
+	dictionary := dictionarymysql.SysDictionary{Type: "gender", Name: "性别", Sort: 1, Status: 1}
+	if err := db.Create(&dictionary).Error; err != nil {
+		log.Error("seed dictionary failed", zap.Error(err))
+		return
+	}
+	details := []dictionarymysql.SysDictionaryDetail{
+		{DictionaryID: dictionary.ID, Label: "男", Value: "male", Sort: 1, Status: 1},
+		{DictionaryID: dictionary.ID, Label: "女", Value: "female", Sort: 2, Status: 1},
+		{DictionaryID: dictionary.ID, Label: "未知", Value: "unknown", Sort: 3, Status: 1},
+	}
+	for i := range details {
+		if err := db.Create(&details[i]).Error; err != nil {
+			log.Error("seed dictionary detail failed", zap.Error(err))
+		}
 	}
 }

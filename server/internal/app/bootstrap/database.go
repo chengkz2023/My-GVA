@@ -3,6 +3,7 @@ package bootstrap
 import (
 	adapter "github.com/casbin/gorm-adapter/v3"
 	apimysql "github.com/chengkz2023/My-GVA/server/internal/modules/system/api/infrastructure/mysql"
+	dictionarymysql "github.com/chengkz2023/My-GVA/server/internal/modules/system/dictionary/infrastructure/mysql"
 	platformdb "github.com/chengkz2023/My-GVA/server/internal/platform/database"
 	"go.uber.org/zap"
 	"gorm.io/gorm"
@@ -17,6 +18,8 @@ func RegisterTables(db *gorm.DB, log *zap.Logger, disableAutoMigrate bool) {
 	tables := []interface{}{
 		apimysql.SysApi{},
 		apimysql.SysIgnoreApi{},
+		dictionarymysql.SysDictionary{},
+		dictionarymysql.SysDictionaryDetail{},
 		platformdb.SysUser{},
 		platformdb.SysBaseMenu{},
 		platformdb.SysAuthority{},

@@ -6,6 +6,7 @@ import (
 	systemapi "github.com/chengkz2023/My-GVA/server/internal/modules/system/api"
 	systemauth "github.com/chengkz2023/My-GVA/server/internal/modules/system/auth"
 	systemconfig "github.com/chengkz2023/My-GVA/server/internal/modules/system/config"
+	systemdictionary "github.com/chengkz2023/My-GVA/server/internal/modules/system/dictionary"
 	systemmenu "github.com/chengkz2023/My-GVA/server/internal/modules/system/menu"
 	operationrecord "github.com/chengkz2023/My-GVA/server/internal/modules/system/operation-record"
 	systemrole "github.com/chengkz2023/My-GVA/server/internal/modules/system/role"
@@ -24,6 +25,7 @@ func NewModule(c *container.Container) *Module {
 			systemapi.NewModule(c),
 			systemauth.NewModule(c),
 			systemconfig.NewModule(c),
+			systemdictionary.NewModule(c),
 			systemmenu.NewModule(c),
 			operationrecord.NewModule(c),
 			systemrole.NewModule(c),
