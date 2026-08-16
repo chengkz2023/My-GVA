@@ -151,14 +151,14 @@
       :close-on-click-modal="false"
       :close-on-press-escape="false"
     >
-      <el-form :model="resetPwdInfo" ref="resetPwdForm" label-width="100px">
+      <el-form :model="resetPwdInfo" ref="resetPwdForm" :rules="resetPwdRules" label-width="100px">
         <el-form-item label="用户账号">
           <el-input v-model="resetPwdInfo.userName" disabled />
         </el-form-item>
         <el-form-item label="用户昵称">
           <el-input v-model="resetPwdInfo.nickName" disabled />
         </el-form-item>
-        <el-form-item label="新密码">
+        <el-form-item label="新密码" prop="password">
           <div class="flex w-full">
             <el-input class="flex-1" v-model="resetPwdInfo.password" placeholder="请输入新密码" show-password />
             <el-button type="primary" @click="generateRandomPassword" style="margin-left: 10px">
@@ -368,6 +368,20 @@
 
   initPage()
 
+  // 与后端 platform/auth.PasswordPolicy 默认策略一致：至少 8 位，含字母和数字
+  const passwordPolicyValidator = (rule, value, callback) => {
+    if (!value) {
+      return callback(new Error('请输入密码'))
+    }
+    if (value.length < 8) {
+      return callback(new Error('密码长度至少 8 位'))
+    }
+    if (!/[a-zA-Z]/.test(value) || !/[0-9]/.test(value)) {
+      return callback(new Error('密码必须同时包含字母和数字'))
+    }
+    return callback()
+  }
+
   // 重置密码对话框相关
   const resetPwdDialog = ref(false)
   const resetPwdForm = ref(null)
@@ -377,14 +391,24 @@
     nickName: '',
     password: ''
   })
+  const resetPwdRules = {
+    password: [
+      { required: true, message: '请输入或生成密码', trigger: 'blur' },
+      { validator: passwordPolicyValidator, trigger: 'blur' }
+    ]
+  }
 
-  // 生成随机密码
+  // 生成随机密码（保证满足策略：至少一个字母和一个数字）
   const generateRandomPassword = () => {
-    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*'
+    const letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz'
+    const digits = '0123456789'
+    const chars = letters + digits + '!@#$%^&*'
     let password = ''
-    for (let i = 0; i < 12; i++) {
+    for (let i = 0; i < 10; i++) {
       password += chars.charAt(Math.floor(Math.random() * chars.length))
     }
+    password += letters.charAt(Math.floor(Math.random() * letters.length))
+    password += digits.charAt(Math.floor(Math.random() * digits.length))
     resetPwdInfo.value.password = password
     // 复制到剪贴板
     navigator.clipboard.writeText(password).then(() => {
@@ -410,32 +434,30 @@
   }
 
   // 确认重置密码
-  const confirmResetPassword = async () => {
-    if (!resetPwdInfo.value.password) {
-      ElMessage({
-        type: 'warning',
-        message: '请输入或生成密码'
-      })
-      return
-    }
+  const confirmResetPassword = () => {
+    resetPwdForm.value.validate(async (valid) => {
+      if (!valid) {
+        return
+      }
 
-    const res = await resetPassword({
-      ID: resetPwdInfo.value.ID,
-      password: resetPwdInfo.value.password
+      const res = await resetPassword({
+        ID: resetPwdInfo.value.ID,
+        password: resetPwdInfo.value.password
+      })
+
+      if (res.code === 0) {
+        ElMessage({
+          type: 'success',
+          message: res.msg || '密码重置成功'
+        })
+        resetPwdDialog.value = false
+      } else {
+        ElMessage({
+          type: 'error',
+          message: res.msg || '密码重置失败'
+        })
+      }
     })
-
-    if (res.code === 0) {
-      ElMessage({
-        type: 'success',
-        message: res.msg || '密码重置成功'
-      })
-      resetPwdDialog.value = false
-    } else {
-      ElMessage({
-        type: 'error',
-        message: res.msg || '密码重置失败'
-      })
-    }
   }
 
   // 关闭重置密码对话框
@@ -486,7 +508,7 @@
     ],
     password: [
       { required: true, message: '请输入用户密码', trigger: 'blur' },
-      { min: 6, message: '最低6位字符', trigger: 'blur' }
+      { validator: passwordPolicyValidator, trigger: 'blur' }
     ],
     nickName: [{ required: true, message: '请输入用户昵称', trigger: 'blur' }],
     phone: [

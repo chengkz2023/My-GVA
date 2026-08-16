@@ -17,9 +17,9 @@ server/                          # Go 1.24+ 后端
 │   │   └── scaffold/            # 模块生成器引擎
 │   ├── interfaces/http/         # HTTP 路由 + 中间件 (jwt, casbin_rbac, error, operation)
 │   ├── modules/
-│   │   ├── system/              # 系统模块 (api, auth, config, menu, operation-record, role, status, user, version)
+│   │   ├── system/              # 系统模块 (api, auth, config, dictionary, menu, operation-record, role, status, user, version)
 │   │   └── business/            # 业务模块 (example — 开发示例，非真实业务)
-│   └── platform/                # 平台共享层 (auth, authz/casbin, buildinfo, config, database, errors, logger, pagination, response, timer)
+│   └── platform/                # 平台共享层 (audit, auth, authz/casbin, buildinfo, config, dataauth, database, errors, logger, pagination, ratelimit, response, timer)
 └── migrations/mysql/            # SQL 迁移文件
 
 web/                             # Vue3 + Element-Plus 前端
@@ -40,7 +40,7 @@ cd server
 go build ./cmd/admin-api          # 构建
 go run ./cmd/admin-api            # 启动 (默认 :8888)
 go run ./cmd/modulegen -name xxx  # 生成新模块
-go test ./internal/...            # 运行所有测试 (26 个包)
+go test ./internal/...            # 运行所有测试 (29 个含测试的包)
 go test ./internal -run TestArchitectureBoundaries -count=1  # 架构边界检查
 
 # 前端
