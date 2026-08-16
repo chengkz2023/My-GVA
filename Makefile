@@ -2,11 +2,11 @@ SHELL = /bin/bash
 
 #SCRIPT_DIR         = $(shell pwd)/etc/script
 #请选择golang版本
-BUILD_IMAGE_SERVER  = golang:1.22
+BUILD_IMAGE_SERVER  = golang:1.24
 #请选择node版本
 BUILD_IMAGE_WEB     = node:20
 #项目名称
-PROJECT_NAME        = github.com/flipped-aurora/gin-vue-admin/server
+PROJECT_NAME        = github.com/chengkz2023/My-GVA/server
 #配置文件目录
 CONFIG_FILE         = config.yaml
 #镜像仓库命名空间
@@ -46,7 +46,7 @@ build-local:
 #本地环境打包前端
 build-web-local:
 	@cd web/ && if [ -d "dist" ];then rm -rf dist; else echo "OK!"; fi \
-	&& yarn config set registry http://mirrors.cloud.tencent.com/npm/ && yarn install && yarn build
+	&& npm install && npm run build
 
 #本地环境打包后端
 build-server-local:

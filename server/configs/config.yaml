@@ -1,8 +1,6 @@
 # -----------------------------------------------------------------------------
-# BoyKing Admin Configuration
-# 1. Basic runtime
-# 2. Security
-# 3. Data storage
+# BoyKing Admin 默认运行配置（安全占位值，clone 后可直接启动）
+# 说明与全部可选项见 config.example.yaml；生产环境请务必修改密钥与数据库凭据。
 # -----------------------------------------------------------------------------
 
 system:
@@ -60,9 +58,3 @@ redis:
   db: 0
   useCluster: false
   clusterAddrs: []
-
-# clickhouse:
-#   addr: 127.0.0.1:9000
-#   database: boyking_admin
-#   username: default
-#   password: ""

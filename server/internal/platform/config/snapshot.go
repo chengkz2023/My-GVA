@@ -6,7 +6,6 @@ type Snapshot struct {
 	MySQL   MySQLSnapshot   `json:"mysql"`
 	Redis   RedisSnapshot   `json:"redis"`
 	Zap     ZapSnapshot     `json:"zap"`
-	CORS    CORSSnapshot    `json:"cors"`
 	Captcha CaptchaSnapshot `json:"captcha"`
 }
 
@@ -62,11 +61,6 @@ type ZapSnapshot struct {
 	ShowLine      bool   `json:"showLine"`
 	LogInConsole  bool   `json:"logInConsole"`
 	RetentionDay  int    `json:"retentionDay"`
-}
-
-type CORSSnapshot struct {
-	Mode           string `json:"mode"`
-	WhitelistCount int    `json:"whitelistCount"`
 }
 
 type CaptchaSnapshot struct {
@@ -127,10 +121,6 @@ func SafeSnapshot(cfg Config) Snapshot {
 			ShowLine:      cfg.Zap.ShowLine,
 			LogInConsole:  cfg.Zap.LogInConsole,
 			RetentionDay:  cfg.Zap.RetentionDay,
-		},
-		CORS: CORSSnapshot{
-			Mode:           cfg.Cors.Mode,
-			WhitelistCount: len(cfg.Cors.Whitelist),
 		},
 		Captcha: CaptchaSnapshot{
 			KeyLong:            cfg.Captcha.KeyLong,
