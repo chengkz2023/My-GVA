@@ -14,6 +14,7 @@ import run from '@/core/gin-vue-admin.js'
 import auth from '@/directive/auth'
 import clickOutSide from '@/directive/clickOutSide'
 import { store } from '@/pinia'
+import i18n from '@/i18n'
 import App from './App.vue'
 import '@/core/error-handel'
 
@@ -25,6 +26,7 @@ app
   .use(run)
   .use(ElementPlus)
   .use(store)
+  .use(i18n)
   .use(auth)
   .use(clickOutSide)
   .use(router)

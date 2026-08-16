@@ -852,3 +852,33 @@ if s.repo == nil {
 - [ ] 在 `internal/modules/modules.go` 中注册模块
 - [ ] 路由注册到正确的 group（Public vs Authenticated）
 - [ ] 模块包可编译：`go build ./internal/modules/business/xxx/...`
+- [ ] application Service 新方法配单元测试；handler 配路由测试
+- [ ] 新 API 已登记：`sys_apis`（seed 或「同步API」）+ 角色分配策略，否则 403
+- [ ] 业务表迁移：版本化 SQL 文件 `server/migrations/mysql/0001_xxx.sql`（见 `docs/adr/0003-migration-split.md`，业务表禁止依赖 AutoMigrate）
+- [ ] 新前端页面文案走 `t()`（见 `docs/i18n.md`）
+- [ ] 涉及密码的模块走 `platform/auth.PasswordPolicy`（见 user 模块）
+- [ ] 需要按角色过滤数据行的查询使用 `platform/dataauth.Scope`（见 example 模块 ScopedList）
+
+---
+
+## 平台能力与约定（P0 验收后新增）
+
+脚手架提供以下横切能力，业务模块按需接入：
+
+| 能力 | 包 | 用法 |
+|------|----|------|
+| 结构化错误 | `platform/errors` | `apperrors.WithMessage(kind, msg)`；契约见 `docs/i18n.md` |
+| 分页 | `platform/pagination` | `pagination.Normalize` + `Result[T]` |
+| 当前用户 | `platform/auth` | `platformauth.ActorFromContext(ctx)` |
+| 密码策略接缝 | `platform/auth.PasswordPolicy` | 注入默认实现，客户项目可替换（等保复杂度） |
+| 登录防爆破 | `platform/ratelimit` | 在登录类 handler 按 IP/账号双维度 Allow/Take/Reset |
+| 审计输出接缝 | `platform/audit.Sink` | 写操作由框架中间件统一记录；替换 Sink 可接 syslog/ELK |
+| 行级数据权限 | `platform/dataauth.Scope` | `Scope(db, "dept_id", ids)`；ids 从角色数据权限映射解析（角色模块 SetDataAuthority） |
+| 字典引用 | `GET /dictionary/types` | 业务模块枚举值集中维护（`system/dictionary` 模块） |
+
+## 约定速记
+
+- 系统表由 AutoMigrate 维护，业务表走 SQL 迁移（ADR-0003）
+- 前端新增文案走 vue-i18n `t()`，存量中文不动（`docs/i18n.md`）
+- 部署走同源代理，无 CORS（`docs/deployment.md`）
+- 评审时对照 `docs/code-review-checklist.md`

@@ -5,32 +5,32 @@
       <div class="gva-btn-list">
         <el-input
           v-model="searchInfo.type"
-          placeholder="字典类型"
+          :placeholder="t('dictionary.type')"
           clearable
           style="width: 200px"
           @keyup.enter="getTableData"
           @clear="getTableData"
         />
-        <el-button type="primary" icon="search" @click="getTableData">搜索</el-button>
-        <el-button type="primary" icon="plus" @click="openDictForm()">新增字典</el-button>
+        <el-button type="primary" icon="search" @click="getTableData">{{ t('dictionary.search') }}</el-button>
+        <el-button type="primary" icon="plus" @click="openDictForm()">{{ t('dictionary.add') }}</el-button>
       </div>
       <el-table :data="tableData" row-key="id" style="width: 100%">
         <el-table-column label="ID" min-width="80" prop="id" />
-        <el-table-column label="字典类型" min-width="140" prop="type" />
-        <el-table-column label="字典名称" min-width="140" prop="name" />
-        <el-table-column label="排序" min-width="80" prop="sort" />
-        <el-table-column label="状态" min-width="90">
+        <el-table-column :label="t('dictionary.type')" min-width="140" prop="type" />
+        <el-table-column :label="t('dictionary.name')" min-width="140" prop="name" />
+        <el-table-column :label="t('dictionary.sort')" min-width="80" prop="sort" />
+        <el-table-column :label="t('dictionary.status')" min-width="90">
           <template #default="scope">
             <el-tag :type="scope.row.status === 1 ? 'success' : 'info'">
-              {{ scope.row.status === 1 ? '启用' : '禁用' }}
+              {{ scope.row.status === 1 ? t('dictionary.enabled') : t('dictionary.disabled') }}
             </el-tag>
           </template>
         </el-table-column>
         <el-table-column align="left" label="操作" min-width="260">
           <template #default="scope">
-            <el-button icon="tickets" type="primary" link @click="openDetailDrawer(scope.row)">字典项</el-button>
-            <el-button icon="edit" type="primary" link @click="openDictForm(scope.row)">编辑</el-button>
-            <el-button icon="delete" type="primary" link @click="removeDict(scope.row)">删除</el-button>
+            <el-button icon="tickets" type="primary" link @click="openDetailDrawer(scope.row)">{{ t('dictionary.details') }}</el-button>
+            <el-button icon="edit" type="primary" link @click="openDictForm(scope.row)">{{ t('dictionary.edit') }}</el-button>
+            <el-button icon="delete" type="primary" link @click="removeDict(scope.row)">{{ t('dictionary.delete') }}</el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -53,23 +53,23 @@
         <div class="flex justify-between items-center">
           <span class="text-lg">{{ dictFormTitle }}</span>
           <div>
-            <el-button @click="dictFormVisible = false">取 消</el-button>
-            <el-button type="primary" @click="submitDictForm">确 定</el-button>
+            <el-button @click="dictFormVisible = false">{{ t('dictionary.cancel') }}</el-button>
+            <el-button type="primary" @click="submitDictForm">{{ t('dictionary.confirm') }}</el-button>
           </div>
         </div>
       </template>
       <el-form ref="dictFormRef" :model="dictForm" :rules="dictRules" label-width="90px">
-        <el-form-item label="字典类型" prop="type">
-          <el-input v-model="dictForm.type" :disabled="dictFormType === 'edit'" autocomplete="off" placeholder="如 gender" />
+        <el-form-item :label="t('dictionary.type')" prop="type">
+          <el-input v-model="dictForm.type" :disabled="dictFormType === 'edit'" autocomplete="off" :placeholder="t('dictionary.typePlaceholder')" />
         </el-form-item>
-        <el-form-item label="字典名称" prop="name">
-          <el-input v-model="dictForm.name" autocomplete="off" placeholder="如 性别" />
+        <el-form-item :label="t('dictionary.name')" prop="name">
+          <el-input v-model="dictForm.name" autocomplete="off" :placeholder="t('dictionary.namePlaceholder')" />
         </el-form-item>
-        <el-form-item label="排序" prop="sort">
+        <el-form-item :label="t('dictionary.sort')" prop="sort">
           <el-input-number v-model="dictForm.sort" :min="0" />
         </el-form-item>
-        <el-form-item label="状态" prop="status">
-          <el-switch v-model="dictForm.status" :active-value="1" :inactive-value="2" active-text="启用" inactive-text="禁用" />
+        <el-form-item :label="t('dictionary.status')" prop="status">
+          <el-switch v-model="dictForm.status" :active-value="1" :inactive-value="2" :active-text="t('dictionary.enabled')" :inactive-text="t('dictionary.disabled')" />
         </el-form-item>
       </el-form>
     </el-drawer>
@@ -78,28 +78,28 @@
     <el-drawer v-model="detailDrawerVisible" :size="appStore.drawerSize" :show-close="false">
       <template #header>
         <div class="flex justify-between items-center">
-          <span class="text-lg">{{ activeDict.name }}（{{ activeDict.type }}）字典项</span>
+          <span class="text-lg">{{ activeDict.name }}（{{ activeDict.type }}）{{ t('dictionary.details') }}</span>
           <div>
-            <el-button @click="detailDrawerVisible = false">关 闭</el-button>
-            <el-button type="primary" icon="plus" @click="openDetailForm()">新增字典项</el-button>
+            <el-button @click="detailDrawerVisible = false">{{ t('dictionary.close') }}</el-button>
+            <el-button type="primary" icon="plus" @click="openDetailForm()">{{ t('dictionary.addDetail') }}</el-button>
           </div>
         </div>
       </template>
       <el-table :data="detailData" row-key="id" style="width: 100%">
-        <el-table-column label="显示值" min-width="120" prop="label" />
-        <el-table-column label="存储值" min-width="120" prop="value" />
-        <el-table-column label="排序" min-width="80" prop="sort" />
-        <el-table-column label="状态" min-width="90">
+        <el-table-column :label="t('dictionary.label')" min-width="120" prop="label" />
+        <el-table-column :label="t('dictionary.value')" min-width="120" prop="value" />
+        <el-table-column :label="t('dictionary.sort')" min-width="80" prop="sort" />
+        <el-table-column :label="t('dictionary.status')" min-width="90">
           <template #default="scope">
             <el-tag :type="scope.row.status === 1 ? 'success' : 'info'">
-              {{ scope.row.status === 1 ? '启用' : '禁用' }}
+              {{ scope.row.status === 1 ? t('dictionary.enabled') : t('dictionary.disabled') }}
             </el-tag>
           </template>
         </el-table-column>
-        <el-table-column align="left" label="操作" min-width="140">
+        <el-table-column align="left" min-width="140">
           <template #default="scope">
-            <el-button icon="edit" type="primary" link @click="openDetailForm(scope.row)">编辑</el-button>
-            <el-button icon="delete" type="primary" link @click="removeDetail(scope.row)">删除</el-button>
+            <el-button icon="edit" type="primary" link @click="openDetailForm(scope.row)">{{ t('dictionary.edit') }}</el-button>
+            <el-button icon="delete" type="primary" link @click="removeDetail(scope.row)">{{ t('dictionary.delete') }}</el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -108,22 +108,22 @@
     <!-- 字典项表单弹窗 -->
     <el-dialog v-model="detailFormVisible" :title="detailFormTitle" width="480px">
       <el-form ref="detailFormRef" :model="detailForm" :rules="detailRules" label-width="90px">
-        <el-form-item label="显示值" prop="label">
-          <el-input v-model="detailForm.label" autocomplete="off" placeholder="如 男" />
+        <el-form-item :label="t('dictionary.label')" prop="label">
+          <el-input v-model="detailForm.label" autocomplete="off" :placeholder="t('dictionary.labelPlaceholder')" />
         </el-form-item>
-        <el-form-item label="存储值" prop="value">
-          <el-input v-model="detailForm.value" autocomplete="off" placeholder="如 male" />
+        <el-form-item :label="t('dictionary.value')" prop="value">
+          <el-input v-model="detailForm.value" autocomplete="off" :placeholder="t('dictionary.valuePlaceholder')" />
         </el-form-item>
-        <el-form-item label="排序" prop="sort">
+        <el-form-item :label="t('dictionary.sort')" prop="sort">
           <el-input-number v-model="detailForm.sort" :min="0" />
         </el-form-item>
-        <el-form-item label="状态" prop="status">
-          <el-switch v-model="detailForm.status" :active-value="1" :inactive-value="2" active-text="启用" inactive-text="禁用" />
+        <el-form-item :label="t('dictionary.status')" prop="status">
+          <el-switch v-model="detailForm.status" :active-value="1" :inactive-value="2" :active-text="t('dictionary.enabled')" :inactive-text="t('dictionary.disabled')" />
         </el-form-item>
       </el-form>
       <template #footer>
-        <el-button @click="detailFormVisible = false">取 消</el-button>
-        <el-button type="primary" @click="submitDetailForm">确 定</el-button>
+        <el-button @click="detailFormVisible = false">{{ t('dictionary.cancel') }}</el-button>
+        <el-button type="primary" @click="submitDetailForm">{{ t('dictionary.confirm') }}</el-button>
       </template>
     </el-dialog>
   </div>
@@ -143,11 +143,15 @@
   import WarningBar from '@/components/warningBar/warningBar.vue'
   import { useAppStore } from '@/pinia'
   import { ref } from 'vue'
+  import { useI18n } from 'vue-i18n'
   import { ElMessage, ElMessageBox } from 'element-plus'
 
   defineOptions({
     name: 'Dictionary'
   })
+
+  // i18n 接缝示范：本页全部 UI 文案走 t()（见 docs/i18n.md）
+  const { t } = useI18n()
 
   const appStore = useAppStore()
 
@@ -184,7 +188,7 @@
 
   const openDictForm = (row) => {
     dictFormType.value = row ? 'edit' : 'add'
-    dictFormTitle.value = row ? '编辑字典' : '新增字典'
+    dictFormTitle.value = row ? t('dictionary.editDict') : t('dictionary.add')
     dictForm.value = row
       ? { id: row.id, type: row.type, name: row.name, sort: row.sort, status: row.status }
       : { id: 0, type: '', name: '', sort: 0, status: 1 }
@@ -199,14 +203,14 @@
       if (dictFormType.value === 'add') {
         const res = await createDictionary(dictForm.value)
         if (res.code === 0) {
-          ElMessage({ type: 'success', message: '添加成功' })
+          ElMessage({ type: 'success', message: t('dictionary.addSuccess') })
           dictFormVisible.value = false
           getTableData()
         }
       } else {
         const res = await updateDictionary(dictForm.value.id, dictForm.value)
         if (res.code === 0) {
-          ElMessage({ type: 'success', message: '更新成功' })
+          ElMessage({ type: 'success', message: t('dictionary.updateSuccess') })
           dictFormVisible.value = false
           getTableData()
         }
@@ -215,20 +219,20 @@
   }
 
   const removeDict = (row) => {
-    ElMessageBox.confirm(`删除字典「${row.name}」将同时删除其全部字典项，是否继续？`, '提示', {
-      confirmButtonText: '确定',
-      cancelButtonText: '取消',
+    ElMessageBox.confirm(t('dictionary.confirmDeleteDict', { name: row.name }), t('dictionary.tip'), {
+      confirmButtonText: t('dictionary.confirm').trim(),
+      cancelButtonText: t('dictionary.cancel').trim(),
       type: 'warning'
     })
       .then(async () => {
         const res = await deleteDictionary(row.id)
         if (res.code === 0) {
-          ElMessage({ type: 'success', message: '删除成功' })
+          ElMessage({ type: 'success', message: t('dictionary.deleteSuccess') })
           getTableData()
         }
       })
       .catch(() => {
-        ElMessage({ type: 'info', message: '已取消删除' })
+        ElMessage({ type: 'info', message: t('dictionary.deleteCanceled') })
       })
   }
 
@@ -262,7 +266,7 @@
 
   const openDetailForm = (row) => {
     detailFormType.value = row ? 'edit' : 'add'
-    detailFormTitle.value = row ? '编辑字典项' : '新增字典项'
+    detailFormTitle.value = row ? t('dictionary.editDetail') : t('dictionary.addDetail')
     detailForm.value = row
       ? { id: row.id, dictionaryId: activeDict.value.id, label: row.label, value: row.value, sort: row.sort, status: row.status }
       : { id: 0, dictionaryId: activeDict.value.id, label: '', value: '', sort: 0, status: 1 }
@@ -277,14 +281,14 @@
       if (detailFormType.value === 'add') {
         const res = await createDictionaryDetail(detailForm.value)
         if (res.code === 0) {
-          ElMessage({ type: 'success', message: '添加成功' })
+          ElMessage({ type: 'success', message: t('dictionary.addSuccess') })
           detailFormVisible.value = false
           getDetailData()
         }
       } else {
         const res = await updateDictionaryDetail(detailForm.value.id, detailForm.value)
         if (res.code === 0) {
-          ElMessage({ type: 'success', message: '更新成功' })
+          ElMessage({ type: 'success', message: t('dictionary.updateSuccess') })
           detailFormVisible.value = false
           getDetailData()
         }
@@ -293,20 +297,20 @@
   }
 
   const removeDetail = (row) => {
-    ElMessageBox.confirm(`确定删除字典项「${row.label}」？`, '提示', {
-      confirmButtonText: '确定',
-      cancelButtonText: '取消',
+    ElMessageBox.confirm(t('dictionary.confirmDeleteDetail', { label: row.label }), t('dictionary.tip'), {
+      confirmButtonText: t('dictionary.confirm').trim(),
+      cancelButtonText: t('dictionary.cancel').trim(),
       type: 'warning'
     })
       .then(async () => {
         const res = await deleteDictionaryDetail(row.id)
         if (res.code === 0) {
-          ElMessage({ type: 'success', message: '删除成功' })
+          ElMessage({ type: 'success', message: t('dictionary.deleteSuccess') })
           getDetailData()
         }
       })
       .catch(() => {
-        ElMessage({ type: 'info', message: '已取消删除' })
+        ElMessage({ type: 'info', message: t('dictionary.deleteCanceled') })
       })
   }
 </script>

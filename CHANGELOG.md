@@ -12,7 +12,14 @@
 
 ### P0 生产成熟度硬化（docs/production-readiness.md）
 
-进行中。
+- 仓库卫生：跟踪安全默认 `config.yaml`、`server/.env.example`、CHANGELOG、Makefile 修正、web Dockerfile 改 npm、删除死 CORS 配置、同源代理部署约定
+- 安全基线：登录防爆破限流（platform/ratelimit）、密码策略接缝（platform/auth.PasswordPolicy）、release 模式强制 `ADMIN_INITIAL_PASSWORD`、验证码默认开启、审计输出接缝（platform/audit.Sink）
+- JWT 黑名单本地缓存；登录 cookie maxAge 读配置
+- 新增字典管理模块（system/dictionary，后端四层 + 前端页面 + 种子示例）
+- 行级数据权限通用模式（platform/dataauth.Scope + example 示范）
+- i18n 接缝：vue-i18n v11 + 字典页示范 + 错误码契约文档
+- 文档包：v1→v2 差异、代码评审清单、模块开发指南扩充、3 个 ADR、CONTEXT 词汇表
+- 依赖：移除 306 个残留包（npm install 修剪）；新增 vue-i18n
 
 ## [v1.0.0]
 

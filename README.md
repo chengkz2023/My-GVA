@@ -58,5 +58,10 @@ server/internal/
 - 词汇表：`CONTEXT.md`
 - 决策记录：`docs/adr/`
 - 生产成熟度验收清单：`docs/production-readiness.md`
+- v1 → v2 差异（老团队必读）：`docs/v1-v2-diff.md`
+- 代码评审清单：`docs/code-review-checklist.md`
+- i18n 接缝与错误码契约：`docs/i18n.md`
+- 部署约定：`docs/deployment.md`
+- 新增模块指南：`server/docs/how-to-add-module.md`
 - 详细 API 列表与架构说明：`docs/backend-handoff.md`
 - 架构蓝图：`docs/backend-architecture-blueprint.md`
