@@ -4,6 +4,7 @@ import (
 	"time"
 
 	"github.com/google/uuid"
+	"gorm.io/gorm"
 )
 
 // ========== User types ==========
@@ -32,7 +33,7 @@ type SysUser struct {
 	Phone         string         `json:"phone"  gorm:"comment:用户手机号"`
 	Email         string         `json:"email"  gorm:"comment:用户邮箱"`
 	Enable        int            `json:"enable" gorm:"default:1;comment:用户是否被冻结 1正常 2冻结"`
-	OriginSetting JSONMap `json:"originSetting" form:"originSetting" gorm:"type:text;default:null;column:origin_setting;comment:配置;"`
+	OriginSetting JSONMap        `json:"originSetting" form:"originSetting" gorm:"type:text;default:null;column:origin_setting;comment:配置;"`
 }
 
 func (SysUser) TableName() string {
@@ -78,7 +79,7 @@ func (s *SysUserAuthority) TableName() string {
 type SysAuthority struct {
 	CreatedAt       time.Time       // 创建时间
 	UpdatedAt       time.Time       // 更新时间
-	DeletedAt       *time.Time      `sql:"index"`
+	DeletedAt       gorm.DeletedAt  `gorm:"index"`
 	AuthorityId     uint            `json:"authorityId" gorm:"not null;unique;primary_key;comment:角色ID;size:90"`
 	AuthorityName   string          `json:"authorityName" gorm:"comment:角色名"`
 	ParentId        *uint           `json:"parentId" gorm:"comment:父角色ID"`
@@ -113,13 +114,13 @@ func (s SysAuthorityMenu) TableName() string {
 
 type SysBaseMenu struct {
 	GVA_MODEL
-	MenuLevel     uint                   `json:"-"`
-	ParentId      uint                   `json:"parentId" gorm:"comment:父菜单ID"`
-	Path          string                 `json:"path" gorm:"comment:路由path"`
-	Name          string                 `json:"name" gorm:"comment:路由name"`
-	Hidden        bool                   `json:"hidden" gorm:"comment:是否在列表隐藏"`
-	Component     string                 `json:"component" gorm:"comment:对应前端文件路径"`
-	Sort          int                    `json:"sort" gorm:"comment:排序标记"`
+	MenuLevel     uint   `json:"-"`
+	ParentId      uint   `json:"parentId" gorm:"comment:父菜单ID"`
+	Path          string `json:"path" gorm:"comment:路由path"`
+	Name          string `json:"name" gorm:"comment:路由name"`
+	Hidden        bool   `json:"hidden" gorm:"comment:是否在列表隐藏"`
+	Component     string `json:"component" gorm:"comment:对应前端文件路径"`
+	Sort          int    `json:"sort" gorm:"comment:排序标记"`
 	Meta          `json:"meta" gorm:"embedded"`
 	SysAuthoritys []SysAuthority         `json:"authoritys" gorm:"many2many:sys_authority_menus;"`
 	Children      []SysBaseMenu          `json:"children" gorm:"-"`

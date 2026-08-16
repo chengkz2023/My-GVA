@@ -55,7 +55,7 @@ func (r *Repository) TreeByAuthority(ctx context.Context, authorityID uint) ([]d
 	}
 
 	domainMenus := buildTree(treeMap, 0)
-	return keepScaffoldMenus(domainMenus), nil
+	return domainMenus, nil
 }
 
 func (r *Repository) All(ctx context.Context) ([]domain.Menu, error) {
@@ -304,16 +304,4 @@ func (r *Repository) FindByID(ctx context.Context, id uint) (domain.MenuDetail, 
 		})
 	}
 	return detail, nil
-}
-
-// keepScaffoldMenus retains only the "superAdmin" root node and its descendants.
-// This preserves compatibility with the old keepScaffoldSysMenus behavior.
-// TODO: Revisit when the frontend no longer depends on the "superAdmin" root convention.
-func keepScaffoldMenus(menus []domain.Menu) []domain.Menu {
-	for _, menu := range menus {
-		if menu.Name == "superAdmin" {
-			return []domain.Menu{menu}
-		}
-	}
-	return []domain.Menu{}
 }

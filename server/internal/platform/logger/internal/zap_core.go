@@ -1,13 +1,12 @@
 package internal
 
 import (
-	"fmt"
+	"os"
+	"time"
+
 	"github.com/chengkz2023/My-GVA/server/config"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
-	"os"
-	"strings"
-	"time"
 )
 
 type ZapCore struct {
@@ -56,65 +55,18 @@ func (z *ZapCore) Check(entry zapcore.Entry, check *zapcore.CheckedEntry) *zapco
 	return check
 }
 
+// Write 将日志写入目标。带 business/folder/directory 字段的条目会被路由到
+// 对应子目录：这里只在本次写入范围内选择 core，绝不修改共享的 z.Core，
+// 避免并发日志下的数据竞争（旧实现会替换 z.Core）。
 func (z *ZapCore) Write(entry zapcore.Entry, fields []zapcore.Field) error {
+	core := z.Core
 	for i := 0; i < len(fields); i++ {
 		if fields[i].Key == "business" || fields[i].Key == "folder" || fields[i].Key == "directory" {
 			syncer := z.WriteSyncer(fields[i].String)
-			z.Core = zapcore.NewCore(z.zapCfg.Encoder(), syncer, z.level)
+			core = zapcore.NewCore(z.zapCfg.Encoder(), syncer, z.level)
 		}
 	}
-	// 先写入原日志目标
-	err := z.Core.Write(entry, fields)
-
-	// 捕捉 Error 及以上级别日志并入库，且可提取 zap.Error(err) 的错误内容
-	if entry.Level >= zapcore.ErrorLevel {
-		// 避免与 GORM zap 写入互相递归：跳过由 gorm logger writer 触发的日志
-		if strings.Contains(entry.Caller.File, "gorm_logger_writer.go") {
-			return err
-		}
-
-		// 生成基础信息
-		info := entry.Message
-
-		// 提取 zap.Error(err) 内容
-		var errStr string
-		for i := 0; i < len(fields); i++ {
-			f := fields[i]
-			if f.Type == zapcore.ErrorType || f.Key == "error" || f.Key == "err" {
-				if f.Interface != nil {
-					errStr = fmt.Sprintf("%v", f.Interface)
-				} else if f.String != "" {
-					errStr = f.String
-				}
-				break
-			}
-		}
-		if errStr != "" {
-			info = fmt.Sprintf("%s | 错误: %s", info, errStr)
-		}
-
-		// 附加来源与堆栈信息
-		if entry.Caller.File != "" {
-			info = fmt.Sprintf("%s \n 源文件:%s:%d", info, entry.Caller.File, entry.Caller.Line)
-		}
-		stack := entry.Stack
-		if stack != "" {
-			info = fmt.Sprintf("%s \n 调用栈：%s", info, stack)
-			// 解析最终业务调用方，并提取其方法源码
-			if frame, ok := FindFinalCaller(stack); ok {
-				fnName, fnSrc, sLine, eLine, exErr := ExtractFuncSourceByPosition(frame.File, frame.Line)
-				if exErr == nil {
-					info = fmt.Sprintf("%s \n 最终调用方法:%s:%d (%s lines %d-%d)\n----- 产生日志的方法代码如下 -----\n%s", info, frame.File, frame.Line, fnName, sLine, eLine, fnSrc)
-				} else {
-					info = fmt.Sprintf("%s \n 最终调用方法:%s:%d (%s) | extract_err=%v", info, frame.File, frame.Line, fnName, exErr)
-				}
-			}
-		}
-
-		// 使用后台上下文，避免依赖 gin.Context
-			// SysError persistence removed
-	}
-	return err
+	return core.Write(entry, fields)
 }
 
 func (z *ZapCore) Sync() error {
