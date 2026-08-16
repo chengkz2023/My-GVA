@@ -16,6 +16,7 @@ type Greeting struct {
 	ID        uint
 	Message   string
 	Author    string
+	DeptID    uint // 归属部门：行级数据权限示范字段
 	CreatedAt time.Time
 }
 
@@ -24,10 +25,13 @@ type Greeting struct {
 type Repository interface {
 	FindByID(ctx context.Context, id uint) (Greeting, error)
 	List(ctx context.Context) ([]Greeting, error)
+	// ScopedList 行级数据权限示范：只返回归属部门在 deptIDs 内的数据。
+	ScopedList(ctx context.Context, deptIDs []uint) ([]Greeting, error)
 	Create(ctx context.Context, input CreateInput) (Greeting, error)
 }
 
 type CreateInput struct {
 	Message string
 	Author  string
+	DeptID  uint
 }

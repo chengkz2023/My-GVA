@@ -4,6 +4,7 @@ type GreetingResponse struct {
 	ID        uint   `json:"ID"`
 	Message   string `json:"message"`
 	Author    string `json:"author"`
+	DeptID    uint   `json:"deptId"`
 	CreatedAt string `json:"createdAt"`
 }
 

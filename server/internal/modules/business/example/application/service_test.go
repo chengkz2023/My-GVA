@@ -49,6 +49,20 @@ func TestCreateGreeting(t *testing.T) {
 	}
 }
 
+func TestScopedListFiltersByDept(t *testing.T) {
+	service := NewService(fakeRepo{items: []domain.Greeting{
+		{ID: 1, Message: "dept1", DeptID: 1},
+		{ID: 2, Message: "dept2", DeptID: 2},
+	}})
+	got, err := service.ScopedList(context.Background(), []uint{1})
+	if err != nil {
+		t.Fatalf("ScopedList() error = %v", err)
+	}
+	if len(got.List) != 1 || got.List[0].Message != "dept1" {
+		t.Fatalf("list = %+v, want only dept1 greeting", got.List)
+	}
+}
+
 type fakeRepo struct {
 	items  []domain.Greeting
 	getErr error
@@ -68,6 +82,20 @@ func (f fakeRepo) FindByID(ctx context.Context, id uint) (domain.Greeting, error
 
 func (f fakeRepo) List(ctx context.Context) ([]domain.Greeting, error) {
 	return f.items, nil
+}
+
+func (f fakeRepo) ScopedList(ctx context.Context, deptIDs []uint) ([]domain.Greeting, error) {
+	allowed := make(map[uint]bool, len(deptIDs))
+	for _, id := range deptIDs {
+		allowed[id] = true
+	}
+	var result []domain.Greeting
+	for _, g := range f.items {
+		if allowed[g.DeptID] {
+			result = append(result, g)
+		}
+	}
+	return result, nil
 }
 
 func (f fakeRepo) Create(ctx context.Context, input domain.CreateInput) (domain.Greeting, error) {

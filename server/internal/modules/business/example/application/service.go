@@ -51,6 +51,24 @@ func (s *Service) List(ctx context.Context) (ListGreetingsResponse, error) {
 	return ListGreetingsResponse{List: resp}, nil
 }
 
+// ScopedList 行级数据权限示范：仅返回归属部门在 deptIDs 内的数据。
+// deptIDs 应由调用方从「当前角色的数据权限映射」解析后传入（见角色模块 SetDataAuthority）；
+// 本示例不做角色解析，只演示过滤模式本身。
+func (s *Service) ScopedList(ctx context.Context, deptIDs []uint) (ListGreetingsResponse, error) {
+	if s.repo == nil {
+		return ListGreetingsResponse{List: []GreetingResponse{}}, nil
+	}
+	items, err := s.repo.ScopedList(ctx, deptIDs)
+	if err != nil {
+		return ListGreetingsResponse{}, apperrors.New(apperrors.Internal, 0, "scoped list greetings failed", err)
+	}
+	resp := make([]GreetingResponse, 0, len(items))
+	for _, g := range items {
+		resp = append(resp, greetingToResponse(g))
+	}
+	return ListGreetingsResponse{List: resp}, nil
+}
+
 func (s *Service) Create(ctx context.Context, cmd CreateGreetingCommand) (CreateGreetingResponse, error) {
 	if cmd.Message == "" {
 		return CreateGreetingResponse{}, apperrors.WithMessage(apperrors.Validation, "message is required")
@@ -70,6 +88,7 @@ func greetingToResponse(g domain.Greeting) GreetingResponse {
 		ID:        g.ID,
 		Message:   g.Message,
 		Author:    g.Author,
+		DeptID:    g.DeptID,
 		CreatedAt: g.CreatedAt.Format("2006-01-02 15:04:05"),
 	}
 }

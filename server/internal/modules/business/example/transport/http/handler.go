@@ -2,6 +2,7 @@ package http
 
 import (
 	"strconv"
+	"strings"
 
 	"github.com/chengkz2023/My-GVA/server/internal/modules/business/example/application"
 	apperrors "github.com/chengkz2023/My-GVA/server/internal/platform/errors"
@@ -21,6 +22,7 @@ func NewHandler(service *application.Service) *Handler {
 func (h *Handler) Register(group *gin.RouterGroup) {
 	g := group.Group("/example/greetings")
 	g.GET("", h.List)
+	g.GET("/scoped", h.ScopedList)
 	g.GET("/:id", h.Get)
 	g.POST("", h.Create)
 }
@@ -32,6 +34,31 @@ type createGreetingRequest struct {
 
 func (h *Handler) List(c *gin.Context) {
 	result, err := h.service.List(c.Request.Context())
+	if err != nil {
+		response.Error(c, err)
+		return
+	}
+	response.OK(c, result)
+}
+
+// ScopedList 行级数据权限示范：?deptIds=1,2 只返回这两个部门的数据。
+// 真实业务中 deptIDs 应从当前角色的数据权限映射解析，而不是直接读查询参数。
+func (h *Handler) ScopedList(c *gin.Context) {
+	raw := c.Query("deptIds")
+	var deptIDs []uint
+	for _, part := range strings.Split(raw, ",") {
+		part = strings.TrimSpace(part)
+		if part == "" {
+			continue
+		}
+		id, err := strconv.ParseUint(part, 10, 64)
+		if err != nil {
+			response.Error(c, apperrors.WithMessage(apperrors.Validation, "invalid deptIds"))
+			return
+		}
+		deptIDs = append(deptIDs, uint(id))
+	}
+	result, err := h.service.ScopedList(c.Request.Context(), deptIDs)
 	if err != nil {
 		response.Error(c, err)
 		return

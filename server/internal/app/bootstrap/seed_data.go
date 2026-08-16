@@ -91,12 +91,6 @@ func seedAdminUser(db *gorm.DB, log *zap.Logger) {
 }
 
 func seedMenus(db *gorm.DB, log *zap.Logger) {
-	var count int64
-	db.Model(&platformdb.SysBaseMenu{}).Count(&count)
-	if count > 0 {
-		return
-	}
-
 	menus := []platformdb.SysBaseMenu{
 		{
 			ParentId: 0, Path: "admin", Name: "superAdmin", Hidden: false,
@@ -135,23 +129,21 @@ func seedMenus(db *gorm.DB, log *zap.Logger) {
 		},
 	}
 	for i := range menus {
-		if err := db.Create(&menus[i]).Error; err != nil {
+		// 增量种子：按 name 幂等，老库升级时能补上新菜单
+		if err := db.Where("name = ?", menus[i].Name).FirstOrCreate(&menus[i]).Error; err != nil {
 			log.Error("seed menu failed", zap.Error(err))
 			continue
 		}
-		db.Create(&platformdb.SysAuthorityMenu{
+		authorityMenu := platformdb.SysAuthorityMenu{
 			MenuId:      strconv.Itoa(int(menus[i].ID)),
 			AuthorityId: strconv.Itoa(adminAuthorityID),
-		})
+		}
+		db.Where("sys_base_menu_id = ? AND sys_authority_authority_id = ?",
+			authorityMenu.MenuId, authorityMenu.AuthorityId).FirstOrCreate(&authorityMenu)
 	}
 }
 
 func seedAPIs(db *gorm.DB, log *zap.Logger) {
-	var count int64
-	db.Model(&apimysql.SysApi{}).Count(&count)
-	if count > 0 {
-		return
-	}
 	apis := []apimysql.SysApi{
 		{Path: "/health", Description: "健康检查", ApiGroup: "public", Method: "GET"},
 		{Path: "/login", Description: "登录", ApiGroup: "public", Method: "POST"},
